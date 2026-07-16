@@ -1,0 +1,342 @@
+{
+  "info": {
+    "_postman_id": "37682f1e-bb34-4ddc-a599-d364b910f27d",
+    "name": "sage ai",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3556289"
+  },
+  "item": [
+    {
+      "name": "https://apidev-orion.talentica.com/customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "accept-language",
+            "value": "en-US,en;q=0.9"
+          },
+          {
+            "key": "origin",
+            "value": "https://dev-orion.talentica.com"
+          },
+          {
+            "key": "priority",
+            "value": "u=1, i"
+          },
+          {
+            "key": "referer",
+            "value": "https://dev-orion.talentica.com/"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?0"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"macOS\""
+          },
+          {
+            "key": "sec-fetch-dest",
+            "value": "empty"
+          },
+          {
+            "key": "sec-fetch-mode",
+            "value": "cors"
+          },
+          {
+            "key": "sec-fetch-site",
+            "value": "same-site"
+          },
+          {
+            "key": "user-agent",
+            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+          },
+          {
+            "key": "Cookie",
+            "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
+          }
+        ],
+        "url": {
+          "raw": "https://apidev-orion.talentica.com/customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7",
+          "protocol": "https",
+          "host": [
+            "apidev-orion",
+            "talentica",
+            "com"
+          ],
+          "path": [
+            "customers",
+            "valueAdd",
+            "hardProblemsFinancialYear"
+          ],
+          "query": [
+            {
+              "key": "cycleId",
+              "value": "8,7"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl 'https://apidev-orion.talentica.com/customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -b 'cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA' \\\n  -H 'origin: https://dev-orion.talentica.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://dev-orion.talentica.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'"
+      },
+      "response": []
+    },
+    {
+      "name": "https://apiorion.talentica.com/tech/categories",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "accept-language",
+            "value": "en-US,en;q=0.9"
+          },
+          {
+            "key": "api-key",
+            "value": "53e72eed-6f0b-4d5b-9cc5-088487d969b9"
+          },
+          {
+            "key": "origin",
+            "value": "https://nexus.talentica.com"
+          },
+          {
+            "key": "priority",
+            "value": "u=1, i"
+          },
+          {
+            "key": "referer",
+            "value": "https://nexus.talentica.com/"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?0"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"macOS\""
+          },
+          {
+            "key": "sec-fetch-dest",
+            "value": "empty"
+          },
+          {
+            "key": "sec-fetch-mode",
+            "value": "cors"
+          },
+          {
+            "key": "sec-fetch-site",
+            "value": "same-site"
+          },
+          {
+            "key": "user-agent",
+            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+          },
+          {
+            "key": "Cookie",
+            "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
+          }
+        ],
+        "url": {
+          "raw": "https://apiorion.talentica.com/tech/categories",
+          "protocol": "https",
+          "host": [
+            "apiorion",
+            "talentica",
+            "com"
+          ],
+          "path": [
+            "tech",
+            "categories"
+          ]
+        },
+        "description": "Generated from cURL: curl 'https://apiorion.talentica.com/tech/categories' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'api-key: 53e72eed-6f0b-4d5b-9cc5-088487d969b9' \\\n  -b 'cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA' \\\n  -H 'origin: https://nexus.talentica.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://nexus.talentica.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'"
+      },
+      "response": []
+    },
+    {
+      "name": "https://apiorion.talentica.com/valueAdd/valueAddsByTag?tag=OpenTelemetry",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "accept-language",
+            "value": "en-US,en;q=0.9"
+          },
+          {
+            "key": "api-key",
+            "value": "53e72eed-6f0b-4d5b-9cc5-088487d969b9"
+          },
+          {
+            "key": "origin",
+            "value": "https://nexus.talentica.com"
+          },
+          {
+            "key": "priority",
+            "value": "u=1, i"
+          },
+          {
+            "key": "referer",
+            "value": "https://nexus.talentica.com/"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?0"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"macOS\""
+          },
+          {
+            "key": "sec-fetch-dest",
+            "value": "empty"
+          },
+          {
+            "key": "sec-fetch-mode",
+            "value": "cors"
+          },
+          {
+            "key": "sec-fetch-site",
+            "value": "same-site"
+          },
+          {
+            "key": "user-agent",
+            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+          },
+          {
+            "key": "Cookie",
+            "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
+          }
+        ],
+        "url": {
+          "raw": "https://apiorion.talentica.com/valueAdd/valueAddsByTag?tag=OpenTelemetry",
+          "protocol": "https",
+          "host": [
+            "apiorion",
+            "talentica",
+            "com"
+          ],
+          "path": [
+            "valueAdd",
+            "valueAddsByTag"
+          ],
+          "query": [
+            {
+              "key": "tag",
+              "value": "OpenTelemetry"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl 'https://apiorion.talentica.com/valueAdd/valueAddsByTag?tag=OpenTelemetry' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'api-key: 53e72eed-6f0b-4d5b-9cc5-088487d969b9' \\\n  -b 'cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA' \\\n  -H 'origin: https://nexus.talentica.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://nexus.talentica.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'"
+      },
+      "response": []
+    },
+    {
+      "name": "https://apiorion.talentica.com/technology/getTechDigest/label?techDigestLabel=OpenTelemetry",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json, text/plain, */*"
+          },
+          {
+            "key": "accept-language",
+            "value": "en-US,en;q=0.9"
+          },
+          {
+            "key": "api-key",
+            "value": "53e72eed-6f0b-4d5b-9cc5-088487d969b9"
+          },
+          {
+            "key": "origin",
+            "value": "https://nexus.talentica.com"
+          },
+          {
+            "key": "priority",
+            "value": "u=1, i"
+          },
+          {
+            "key": "referer",
+            "value": "https://nexus.talentica.com/"
+          },
+          {
+            "key": "sec-ch-ua",
+            "value": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\""
+          },
+          {
+            "key": "sec-ch-ua-mobile",
+            "value": "?0"
+          },
+          {
+            "key": "sec-ch-ua-platform",
+            "value": "\"macOS\""
+          },
+          {
+            "key": "sec-fetch-dest",
+            "value": "empty"
+          },
+          {
+            "key": "sec-fetch-mode",
+            "value": "cors"
+          },
+          {
+            "key": "sec-fetch-site",
+            "value": "same-site"
+          },
+          {
+            "key": "user-agent",
+            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+          },
+          {
+            "key": "Cookie",
+            "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
+          }
+        ],
+        "url": {
+          "raw": "https://apiorion.talentica.com/technology/getTechDigest/label?techDigestLabel=OpenTelemetry",
+          "protocol": "https",
+          "host": [
+            "apiorion",
+            "talentica",
+            "com"
+          ],
+          "path": [
+            "technology",
+            "getTechDigest",
+            "label"
+          ],
+          "query": [
+            {
+              "key": "techDigestLabel",
+              "value": "OpenTelemetry"
+            }
+          ]
+        },
+        "description": "Generated from cURL: curl 'https://apiorion.talentica.com/technology/getTechDigest/label?techDigestLabel=OpenTelemetry' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'api-key: 53e72eed-6f0b-4d5b-9cc5-088487d969b9' \\\n  -b 'cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA' \\\n  -H 'origin: https://nexus.talentica.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://nexus.talentica.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'"
+      },
+      "response": []
+    }
+  ]
+}

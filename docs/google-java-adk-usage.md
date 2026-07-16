@@ -1,8 +1,11 @@
-# Google Java ADK Usage — Sage POC
+# Google Java ADK Usage
 
-> **Status:** Pre-implementation architecture guide  
-> **Source of truth for product scope:** [feature-document.md](../feature-document.md)  
-> **Purpose:** How to use [Google ADK for Java](https://google.github.io/adk-docs/get-started/java/) for Sage’s ask-time agent orchestration — concise and implementation-focused.
+> **Status:** Pre-implementation guide  
+> **Architecture:** [architecture.md](architecture.md)  
+> **Product scope:** [feature-document.md](../feature-document.md)  
+> **Orion reference (ingest only):** [orion-api-documentation.md](orion-api-documentation.md)  
+> **Stack:** Java **25** (LTS) · Spring Boot **4.1** · Google ADK 1.5.0 · LangChain4j / Ollama  
+> **Purpose:** How to use [Google ADK for Java](https://google.github.io/adk-docs/get-started/java/) for Sage's ask-time agent orchestration.
 
 ---
 
@@ -12,132 +15,141 @@ Sage answers: *who here already solved this, and where is the proof?* Google Jav
 
 | Layer | Owns | Does not own |
 |-------|------|--------------|
-| **Google Java ADK** | Question → parallel source fetch → Knowledge Card synthesis; request-scoped session/events | PDF ingest, embeddings, GraphRAG index build, REST/SSE transport, Nexus/Orion HTTP clients |
-| **Spring AI (+ Spring Boot)** | Ingestion, local embeddings, GraphRAG/vector retrieval, API clients, chat HTTP/SSE | Agent orchestration logic |
+| **Google Java ADK** | Question → intent classify → Graph RAG retrieve → Knowledge Card synthesis; request-scoped session/events | Orion-metadata ingest, Neo4j, PDF parsing, REST/SSE transport |
+| **Spring Boot 4.1** | Chat HTTP/SSE, Graph RAG HTTP client, web UI, eval entrypoint | Agent orchestration logic; Orion HTTP |
+| **Graph RAG Python** | Orion-metadata sync → Neo4j, `POST /retrieve` | Ask orchestration |
 
-**POC limits (explicit):**
+### Design constraints
 
-- Shallow agent tree — no deep multi-turn reasoning, no `LoopAgent`, no LLM-driven router-of-routers.
-- **Single-turn / request-scoped** sessions only — no cross-turn `MemoryService`.
-- Local LLM via LangChain4j bridge (OpenAI-compatible / Ollama) — Phase-0 spike before wiring agents.
-- Demo-grade, not production HA/auth/RBAC.
+- Shallow agent tree — no `LoopAgent`, no LLM-driven router-of-routers across external sources.
+- **Single-turn / request-scoped** sessions — no `MemoryService`.
+- Local LLM via LangChain4j bridge (Ollama / OpenAI-compatible).
+- Java **never** calls Orion; ask-time evidence comes only from Graph RAG.
 
 ---
 
-## 2. Proposed agent architecture
+## 2. Why Java does not call Orion at ask-time
 
-Deterministic workflow agents control flow; `LlmAgent`s call tools and summarize. Route-first: tools return evidence; synthesis only summarizes and names teams/people.
+Orion metadata is ingested once into Neo4j by the Python service. Ask-time uses `POST /retrieve`, which returns **card-complete** hits (teams, people, summary passage, document handle).
+
+| Need | How it is met |
+|------|----------------|
+| Structured card fields | `/retrieve` `metadata` + `passage` |
+| Technology vs hard-problem bias | Java `IntentClassify` → `intent` on `/retrieve` |
+| Vague / multi-hop question | Graph traversal + vector search inside Graph RAG |
+| Freshness | Bounded by last Orion ingest sync |
+| Service down | Empty hits → honest `gapFlag` (no live Orion fallback) |
+
+Full rationale: [architecture.md §6](architecture.md#6-orion-ingest-vs-ask-time).
+
+---
+
+## 3. ADK ownership boundary
 
 ```mermaid
 flowchart TB
-  subgraph springLayer [Spring AI application shell]
-    ChatAPI[Chat REST SSE]
-    Ingest[PDF ingest and GraphRAG index]
-    NexusClient[Nexus API client]
-    OrionClient[Orion API client]
-    Retriever[GraphRAG / vector retriever]
+  subgraph springShell [Spring_Boot_shell]
+    ChatAPI[Chat_REST_SSE]
+    RagClient[GraphRagApiClient]
   end
 
-  subgraph adkLayer [Google Java ADK ask pipeline]
-    Root[SequentialAgent SageRoot]
-    Parallel[ParallelAgent SourceFetch]
-    NexusAgent[LlmAgent NexusRouter]
-    OrionAgent[LlmAgent OrionExpertise]
-    PdfAgent[LlmAgent PdfRetriever]
-    Synth[LlmAgent KnowledgeCardSynth]
+  subgraph adkPipeline [Google_Java_ADK]
+    Root[SequentialAgent_SageRoot]
+    Intent[LlmAgent_IntentClassify]
+    GraphRag[LlmAgent_GraphRagRetrieve]
+    Synth[LlmAgent_KnowledgeCardSynth]
   end
 
   ChatAPI --> Root
-  Root --> Parallel
-  Parallel --> NexusAgent
-  Parallel --> OrionAgent
-  Parallel --> PdfAgent
+  Root --> Intent
+  Root --> GraphRag
   Root --> Synth
-  NexusAgent -->|FunctionTool| NexusClient
-  OrionAgent -->|FunctionTool| OrionClient
-  PdfAgent -->|FunctionTool| Retriever
-  Ingest --> Retriever
+  GraphRag -->|FunctionTool| RagClient
 ```
 
-**Pipeline shape:** `SageRoot` (`SequentialAgent`) runs `SourceFetch` (`ParallelAgent`) then `KnowledgeCardSynth` (`LlmAgent`).
+**Pipeline:** `SageRoot` (`SequentialAgent`) → `IntentClassify` → `GraphRagRetrieve` → `KnowledgeCardSynth`.
 
 ---
 
-## 3. Required agents and responsibilities
+## 4. Agent architecture
 
-| Agent | ADK type | Responsibility | Features |
-|-------|----------|----------------|----------|
-| `SageRoot` | `SequentialAgent` | Fixed order: parallel fetch → synthesize card | F1 |
-| `SourceFetch` | `ParallelAgent` | Fan-out Nexus + Orion + PDF retrieval concurrently | F2 |
-| `NexusRouter` | `LlmAgent` + tools | Team ↔ tech coverage, hard-problem counts | F2, F3 |
-| `OrionExpertise` | `LlmAgent` + tools | People, solved counts, Orion summaries | F2, F3, F4 |
-| `PdfRetriever` | `LlmAgent` + tools | Call Spring GraphRAG/retriever; passages + doc handles | F2, F4 |
-| `KnowledgeCardSynth` | `LlmAgent` | Merge hits into Knowledge Card; gap flag when empty | F1, F5 |
+### Agent tree
+
+```mermaid
+flowchart TB
+  Root[SageRoot_SequentialAgent]
+  Intent[IntentClassify]
+  GraphRag[GraphRagRetrieve]
+  Synth[KnowledgeCardSynth]
+
+  Root --> Intent
+  Root --> GraphRag
+  Root --> Synth
+```
+
+### Agent responsibility table
+
+| Agent | ADK type | Tool(s) | Session key |
+|-------|----------|---------|-------------|
+| `SageRoot` | `SequentialAgent` | — | — |
+| `IntentClassify` | `LlmAgent` | — | `intent` (`technology` \| `problem` \| `ambiguous`) |
+| `GraphRagRetrieve` | `LlmAgent` | `retrieveFromGraph(query, intent)` | `graph_rag_hits` |
+| `KnowledgeCardSynth` | `LlmAgent` | — | `knowledge_card` |
 
 ### Knowledge Card field mapping
 
 | Card field | Primary producer |
 |------------|------------------|
-| Direct answer | `KnowledgeCardSynth` (from hits) |
-| Team(s) + people | `NexusRouter` + `OrionExpertise` |
-| Evidence / confidence | Nexus/Orion counts via tools |
-| Summary | Orion summary and/or PDF passages (extractive) |
-| Full document | `PdfRetriever` (link/handle) or “no formal doc yet” |
-| Honesty / gap flag | `KnowledgeCardSynth` when all sources empty/irrelevant |
+| Direct answer | `KnowledgeCardSynth` (from hit titles + counts) |
+| Team(s) + people | `GraphRagRetrieve` → `metadata.teams`, `metadata.people` |
+| Evidence / confidence | Hit count + score bands ([architecture.md §11](architecture.md#11-knowledge-card-contract)) |
+| Summary | **`hits[].passage`** (extractive; do not paraphrase) |
+| Full document | `metadata.fileName` / `ticketLink` |
+| Honesty / gap flag | `KnowledgeCardSynth` when `graph_rag_hits` empty |
+| Intent (audit) | `IntentClassify` → echoed on card |
 
-**Instructions stance for all LLM agents:** Prefer tool evidence over generation. Never invent teams, people, or docs. If nothing relevant, say so.
+**Instruction stance:** Prefer tool evidence over generation. Never invent teams, people, or docs.
 
 ---
 
-## 4. Orchestration and workflows
+## 5. Orchestration
 
 ### Task routing
 
-- **Not** an LLM that chooses which source to call.
-- Always run all three source agents in parallel; each tool decides relevance (empty list = no hit).
-- Synthesis interprets combined evidence — this is “routing” in the product sense (which team/doc), not control-flow routing.
+- Intent classification chooses **retrieval bias**, not which external HTTP source to call.
+- There is a single evidence source at ask-time: Graph RAG.
+- Synthesis interprets hit evidence — product routing (which team/doc), not multi-source fan-out.
 
 ### Sequencing
 
 1. Create request-scoped `Session`.
-2. `SourceFetch` completes (all three branches).
-3. `KnowledgeCardSynth` reads session state / prior events and emits the card.
-4. Map final (and optionally intermediate) ADK `Event`s to SSE.
-
-### Parallelism
-
-- `ParallelAgent` runs `NexusRouter`, `OrionExpertise`, `PdfRetriever` concurrently to cut P95 latency.
-- Tools must be thread-safe (stateless Spring beans or request-scoped clients).
-- Partial failure: one source error → empty hits for that source + synth still runs (honest partial card).
+2. `IntentClassify` writes `intent` (`technology` | `problem` | `ambiguous`).
+3. `GraphRagRetrieve` calls `retrieveFromGraph` with the user question and intent.
+4. `KnowledgeCardSynth` reads session state and emits Knowledge Card JSON.
+5. Map ADK `Event`s to SSE (`knowledge_card` event).
 
 ### State management
 
-| Concern | POC choice |
-|---------|------------|
+| Concern | Choice |
+|---------|--------|
 | Session store | `InMemorySessionService` via `InMemoryRunner` |
 | Scope | One `Session` per ask; discard after response |
-| Intermediate results | Session state keys, e.g. `nexus_hits`, `orion_hits`, `pdf_hits` (structured JSON/maps from tools) |
-| Long-term memory | **Do not use** `MemoryService` / `LoadMemoryTool` |
-| Artifacts | Optional: PDF handle as artifact if useful for Dev UI; not required for chat |
+| Intermediate results | `intent`, `graph_rag_hits` |
+| Long-term memory | **Do not use** `MemoryService` |
 
 ---
 
-## 5. ADK components to use
+## 6. ADK components
 
 | Component | Role in Sage |
 |-----------|--------------|
-| `LlmAgent` | Source agents + synthesizer; local model via LangChain4j |
-| `SequentialAgent` | `SageRoot` — fetch then synth |
-| `ParallelAgent` | `SourceFetch` — concurrent sources |
-| `FunctionTool` | Thin wrappers over Spring beans (Nexus, Orion, retriever) |
-| `InMemoryRunner` / `Runner` | Execute root agent from Spring service |
-| `RunConfig` | Per-run options (streaming-friendly defaults) |
-| `Session` + `InMemorySessionService` | Request-scoped conversation/state |
-| ADK `Event` stream (`Flowable`) | Bridge to SSE for F6 |
-| `google-adk-langchain4j` + OpenAI/Ollama chat model | Local LLM (privacy; IP stays on-network) |
-| `google-adk-dev` / `AdkWebServer` | Local agent debugging only — not the product UI |
+| `LlmAgent` | Intent, retrieve, synthesizer; local model via LangChain4j |
+| `SequentialAgent` | `SageRoot` — intent → retrieve → synth |
+| `FunctionTool` | Thin wrapper over `GraphRagApiClient` |
+| `InMemoryRunner` | Execute root agent from `SageAskService` |
+| ADK `Event` stream | Bridge to SSE |
 
-**Do not use for POC:** `LoopAgent`, `MemoryService`, Vertex/Firestore session/memory backends, production ADK Web deployment.
+**Do not use:** `LoopAgent`, `MemoryService`, `ParallelAgent` for multi-source Orion fan-out, production ADK Web deployment.
 
 ### Maven (indicative)
 
@@ -150,123 +162,158 @@ flowchart TB
 <dependency>
   <groupId>com.google.adk</groupId>
   <artifactId>google-adk-langchain4j</artifactId>
-  <!-- align version with google-adk -->
+  <version>1.5.0</version>
 </dependency>
-<!-- plus langchain4j-open-ai or langchain4j-ollama for the local endpoint -->
 ```
 
-Pin exact versions at kickoff; bump only after the Phase-0 model spike.
-
-### Local model wiring (pattern)
-
-1. Build LangChain4j `OpenAiChatModel` / `OllamaChatModel` pointing at the local endpoint.
-2. Wrap with ADK `LangChain4j` (`BaseLlm`).
-3. Pass into every `LlmAgent.builder().model(...)`.
-
-References: [Java quickstart](https://google.github.io/adk-docs/get-started/java/), [workflow agents](https://google.github.io/adk-docs/agents/workflow-agents/), [LangChain4j bridge](https://developers.googleblog.com/adk-for-java-opening-up-to-third-party-language-models-via-langchain4j-integration/).
+References: [Java quickstart](https://google.github.io/adk-docs/get-started/java/), [workflow agents](https://google.github.io/adk-docs/agents/workflow-agents/).
 
 ---
 
-## 6. Integration with the application
+## 7. Integration sequence
 
 ```mermaid
 sequenceDiagram
   participant UI as WebChat
   participant API as SpringChatController
   participant Runner as ADK_InMemoryRunner
-  participant SourceFetch as ParallelAgent_SourceFetch
-  participant Nexus as NexusRouter
-  participant Orion as OrionExpertise
-  participant Pdf as PdfRetriever
+  participant Intent as IntentClassify
+  participant GraphRag as GraphRagRetrieve
   participant Synth as KnowledgeCardSynth
-  participant Svcs as SpringServices
+  participant RAG as GraphRagApiClient
 
-  UI->>API: POST question SSE
-  API->>Runner: createSession plus runAsync
-  Runner->>SourceFetch: sequential step 1
-  par Source_fan_out
-    SourceFetch->>Nexus: run
-    Nexus->>Svcs: FunctionTool Nexus
-    Svcs-->>Nexus: nexus_hits
-  and
-    SourceFetch->>Orion: run
-    Orion->>Svcs: FunctionTool Orion
-    Svcs-->>Orion: orion_hits
-  and
-    SourceFetch->>Pdf: run
-    Pdf->>Svcs: FunctionTool GraphRAG
-    Svcs-->>Pdf: pdf_hits
-  end
-  Runner->>Synth: sequential step 2
-  Synth-->>Runner: KnowledgeCard events
+  UI->>API: POST /ask SSE
+  API->>Runner: createSession runAsync
+  Runner->>Intent: step 1 classify
+  Intent-->>Runner: intent
+  Runner->>GraphRag: step 2 retrieve
+  GraphRag->>RAG: POST /retrieve query+intent
+  RAG-->>GraphRag: graph_rag_hits
+  Runner->>Synth: step 3 synthesize
+  Synth-->>Runner: knowledge_card
   Runner-->>API: Event stream
-  API-->>UI: SSE Knowledge Card
+  API-->>UI: SSE knowledge_card
 ```
-
-### Boundaries
-
-| Spring component | ADK interaction |
-|------------------|-----------------|
-| Chat controller / service | Creates session, calls `runner.runAsync(...)`, maps `Event` → SSE |
-| `NexusClient`, `OrionClient` | Invoked only via `FunctionTool` from source agents |
-| GraphRAG / vector retriever | Invoked only via `PdfRetriever` tools; index built by ingest jobs **outside** ADK |
-| Ingest pipeline (F7) | No ADK agents — Spring AI embeddings + GraphRAG write path |
-| Promptfoo / MLflow (F8) | Call the same chat/ask entrypoint; score Knowledge Card fields |
-
-### Tool contract guidelines
-
-- Tools return **typed, citation-ready** payloads (team id/name, person, counts, doc id/url, short passage).
-- Prefer empty collections over null; synth treats empty as “no evidence.”
-- Keep tool methods side-effect free (read-only APIs for the ask path).
-
-### Streaming (F6)
-
-- Stream ADK events as they arrive (tool progress optional; final card required).
-- Product UI is the Spring web chat — not ADK Dev UI.
 
 ---
 
-## 7. Assumptions, trade-offs, and recommendations
+## 8. Tool contracts
 
-### Assumptions
+### `GraphRagRetrievalTool.retrieveFromGraph(query, intent)`
 
-1. Local LLM is reachable via OpenAI-compatible or Ollama API and works with ADK tool calling through LangChain4j (validate in Phase-0).
-2. Nexus and Orion APIs plus 10–30 curated PDFs are available at kickoff.
-3. Route-first + extractive summaries keep hallucination risk low enough for a CEO demo.
-4. One ask ≈ one Knowledge Card; follow-ups are new asks (no conversational memory).
+| | |
+|---|---|
+| **Endpoint** | `POST {SAGE_GRAPH_RAG_BASE_URL}/retrieve` |
+| **Args** | `query` (user question), `intent` (`technology` \| `problem` \| `ambiguous`) |
+| **Returns** | JSON hits per [architecture.md §12](architecture.md#12-inter-service-api-contracts) |
 
-### Trade-offs
+Fail-soft: return `"[]"` on any exception — never abort the ask.
+
+Intent is produced by `IntentClassify` **before** the retrieve tool call, then passed into `retrieveFromGraph`.
+
+---
+
+## 9. Agent factory (indicative)
+
+```java
+@Configuration
+public class SageAgents {
+
+    @Bean
+    public SequentialAgent sageRootAgent(
+            LangChain4jChatModel adkModel,
+            GraphRagRetrievalTool graphRagTool) {
+
+        LlmAgent intentClassify = LlmAgent.builder()
+            .name("IntentClassify")
+            .model(adkModel)
+            .instruction("""
+                Classify the user question as exactly one of:
+                technology | problem | ambiguous.
+                technology = asking about a stack, library, platform, or tool usage.
+                problem = asking about a hard problem, failure mode, or how something was solved.
+                ambiguous = unclear or mixes both.
+                Output only the intent token.
+                """)
+            .outputKey("intent")
+            .build();
+
+        LlmAgent graphRagRetrieve = LlmAgent.builder()
+            .name("GraphRagRetrieve")
+            .model(adkModel)
+            .tools(List.of(FunctionTool.create(graphRagTool, "retrieveFromGraph")))
+            .instruction("""
+                Call retrieveFromGraph with the user question and the classified intent.
+                Report only tool results. Never invent teams, people, or documents.
+                """)
+            .outputKey("graph_rag_hits")
+            .build();
+
+        LlmAgent synth = LlmAgent.builder()
+            .name("KnowledgeCardSynth")
+            .model(adkModel)
+            .instruction(SYNTH_INSTRUCTION)
+            .outputKey("knowledge_card")
+            .build();
+
+        return new SequentialAgent("SageRoot", List.of(intentClassify, graphRagRetrieve, synth));
+    }
+}
+```
+
+### `KnowledgeCardSynth` instruction
+
+```
+Merge graph_rag_hits (and intent) into a Knowledge Card.
+- Prefer hits[].passage as summary — do not paraphrase when present
+- Map metadata.teams / metadata.people / fileName / ticketLink into card fields
+- evidenceConfidence per architecture score bands (HIGH / MEDIUM / LOW / NONE)
+- If hits empty: gapFlag=true
+- Never invent teams, people, or documents
+- Emit strict JSON
+```
+
+---
+
+## 10. Configuration
+
+```yaml
+sage:
+  graph-rag:
+    base-url: http://localhost:8000
+  adk:
+    llm:
+      base-url: http://localhost:11434
+      model-name: llama3.2:3b
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SAGE_GRAPH_RAG_BASE_URL` | `http://localhost:8000` | Graph RAG client |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Local LLM for ADK |
+
+Java does **not** configure Orion credentials. Orion env vars belong to the Python ingest service only.
+
+---
+
+## 11. Testing
+
+| Test | Assertion |
+|------|-----------|
+| `IntentClassifyTest` | Technology-flavored question → `intent=technology` |
+| `GraphRagRetrieveFallbackTest` | `graph_rag_hits = "[]"` when Python down |
+| `GapFlagTest` | `gapFlag=true` when hits empty |
+| `ChatControllerE2ETest` | SSE `knowledge_card` event; retrieve called with intent |
+
+Eval uses the same `POST /ask` path as the UI — no special harness.
+
+---
+
+## 12. Trade-offs
 
 | Choice | Benefit | Cost |
 |--------|---------|------|
-| Deterministic `ParallelAgent` + always-all-sources | Predictable latency and eval; simple | Extra API/retrieval cost when one source would suffice |
-| ADK for ask + Spring AI for ingest/HTTP | Clear learning map (§12 of feature doc); testable tools | Two frameworks to wire and debug |
-| No `MemoryService` | Fits non-goals; reliable demos | No “who on that team?” follow-up without re-asking |
-| Shallow tree (no `LoopAgent`) | Fits 2-week POC | No iterative refine loops |
-
-### Implementation recommendations
-
-1. **Phase-0 spike first:** One `LlmAgent` + one `FunctionTool` against the local model; confirm tool calling and streaming before building the full graph.
-2. **Keep tools thin:** Business logic and HTTP live in Spring services; ADK tools are adapters.
-3. **Shared card schema:** Define a Java record/DTO for the Knowledge Card; synth must emit it; Promptfoo asserts fields.
-4. **Fail soft per source:** Catch tool errors, write empty hits + error note to state, continue synth.
-5. **Debug with ADK Dev UI; ship with Spring chat.** Do not expose Dev UI in demo environments.
-6. **Eval early:** Golden set (§5 / F8) against the same runner path used by the UI.
-
----
-
-## 8. Suggested package layout (when coding starts)
-
-```
-.../sage/
-  chat/          # Spring REST + SSE
-  ingest/        # PDF + GraphRAG write path
-  clients/       # Nexus, Orion
-  retrieval/     # GraphRAG / vector query API
-  adk/
-    SageAgents.java      # ROOT_AGENT = SequentialAgent(...)
-    tools/               # FunctionTool adapters
-    SageAskService.java  # Runner + session + event bridge
-```
-
-Root agent construction should be a single factory used by both the chat path and eval harness.
+| Intent then single `/retrieve` | Clear Java↔Python contract; no dual Orion clients | Card quality depends on ingest freshness and retrieve projection |
+| Card-complete retrieve metadata | Java needs no Orion HTTP | Graph RAG API must stay rich enough for Knowledge Card |
+| Extractive `passage` over paraphrase | Credible answers | Less fluent prose |
+| No `MemoryService` | Simple, reliable | No conversational follow-up |
