@@ -1,50 +1,41 @@
 # Orion API Documentation
 
-HTTP reference for Orion endpoints used by Sage. Captured from `postman/sage ai.postman_collection.json` and validated against fixture payloads in `postman/`.
+HTTP reference for Orion endpoints used by Sage's **seed script (F0)**. Captured from `postman/sage ai.postman_collection.json` and validated against fixture payloads in `postman/`.
+
+> **Architecture note:** Nexus (`nexus.talentica.com`) is a web portal that calls this same Orion API. There is no separate Nexus backend. Sage uses the Orion API directly with `api-key` authentication — Nexus and Orion API are the same data source.
 
 ---
 
 ## Overview
 
-Orion is the internal expertise and value-add catalog. Sage uses four GET endpoints in two lifecycles:
+Orion is the sole upstream data source for Sage. All four endpoints are called **at ingest time only** by the Python seed script. The Java ask-time pipeline **never calls Orion** — it queries the pre-built Neo4j store via `POST /retrieve/semantic` and `POST /retrieve/graph`.
+
+### Lifecycle
 
 | Lifecycle | Caller | Purpose |
 |-----------|--------|---------|
-| **Ingest** | Python Graph RAG | Build graph nodes, edges, and vector embeddings from Orion records |
-| **Ask** | Java ADK agents | Fetch structured records for Knowledge Card assembly at query time |
+| **Ingest (F0 seed)** | Python seed script | Build Neo4j graph nodes, edges, and vector embeddings from Orion records |
+| **Ask** | Python retrieval service (Neo4j only) | No Orion calls — all data already in Neo4j |
 
-### Endpoint selection guide
+### Ingest fan-out order *(run in this sequence)*
 
-| If you need… | Call this endpoint | Why |
-|--------------|-------------------|-----|
-| Teams, owners, extractive summary, document handle for a known tag | `valueAddsByTag` | Richest structured record; primary ask-time source |
-| Customer/project coverage for a technology label | `getTechDigest/label` | Secondary evidence for confidence scoring |
-| Closed vocabulary for tag extraction | `tech/categories` | Taxonomy lookup — not a direct answer source |
-| Broad hard-problem discovery by financial cycle | `hardProblemsFinancialYear` | Catalog seed / fallback — too large for LLM context |
+| Step | Endpoint | Output | Notes |
+|------|----------|--------|-------|
+| 1 (first) | `GET /tech/categories` | `Technology` nodes — full tag vocabulary | Drives steps 2 & 3 |
+| 2 (parallel, per tag) | `GET /valueAdd/valueAddsByTag?tag={tag}` | `HardProblem`, `Team`, `Person`, `Document` nodes + all edges | Primary rich-data source |
+| 3 (parallel, per tag) | `GET /technology/getTechDigest/label?techDigestLabel={tag}` | Enrich `Technology` nodes with customer coverage | |
+| 4 (gap-fill) | `GET /customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7` | Any `HardProblem` not reached via tag fan-out | ⚠️ Confirm `cycleId` values (see [architecture.md D4](architecture.md)) |
 
-### Ask-time vs ingest-time (why both?)
+### Endpoint selection (ingest purpose only)
 
-The graph index is **built from** Orion, but ask-time Orion calls are **not redundant**:
+| Endpoint | Why called | Neo4j role |
+|----------|-----------|------------|
+| `valueAddsByTag` | Richest structured record — team, people, summary, doc handle | Primary HP + relationship data |
+| `getTechDigest/label` | Customer/project coverage for a technology | Evidence enrichment on `Technology` nodes |
+| `tech/categories` | Closed vocabulary of all technology tags | Seed vocabulary for fan-out |
+| `hardProblemsFinancialYear` | Full catalog — catches HPs with no tag or missing from fan-out | Gap-fill — filter `ACCEPTED` only |
 
-| | Orion at ask-time | Graph `POST /retrieve` |
-|---|---|---|
-| Query style | Tag/label parameter | Natural language |
-| Returns | Full `fileDetails` + `customersValueAdd` objects | Scored `passage` + slim metadata |
-| Best for | Deterministic routing when tag is known | Fuzzy questions, multi-hop, synonym matching |
-| Summary | Canonical `fileDetails.summary` field | Indexed passage chunk |
-| Freshness | Live Orion | Last ingest sync |
-
-**Agent mapping:**
-
-| Endpoint | ADK agent / tool | Session key |
-|----------|------------------|-------------|
-| `valueAddsByTag` | `OrionValueAdd` → `valueAddsByTag(tag)` | `orion_value_add_hits` |
-| `getTechDigest/label` | `OrionTechCoverage` → `techDigestByLabel(label)` | `orion_coverage_hits` |
-| `tech/categories` | `TagExtractor` (pre-agent, not an LLM tool) | — |
-| `hardProblemsFinancialYear` | Optional `OrionHardProblemsSearch` (not in default fan-out) | — |
-| — | `GraphRagRetrieve` → `retrieveFromGraph(query)` | `graph_rag_hits` |
-
-See [architecture.md §6](architecture.md#6-orion-at-ask-time-vs-ingest-time) for the full design rationale.
+See [architecture.md §6](architecture.md#6-orion-api--ingest-only-never-at-ask-time) for the full lifecycle rationale.
 
 ---
 
@@ -68,7 +59,7 @@ Stub mode (`ORION_API_KEY=stub`) reads committed `postman/*.json` fixtures — n
 
 ## 1. Value adds by tag
 
-Primary ask-time endpoint. Returns expertise records with narrative summary and provenance.
+**Ingest step 2 (primary data source).** Returns the richest per-HP record — team, members, summary, document handle. Called once per tag from the vocabulary returned by `tech/categories`.
 
 **Request**
 
@@ -145,7 +136,7 @@ Cookie: auth-token=<redacted>; cf_clearance=<redacted>
 
 ## 2. Tech digest by label
 
-Secondary ask-time endpoint. Returns customer/project coverage rows for a technology label.
+**Ingest step 3 (coverage enrichment).** Returns customer/project rows for a technology label. Enriches `Technology` nodes in the graph with real-world deployment evidence.
 
 **Request**
 
@@ -201,7 +192,7 @@ Host: apiorion.talentica.com
 
 ## 3. Tech categories
 
-Taxonomy endpoint. Used for tag vocabulary and ingest seeding — not a direct answer source.
+**Ingest step 1 (must run first).** Returns the full closed vocabulary of technology categories and tags. The seed script calls this first to get the list of tags used in steps 2 and 3.
 
 **Request**
 
@@ -246,7 +237,9 @@ Host: apiorion.talentica.com
 
 ## 4. Hard problems for financial year
 
-Catalog endpoint. Large payload (~6 MB fixture). Used for ingest seeding and filtered code-side fallback — never loaded into LLM context.
+**Ingest step 4 (gap-fill).** Large catalog payload (~6 MB fixture). Used after the tag fan-out to catch any HPs that were not reached via a tag. Filter `status = ACCEPTED` code-side before writing to Neo4j. Never loaded into LLM context.
+
+> ⚠️ **D4** — Confirm `cycleId=8,7` covers the relevant financial cycles. Additional cycle IDs may be needed.
 
 **Request**
 
@@ -301,6 +294,17 @@ Host: apidev-orion.talentica.com
 **Fixture:** `postman/Hard Problems for the financial year.json`
 
 ---
+
+## Authentication
+
+> ⚠️ **D5** — Confirm the `api-key` value is current and stable for the POC seed run.
+
+| Method | Header | Host | Used for |
+|--------|--------|------|----------|
+| API key | `api-key: <value>` | `apiorion.talentica.com` | Steps 1, 2, 3 (preferred for seed script) |
+| Cookie | `Cookie: auth-token=<JWT>; cf_clearance=<value>` | `apidev-orion.talentica.com` | Step 4 (dev host; browser session only) |
+
+Offline/stub mode: set `ORION_API_KEY=stub` → seed script reads `postman/*.json` fixtures instead of making live HTTP calls.
 
 ## Pagination and errors
 

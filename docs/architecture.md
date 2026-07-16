@@ -1,7 +1,25 @@
 # Architecture
 
 > **Product scope:** [feature-document.md](../feature-document.md)  
-> **Related:** [google-java-adk-usage.md](google-java-adk-usage.md), [orion-api-documentation.md](orion-api-documentation.md)
+> **Related:** [google-java-adk-usage.md](google-java-adk-usage.md), [orion-api-documentation.md](orion-api-documentation.md)  
+> **Last updated:** Jul 16 2026 — reflects query interpretation, parallel hybrid search (semantic + Graph RAG), confidence scoring, Postman/SSE client, Neo4j-only DB
+
+---
+
+## ⚠️ Decisions Required Before Implementation
+
+The following items are **open and blocking**. Implementation of the components that depend on them must not start until resolved.
+
+| # | Decision | Blocks | Owner |
+|---|---|---|---|
+| D1 | **Local LLM + hardware** — which model (e.g. `llama3.2:3b`, `mistral`) on which machine? | Latency targets, ADK `LangChain4jChatModel` config, embedding model choice | Project lead |
+| D2 | **Confidence score weights** — `w1` (vector similarity) vs `w2` (graph score), boost value for dual-match results, minimum threshold to suppress a result | Python `/retrieve/semantic` + `/retrieve/graph` merge logic, F3 scoring | Tech lead |
+| D3 | **Top-N result count** — default is 5; confirm | Python `/retrieve` `top_k` default, Knowledge Card `results[]` size | Project lead |
+| D4 | **`cycleId` values** — confirm `cycleId=8,7` covers all relevant financial cycles for the seed | F0 seed script, data coverage of gap-fill pass | Data / Orion access owner |
+| D5 | **Orion `api-key` validity** — confirm `53e72eed-6f0b-4d5b-9cc5-088487d969b9` is current and stable for POC duration | F0 seed script, all Python ingest | Orion access owner |
+| D6 | **Re-seed endpoint** — is `POST /admin/reseed` required for the POC, or is running the seed script manually sufficient? | Python service scope, DevOps | Project lead |
+
+---
 
 ---
 
@@ -36,12 +54,15 @@ Sage is an internal **expertise-locator + prior-art concierge**. Given a technic
 
 This document specifies:
 
-- Two-service architecture (Java Sage + Python Graph RAG)
-- Orion used **only at ingest** (Python → own Neo4j store); never from Java at ask-time
-- Inter-service HTTP contracts (what Java needs from Graph RAG)
+- Two-service architecture (Java Sage + Python Graph RAG / Search)
+- Orion API used **only at ingest** (Python seed script → Neo4j); never called at ask-time
+- Ask-time pipeline: query interpretation → parallel hybrid search (semantic + Graph RAG) → confidence scoring → Knowledge Card → SSE stream to Postman
+- Inter-service HTTP contracts (what Java needs from the Python retrieval service)
 - Agent orchestration boundaries (detail in [google-java-adk-usage.md](google-java-adk-usage.md))
 
-**Out of scope here:** Neo4j Cypher schema / node label design, PDF ingest and enrichment (later).
+**Out of scope here:** Neo4j Cypher schema / property maps (Python internal), PDF chunking strategy, embedding model internals.
+
+**Nexus clarification:** Nexus (`nexus.talentica.com`) is a web portal that calls the Orion API. There is no separate Nexus backend. Sage uses the Orion API directly with `api-key` authentication.
 
 ---
 
@@ -99,12 +120,14 @@ sage-ai/
 |-----------|------------------|
 | **Route-first** | Lead with team/person + document; generation only summarizes retrieved evidence |
 | **Evidence-only synthesis** | Never invent teams, people, or documents; prefer extractive `passage` / indexed summary over LLM paraphrase |
-| **Ingest once, query own store** | Orion is copied into Neo4j at ingest; ask-time never calls Orion |
-| **Intent then retrieve** | Classify question as technology / problem / ambiguous, then bias Graph RAG similarity |
-| **Fail-soft retrieval** | Graph RAG failure → empty hits; synth still produces an honest gap card |
+| **Ingest once, query own store** | Orion API is seeded into Neo4j once; ask-time never calls Orion |
+| **Interpret then parallel-retrieve** | LLM splits query into `problemStatement` + `techNeeded[]`; drives parallel semantic search + Graph RAG traversal simultaneously |
+| **Hybrid search — both paths** | Semantic search (vector similarity on problem descriptions) runs in parallel with Graph RAG traversal (tech tags → graph). Results merged and ranked by confidence score. Neither path alone is sufficient — they cover each other's blind spots |
+| **Confidence-scored results** | Every result carries a `confidenceScore` (0–1); results surfaced by both paths get a boost *(⚠️ D2 — weights TBD)* |
+| **Fail-soft retrieval** | Either search path failing → empty hits from that path; the other path still contributes; synth produces an honest gap card if both empty |
 | **On-network LLM** | Company data and inference stay on-network |
 | **Single-turn asks** | One `Session` per question; discard after response |
-| **Clear service boundaries** | Java owns ask + intent; Python owns Orion ingest, Neo4j, `/retrieve` |
+| **Clear service boundaries** | Java owns ask orchestration + SSE; Python owns Orion seed, Neo4j, semantic search, graph traversal, confidence scoring |
 
 ---
 
@@ -112,44 +135,61 @@ sage-ai/
 
 ```mermaid
 flowchart TB
-  subgraph client [Client]
-    WebChat[WebChat]
+  subgraph client [Client_POC]
+    Postman[Postman_SSE_Client]
   end
 
   subgraph sageJava [Sage_Java_8080]
-    ChatAPI[Chat_REST_SSE]
+    ChatAPI[POST_ask_SSE]
     ADK[Google_Java_ADK]
-    RagClient[GraphRag_HTTP_Client]
+    QI[QueryInterpret_Agent]
+    PA[ParallelRetrieve_Agent]
+    RM[ResultMerger]
+    Synth[KnowledgeCardSynth_Agent]
+    SemanticClient[SemanticSearch_HTTP_Client]
+    GraphClient[GraphTraversal_HTTP_Client]
   end
 
-  subgraph graphRagPython [GraphRAG_Python_8000]
-    IngestOrion[Orion_Metadata_Ingest]
-    RetrieveAPI[POST_retrieve]
-    Neo4jStore[Neo4j_Community]
+  subgraph pythonService [Retrieval_Python_8000]
+    SeedScript[F0_Seed_Script]
+    SemanticAPI[POST_retrieve_semantic]
+    GraphAPI[POST_retrieve_graph]
+    Neo4jStore[Neo4j_VectorIndex_plus_Graph]
   end
 
-  subgraph external [External]
-    OrionAPI[Orion_API]
-    PDFs[PDF_Corpus]
+  subgraph external [External_Ingest_Only]
+    OrionAPI[Orion_API_apiorion]
+    PDFs[Approved_PDFs]
   end
 
-  WebChat --> ChatAPI
+  Postman -->|POST /ask| ChatAPI
   ChatAPI --> ADK
-  ADK --> RagClient
-  RagClient --> RetrieveAPI
-  IngestOrion --> OrionAPI
-  IngestOrion --> Neo4jStore
-  RetrieveAPI --> Neo4jStore
-  PDFs -.->|later| IngestOrion
+  ADK --> QI
+  QI --> PA
+  PA --> SemanticClient
+  PA --> GraphClient
+  SemanticClient -->|POST /retrieve/semantic| SemanticAPI
+  GraphClient -->|POST /retrieve/graph| GraphAPI
+  PA --> RM
+  RM --> Synth
+  Synth -->|SSE events| ChatAPI
+  ChatAPI -->|SSE stream| Postman
+
+  SeedScript -->|api-key| OrionAPI
+  SeedScript --> PDFs
+  SeedScript --> Neo4jStore
+  SemanticAPI --> Neo4jStore
+  GraphAPI --> Neo4jStore
 ```
 
 | User need | System response |
 |-----------|-----------------|
-| Who solved this? | Team + people from Graph RAG hit metadata (ingested from Orion) |
-| Where is the proof? | `fileName` / `ticketLink` and citations from `/retrieve` hits |
-| What was the approach? | Extractive `passage` (indexed Orion summary / graph context) |
-| Similar tech or problems? | Intent-biased similarity over Neo4j-backed index |
-| Nothing found? | Knowledge Card gap flag — candidate Hard Problem |
+| Who solved this? | Team + people from merged search hits (seeded from Orion into Neo4j) |
+| Where is the proof? | `documentLink` / `ticketLink` from hit metadata |
+| What was the approach? | Extractive `summary` from indexed Orion summary or PDF chunk |
+| Similar tech or problem? | Parallel: semantic search on `problemStatement` + graph traversal on `techNeeded[]` |
+| Confidence? | Per-result `confidenceScore` (0–1) — ranked descending |
+| Nothing found? | `gapFlag: true` — candidate Hard Problem callout |
 
 ---
 
@@ -161,48 +201,64 @@ flowchart TB
 |----------------|------------|
 | Public API (`POST /ask`, SSE) | Spring Boot **4.1** · Java **25** |
 | Agent orchestration | Google Java ADK 1.5.0 |
-| Intent classification | ADK `IntentClassify` → `technology` \| `problem` \| `ambiguous` |
-| Graph RAG HTTP client | `GraphRagApiClient` → `POST /retrieve` |
+| **Query interpretation** | ADK `QueryInterpret` → `problemStatement` + `techNeeded[]` |
+| **Parallel search fan-out** | ADK `ParallelAgent` → `SemanticSearchAgent` + `GraphTraversalAgent` |
+| **Result merge + confidence score** | `ResultMerger` (pure Java, deterministic) |
 | Knowledge Card synthesis | ADK `KnowledgeCardSynth` |
-| Web chat UI | Spring-served frontend |
+| SSE streaming | Spring `SseEmitter` — emits `status` / `result` / `done` events to Postman |
 | Eval entrypoint | Same `POST /ask` path |
 
-**Does not own:** Orion HTTP, graph index build, Neo4j, PDF parsing, embedding models.
+> **Web chat UI:** deferred post-POC. POC client is Postman only.
 
-### Graph RAG — Python (`:8000`)
+**Does not own:** Orion HTTP, Neo4j, PDF parsing, embedding models, semantic search logic, graph traversal logic.
+
+### Retrieval Service — Python (`:8000`)
 
 | Responsibility | Technology |
 |----------------|------------|
-| Orion metadata **ingest/sync** | FastAPI (sole Orion consumer) |
-| PDF ingest | Deferred |
-| Knowledge graph + vector index | **Neo4j Community** (+ vector index internal) |
-| Retrieval API | `POST /retrieve` (intent-aware, card-complete hits) |
-| Ingest trigger | `POST /ingest` |
+| **Orion + PDF seed script (F0)** | Python script — sole Orion consumer, run once before first ask |
+| **Semantic search** | `POST /retrieve/semantic` — Neo4j vector index query on `problemStatement` |
+| **Graph RAG traversal** | `POST /retrieve/graph` — Cypher traversal on `techNeeded[]` tags |
+| Knowledge graph + vector index | **Neo4j Community Edition** (single store for both — decided, see §9.2 in feature doc) |
 | Health | `GET /health` |
+| Optional re-seed trigger | `POST /admin/reseed` *(⚠️ D6 — required for POC?)* |
 
-**Does not own:** ask orchestration, Knowledge Card rendering, public chat API.
+**Does not own:** ask orchestration, result merging, Knowledge Card rendering, public chat API, confidence score calculation (that is Java `ResultMerger`).
 
 ### Why two services?
 
 | Reason | Detail |
 |--------|--------|
-| Language fit | Python has mature Graph RAG tooling; Java ADK is required for agent orchestration |
-| Independent deployment | Upgrade retrieval / Neo4j without rebuilding Sage |
-| Single Orion owner | Only Python touches Orion — avoids dual clients and divergent freshness |
-| Contract stability | Replace retriever by updating Java HTTP client only |
+| Language fit | Python has mature Neo4j + vector tooling; Java ADK required for agent orchestration |
+| Independent deployment | Upgrade Neo4j / retrieval logic without rebuilding Sage Java |
+| Single Orion owner | Only Python seed script touches Orion — no dual clients |
+| Contract stability | Swap retrieval implementation by updating Java HTTP clients only |
 
 ---
 
-## 6. Orion ingest vs ask-time
+## 6. Orion API — ingest only (never at ask-time)
 
-Orion is used in **one lifecycle only**. Ask-time reads the owned store via Graph RAG.
+Orion API is used in **one lifecycle only — ingest**. Ask-time reads the pre-built Neo4j store.
 
-| Lifecycle | Owner | When | Touches Orion? | Output |
+| Lifecycle | Owner | When | Touches Orion API? | Output |
 |-----------|-------|------|----------------|--------|
-| **Ingest** | Python Graph RAG | One-shot / scheduled / `POST /ingest` | **Yes** — all captured endpoints | Neo4j nodes/edges + vector embeddings |
-| **Ask** | Java ADK | Every `POST /ask` | **No** — only `POST /retrieve` | Knowledge Card from card-complete hits |
+| **Ingest (F0)** | Python seed script | Once before first ask *(⚠️ D4, D5)* | **Yes** — all 4 endpoints in fan-out order | Neo4j nodes/edges + vector embeddings |
+| **Ask** | Java ADK | Every `POST /ask` | **No** — calls `POST /retrieve/semantic` + `POST /retrieve/graph` only | Knowledge Card from merged, scored hits |
 
-Knowledge Card fields come from the **`/retrieve` hit projection**, not live Orion. Freshness is bounded by last ingest sync.
+**There is no live Orion fallback at ask-time.** If Neo4j is empty or retrieval fails, Sage returns `gapFlag: true`.
+
+Knowledge Card fields come from hit projections returned by the Python retrieval service. Freshness is bounded by last seed run.
+
+**Ingest fan-out order (F0 seed script):**
+
+```
+Step 1: GET /tech/categories              → seed Technology nodes (vocabulary)
+        ↓  for each tag, in parallel:
+Step 2: GET /valueAdd/valueAddsByTag?tag= → HardProblem, Team, Person, Document nodes + edges
+Step 3: GET /technology/getTechDigest/label?techDigestLabel= → enrich Technology with coverage
+        ↓  gap-fill:
+Step 4: GET /customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7  ⚠️ D4
+```
 
 Agent wiring detail: [google-java-adk-usage.md](google-java-adk-usage.md).
 
@@ -210,27 +266,27 @@ Agent wiring detail: [google-java-adk-usage.md](google-java-adk-usage.md).
 
 ## 7. Orion API mapping (ingest only)
 
-The feature document names **Nexus** and **Orion** as separate sources. Postman fixtures show **only Orion hosts** (`apiorion.talentica.com`, `apidev-orion.talentica.com`). Requests with `Origin: https://nexus.talentica.com` are the Nexus UI calling Orion — not a separate REST API.
+**Nexus is the web portal that calls Orion. There is no separate Nexus API.** Requests with `Origin: https://nexus.talentica.com` in the Postman collection are Nexus UI traffic hitting Orion — Sage uses the same endpoints directly with `api-key` auth.
 
-| Role | Orion endpoint | Ask-time owner | Ingest owner | Feeds Knowledge Card via |
-|------|----------------|----------------|--------------|--------------------------|
-| Expertise + summary + doc handle | `GET /valueAdd/valueAddsByTag?tag={tag}` | **N/A (Java)** | **Python** | `/retrieve` metadata + passage |
-| Tech coverage | `GET /technology/getTechDigest/label?techDigestLabel={label}` | **N/A (Java)** | **Python** | `/retrieve` evidence |
-| Taxonomy | `GET /tech/categories` | **N/A (Java)** | **Python** | Index vocabulary / similarity |
-| Hard-problems catalog | `GET /customers/valueAdd/hardProblemsFinancialYear?cycleId={ids}` | **N/A (Java)** | **Python** | Problem-intent similarity, eval goldens |
+| Ingest step | Orion endpoint | Neo4j output | Notes |
+|-------------|----------------|--------------|-------|
+| 1 (first) | `GET /tech/categories` | `Technology` nodes | Drives fan-out vocabulary |
+| 2 (parallel) | `GET /valueAdd/valueAddsByTag?tag={tag}` | `HardProblem`, `Team`, `Person`, `Document` nodes + all edges | Primary rich-data source |
+| 3 (parallel) | `GET /technology/getTechDigest/label?techDigestLabel={label}` | Enrich `Technology` nodes | Coverage context |
+| 4 (gap-fill) | `GET /customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7` | Any remaining `HardProblem` nodes | ⚠️ D4 — confirm cycleId |
 
-Full API reference: [orion-api-documentation.md](orion-api-documentation.md). Stub/offline ingest reads `postman/*.json`.
+Full API reference: [orion-api-documentation.md](orion-api-documentation.md). Offline seed reads `postman/*.json` fixtures.
 
 ### Primary ingest payload — `valueAddsByTag`
 
-| Payload section | Key fields | Card role (after ingest) |
-|-----------------|------------|--------------------------|
-| `fileDetails` | `title`, `summary`, `fileName`, `techDigests`, `tags` | Direct answer, summary, document handle, evidence |
-| `customersValueAdd` | `ownerId[]`, `teamId`, `teamLeads[]`, `status`, `type`, `ticketLink` | People, teams, citations, filtering |
+| Payload section | Key fields | Neo4j role |
+|-----------------|------------|------------|
+| `fileDetails` | `title`, `summary`, `fileName`, `techDigests`, `tags` | `HardProblem` properties; `summary` embedded for vector search |
+| `customersValueAdd` | `ownerId[]`, `teamId`, `teamLeads[]`, `status`, `type`, `ticketLink` | `Person`, `Team` nodes; `ticketLink` = document citation |
 
-**Rule:** Prefer indexed extractive summary as-is — do not regenerate with LLM when present.
-
-**Do not** load the full hard-problems JSON (~6 MB) into LLM context at ask-time. Filter at ingest / retrieve; pass only matched hit records to synthesis.
+**Ingest rule:** Index `fileDetails.summary` as-is for the vector store — do not paraphrase with LLM.  
+**Filter rule:** Exclude records where `customersValueAdd.status = REJECTED`.  
+**Size rule:** Do not load the full `hardProblemsFinancialYear` JSON (~6 MB) into LLM context — filter code-side at ingest, pass only matched hits to synthesis at ask-time.
 
 ---
 
@@ -263,38 +319,64 @@ Graph traversal, embedding model, and Neo4j schema are internal to the Python se
 
 ```mermaid
 sequenceDiagram
-  participant UI as WebChat
+  participant PM as Postman_Client
   participant API as Sage_ChatController
   participant ADK as ADK_SageRoot
-  participant Intent as IntentClassify
-  participant RAG as GraphRagRetrieve
+  participant QI as QueryInterpret
+  participant PA as ParallelAgent
+  participant SS as SemanticSearchAgent
+  participant GT as GraphTraversalAgent
+  participant RM as ResultMerger
   participant Synth as KnowledgeCardSynth
-  participant GraphAPI as GraphRAG_8000
+  participant PY as Python_8000
 
-  UI->>API: POST /ask question
+  PM->>API: POST /ask {"query":"..."}
+  API-->>PM: SSE: status "Interpreting query…"
   API->>ADK: createSession runAsync
-  ADK->>Intent: classify intent
-  Intent-->>ADK: technology|problem|ambiguous
-  ADK->>RAG: retrieve
-  RAG->>GraphAPI: POST /retrieve query+intent
-  GraphAPI-->>RAG: graph_rag_hits
-  ADK->>Synth: synthesize
-  Synth-->>ADK: knowledge_card
+  ADK->>QI: interpret query
+  QI-->>ADK: problemStatement + techNeeded[]
+  API-->>PM: SSE: status "Identified problem state and tech context"
+  API-->>PM: SSE: status "Searching knowledge base…"
+  ADK->>PA: fan-out parallel
+  par Semantic path
+    PA->>SS: semanticSearch(problemStatement)
+    SS->>PY: POST /retrieve/semantic
+    PY-->>SS: semantic_hits[]
+  and Graph path
+    PA->>GT: graphTraversal(techNeeded[])
+    GT->>PY: POST /retrieve/graph
+    PY-->>GT: graph_hits[]
+  end
+  PA-->>ADK: semantic_hits + graph_hits
+  API-->>PM: SSE: status "Ranking results…"
+  ADK->>RM: merge + score (Java, deterministic)
+  RM-->>ADK: merged_hits[] with confidenceScore ⚠️D2
+  ADK->>Synth: synthesize Knowledge Card
+  Synth-->>ADK: knowledge_card JSON
   ADK-->>API: Event stream
-  API-->>UI: SSE knowledge_card
+  API-->>PM: SSE: result <KnowledgeCard JSON>
+  API-->>PM: SSE: done
 ```
 
-1. Client sends `POST /ask` with natural-language question.
-2. Sage creates request-scoped ADK `Session`.
-3. `IntentClassify` sets intent: `technology` | `problem` | `ambiguous`.
-4. `GraphRagRetrieve` calls `POST /retrieve` with the full question and intent.
-5. `KnowledgeCardSynth` merges hit metadata into Knowledge Card JSON.
-6. Sage streams card to UI as SSE.
-7. Session discarded.
+**Step-by-step:**
 
-| Environment | P95 target |
+1. Client (`Postman`) sends `POST /ask {"query":"..."}`.
+2. Sage immediately emits `status: "Interpreting query…"` SSE event.
+3. `QueryInterpret` (LlmAgent) extracts `problemStatement` and `techNeeded[]` from the query.
+4. Sage emits `status: "Identified problem state and tech context"` + `status: "Searching knowledge base…"`.
+5. `ParallelAgent` fans out to `SemanticSearchAgent` and `GraphTraversalAgent` simultaneously.
+6. Each agent calls its Python endpoint: `POST /retrieve/semantic` and `POST /retrieve/graph`.
+7. Both return; Sage emits `status: "Ranking results…"`.
+8. `ResultMerger` (deterministic Java) deduplicates hits (same HP from both paths → merged), applies confidence scoring *(⚠️ D2)*, sorts descending.
+9. `KnowledgeCardSynth` assembles the Knowledge Card JSON.
+10. Sage emits `result: <KnowledgeCard JSON>` then `done`; stream closes.
+11. Session discarded.
+
+> ⚠️ **D1** — P95 latency target depends on local LLM hardware. Set after hardware validation.
+
+| Environment | P95 target (indicative) |
 |-------------|------------|
-| Development (local model) | < 8 s |
+| Development (local model) | < 10 s *(⚠️ D1 — validate on hardware)* |
 | Production | < 3 s |
 
 ---
@@ -324,35 +406,70 @@ Incremental sync keys records by `customersValueAdd.id`. Re-sync on schedule or 
 
 ## 11. Knowledge Card contract
 
-| Field | Primary source | Fallback |
-|-------|----------------|----------|
-| Direct answer | Synth from hit titles + counts | — |
-| Team(s) + people | `/retrieve` `metadata.teams`, `metadata.people` | — |
-| Evidence / confidence | Hit count + score bands ([below](#evidence-confidence)) | — |
-| Summary | **`hits[].passage`** (extractive indexed summary) | "no formal summary — reach out to team" |
-| Full document | `metadata.fileName` / ticket link | "no formal doc — reach out to team" |
-| Honesty / gap flag | Synth when `hits` empty | — |
+The Knowledge Card is the JSON payload sent in the `result` SSE event. It is the output contract between the Java `KnowledgeCardSynth` agent and the Postman client.
 
-### Evidence confidence
+### Top-level fields
 
-| Condition | `evidenceConfidence` |
-|-----------|----------------------|
-| ≥ 2 hits with `score` ≥ 0.85 | `HIGH` |
-| ≥ 1 hit with `score` ≥ 0.70 | `MEDIUM` |
-| ≥ 1 hit below 0.70 (above `min_score`) | `LOW` |
-| No hits | `NONE` — `gapFlag=true` |
+| Field | Type | Source | Notes |
+|-------|------|--------|-------|
+| `query` | string | echo | User's original question |
+| `problemStatement` | string | `QueryInterpret` | LLM-derived problem restatement |
+| `techNeeded` | string[] | `QueryInterpret` | LLM-extracted technology tags |
+| `directAnswer` | string | `KnowledgeCardSynth` | One-line answer derived from top result |
+| `results` | Result[] | `ResultMerger` | Ranked results — see below |
+| `gapFlag` | boolean | `KnowledgeCardSynth` | `true` when `results` empty |
+| `gapMessage` | string \| null | `KnowledgeCardSynth` | Candidate Hard Problem callout when `gapFlag=true` |
+
+### Per-result fields (`results[]`)
+
+| Field | Type | Source | Notes |
+|-------|------|--------|-------|
+| `rank` | int | `ResultMerger` | 1-indexed, ascending |
+| `confidenceScore` | float (0–1) | `ResultMerger` | ⚠️ **D2** — weights TBD |
+| `matchedVia` | string[] | `ResultMerger` | `["semantic"]`, `["graph"]`, or `["semantic","graph"]` |
+| `teamName` | string | Neo4j hit | From Orion `customersValueAdd.teamId.teamName` |
+| `hardProblemTitle` | string | Neo4j hit | From Orion `fileDetails.title` |
+| `category` | string | Neo4j hit | `HARD_PROBLEMS` \| `INNOVATION` \| `AGENT_SYSTEM` |
+| `solvedBy` | string[] | Neo4j hit | From Orion `customersValueAdd.ownerId[].name` |
+| `summary` | string | Neo4j hit | Extractive — `fileDetails.summary`; do not paraphrase |
+| `documentLink` | string \| null | Neo4j hit | `fileDetails.fileName` or `ticketLink` |
+| `evidenceDetail` | string | `ResultMerger` | Human-readable score breakdown |
+| `sourceAttribution` | string[] | `ResultMerger` | `["Orion API"]`, `["PDF"]`, or both |
+
+### Confidence score thresholds *(⚠️ D2 — exact values TBD in tech spec)*
+
+| Condition | `confidenceScore` band | Label shown |
+|-----------|------------------------|-------------|
+| Surfaced by both semantic + graph | boosted | HIGH |
+| Semantic only, similarity ≥ 0.85 | high | HIGH |
+| Semantic only, 0.70–0.85 | medium | MEDIUM |
+| Graph only (exact tag match) | medium | MEDIUM |
+| Below threshold | excluded | — |
+| No results from either path | — | `gapFlag: true` |
 
 ```json
 {
-  "directAnswer": "Yes — Rupeek migrated observability to OpenTelemetry.",
-  "teams": [{ "teamId": "52", "name": "Rupeek" }],
-  "people": [{ "personId": "65", "name": "Hemant Sachdeva" }],
-  "evidenceConfidence": "HIGH",
-  "summary": "From indexed Orion summary via hits[].passage — do not paraphrase when present.",
-  "documentLinks": [{ "docId": "1046", "fileName": "Rupeek Mail - Observability @Rupeek.pdf" }],
+  "query": "How did we handle SSRF for external image fetching from emails?",
+  "problemStatement": "Safely fetching external images from emails without SSRF exposure",
+  "techNeeded": ["SSRF mitigation", "npm image proxy", "email rendering"],
+  "directAnswer": "Yes — 1 team has solved this.",
+  "results": [
+    {
+      "rank": 1,
+      "confidenceScore": 0.87,
+      "matchedVia": ["semantic", "graph"],
+      "teamName": "Payments Platform",
+      "hardProblemTitle": "SSRF-safe external image loader",
+      "category": "HARD_PROBLEMS",
+      "solvedBy": ["Priya Sharma", "Arjun Mehta"],
+      "summary": "Implemented a server-side proxy using got-scrubbing library…",
+      "documentLink": "https://talenticacontact.freshdesk.com/a/tickets/1234",
+      "evidenceDetail": "Semantic similarity 0.83; graph matched via tag 'SSRF mitigation'",
+      "sourceAttribution": ["Orion API"]
+    }
+  ],
   "gapFlag": false,
-  "sources": { "graphRag": true },
-  "intent": "technology"
+  "gapMessage": null
 }
 ```
 
@@ -366,26 +483,39 @@ Incremental sync keys records by `customersValueAdd.id`. Re-sync on schedule or 
 
 | | |
 |---|---|
-| **Request** | `{ "question": "string" }` |
-| **Response** | `text/event-stream` — event `knowledge_card` with JSON body |
+| **Request** | `{ "query": "string" }` |
+| **Response** | `text/event-stream` (SSE) — sequence of events below |
+
+SSE event sequence:
+
+| Event type | `data` payload | When |
+|---|---|---|
+| `status` | `{"message":"Interpreting query…"}` | Immediately on receipt |
+| `status` | `{"message":"Identified problem state and tech context","problemStatement":"...","techNeeded":["..."]}` | After `QueryInterpret` |
+| `status` | `{"message":"Searching knowledge base…"}` | Parallel search launched |
+| `status` | `{"message":"Ranking results…"}` | Both searches returned |
+| `result` | Full Knowledge Card JSON (§11) | After `KnowledgeCardSynth` |
+| `done` | `{}` | Stream close |
+| `error` | `{"message":"..."}` | On any unrecoverable error |
 
 #### `GET /health`
 
-→ `{ "status": "ok", "graphRagReachable": true|false }`
+→ `{ "status": "ok", "semanticServiceReachable": true, "graphServiceReachable": true }`
 
-### Graph RAG Python — APIs Java needs
+---
 
-#### `POST /retrieve`
+### Retrieval Service Python — APIs Java calls
 
-Card-complete retrieval so Java never needs Orion.
+#### `POST /retrieve/semantic`
+
+Vector similarity search on `problemStatement`.
 
 ```json
 // Request
 {
-  "query": "How did we migrate to OpenTelemetry?",
-  "intent": "technology",
+  "problemStatement": "Safely fetching external images from emails without SSRF exposure",
   "top_k": 5,
-  "min_score": 0.70
+  "min_score": 0.60
 }
 
 // Response 200
@@ -393,48 +523,89 @@ Card-complete retrieval so Java never needs Orion.
   "hits": [{
     "doc_id": "178025",
     "source": "orion_metadata",
-    "passage": "Extractive text from indexed Orion summary or graph context.",
-    "score": 0.91,
+    "vectorScore": 0.83,
+    "passage": "Implemented a server-side proxy using got-scrubbing library…",
     "metadata": {
-      "title": "Application monitoring platform from NewRelic to OpenTelemetry",
-      "teams": [{ "teamId": "52", "name": "Rupeek" }],
-      "people": [{ "personId": "65", "name": "Hemant Sachdeva" }],
-      "technologies": ["OpenTelemetry", "Prometheus", "Grafana"],
-      "fileName": "Rupeek Mail - Observability @Rupeek.pdf",
-      "ticketLink": "https://...",
-      "status": "ACCEPTED"
+      "title": "SSRF-safe external image loader",
+      "teamName": "Payments Platform",
+      "teamId": "42",
+      "people": [{ "personId": "65", "name": "Priya Sharma" }],
+      "technologies": ["SSRF mitigation", "npm", "Node.js"],
+      "documentLink": "https://talenticacontact.freshdesk.com/a/tickets/1234",
+      "category": "HARD_PROBLEMS",
+      "sourceAttribution": "Orion API"
     }
   }],
-  "query_time_ms": 340,
-  "total_found": 2
+  "query_time_ms": 210,
+  "total_found": 1
 }
 ```
 
-| Field | Rules |
-|-------|--------|
-| `intent` | Required enum: `technology` \| `problem` \| `ambiguous` — biases similarity toward tech vs hard-problem neighborhoods |
-| `hits` | Always an array — never `null` |
-| Empty result | `200` with `hits: []` |
-| `passage` | Extractive — not LLM-paraphrased at the API boundary |
-| `metadata` | Must include teams, people, title, technologies, and document handle when known so the Knowledge Card can be built without Orion |
+#### `POST /retrieve/graph`
 
-#### `POST /ingest`
-
-Owned and triggered by Graph RAG ops / cron. **Java does not call this** on the default ask path.
+Cypher graph traversal on `techNeeded[]` tags.
 
 ```json
-{ "mode": "orion_metadata", "force_refresh": false }
+// Request
+{
+  "techNeeded": ["SSRF mitigation", "npm image proxy", "email rendering"],
+  "top_k": 5
+}
+
+// Response 200
+{
+  "hits": [{
+    "doc_id": "178025",
+    "source": "orion_metadata",
+    "graphScore": 1.0,
+    "matchedTags": ["SSRF mitigation"],
+    "pathDescription": "Technology[SSRF mitigation] → HardProblem[SSRF-safe image loader] → Team[Payments Platform]",
+    "passage": "Implemented a server-side proxy using got-scrubbing library…",
+    "metadata": {
+      "title": "SSRF-safe external image loader",
+      "teamName": "Payments Platform",
+      "teamId": "42",
+      "people": [{ "personId": "65", "name": "Priya Sharma" }],
+      "technologies": ["SSRF mitigation", "npm", "Node.js"],
+      "documentLink": "https://talenticacontact.freshdesk.com/a/tickets/1234",
+      "category": "HARD_PROBLEMS",
+      "sourceAttribution": "Orion API"
+    }
+  }],
+  "query_time_ms": 180,
+  "total_found": 1
+}
 ```
 
+**Common rules for both retrieve endpoints:**
+
+| Field | Rule |
+|-------|------|
+| `hits` | Always an array — never `null` |
+| Empty result | `200` with `hits: []` — never error on no-match |
+| `passage` | Extractive from indexed `fileDetails.summary` — never LLM-paraphrased at this boundary |
+| `metadata` | Must include all fields needed to build Knowledge Card — Java never calls Orion |
+
+> ⚠️ **D2** — `min_score` default and `graphScore` normalization TBD in tech spec.
+
+#### `POST /admin/reseed` *(⚠️ D6 — optional)*
+
+Triggers F0 seed script. Java does **not** call this on the ask path.
+
+```json
+{ "force_refresh": false }
+```
 → `202 Accepted` `{ "job_id": "...", "status": "started" }`
 
 #### `GET /health`
 
-→ `{ "status": "ok", "last_orion_sync": "ISO-8601", "indexed_records": 1204, "neo4j_reachable": true }`
+→ `{ "status": "ok", "last_seed_run": "ISO-8601", "indexed_records": 1204, "neo4j_reachable": true }`
 
-### Orion — external (Python ingest only)
+---
 
-See [orion-api-documentation.md](orion-api-documentation.md). Stub mode reads `postman/*.json`; live mode uses `ORION_API_KEY` and `ORION_AUTH_TOKEN` on the **Python** service only.
+### Orion API — external (Python seed script only)
+
+See [orion-api-documentation.md](orion-api-documentation.md). Offline seed reads `postman/*.json` fixtures; live seed uses `ORION_API_KEY` env var on the Python service only. Java has no Orion credentials.
 
 ---
 
@@ -516,11 +687,14 @@ Eval calls the **same** `POST /ask` entrypoint as the product UI. Assert: no hal
 
 | Feature | Description | Primary owner | Key components |
 |---------|-------------|---------------|----------------|
-| **F1** | Ask → Knowledge Card | Sage Java | `ChatController`, `SageRoot`, `KnowledgeCardSynth` |
-| **F2** | Similar tech / problem blend | Sage + Graph RAG | `IntentClassify` + intent-biased `/retrieve` |
-| **F3** | Expertise routing | Graph RAG → Sage | Hit `metadata.teams` / `people` |
-| **F4** | Document retrieval & summary | Graph RAG → Sage | `passage`, `fileName` / ticket link |
-| **F5** | Honest no-answer + gap flag | Sage Java | `KnowledgeCardSynth` |
-| **F6** | Web chat interface | Sage Java | SSE streaming |
-| **F7** | Ingestion | Graph RAG Python | Orion-metadata sync → Neo4j (PDF later) |
-| **F8** | Evaluation | Sage Java | Promptfoo → `POST /ask` |
+| **F0** | Knowledge DB seed — Orion API + PDFs → Neo4j | Python seed script | 4-endpoint fan-out, embedding generation, graph edge creation |
+| **F1** | Ask → query interpretation → Knowledge Card | Sage Java | `ChatController`, `SageRoot`, `QueryInterpret`, `KnowledgeCardSynth` |
+| **F2** | Parallel hybrid search (semantic + Graph RAG) | Java ADK + Python | `ParallelAgent`, `SemanticSearchAgent`, `GraphTraversalAgent`, `POST /retrieve/semantic`, `POST /retrieve/graph` |
+| **F3** | Confidence score + ranked results | Java `ResultMerger` | Weighted blend *(⚠️ D2)*, deduplication, sort |
+| **F4** | Document retrieval, summary, expertise routing | Python → Java | Neo4j hit `passage` / `documentLink`, team + people from metadata |
+| **F5** | Honest no-answer + gap flag | Sage Java | `KnowledgeCardSynth` — `gapFlag: true` when `results` empty |
+| **F6** | SSE streaming API — Postman client | Sage Java | `SseEmitter`, status events, `result` event, `done` |
+| **F7** | PDF ingestion (curated corpus) | Python seed script | PDF chunking, embedding, link to `HardProblem`/`Document` nodes |
+| **F8** | Evaluation & metrics harness | Sage Java | Promptfoo → `POST /ask`, MLflow metrics |
+
+> **Web chat UI** (original F6) is deferred post-POC. POC client is Postman + SSE only.
