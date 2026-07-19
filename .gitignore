@@ -149,3 +149,12 @@ junit.xml
 *.iso
 *.tar.gz
 *.zip
+
+# Sage - Maven wrapper files
+/sage/mvnw
+/sage/mvnw.cmd
+/sage/.mvn/
+
+# Sage - service-level Git files
+/sage/.gitignore
+/sage/.gitattributes
