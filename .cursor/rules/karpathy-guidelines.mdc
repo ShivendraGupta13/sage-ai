@@ -1,0 +1,34 @@
+---
+description: Karpathy guidelines — simplicity, surgical edits, verifiable goals
+alwaysApply: true
+---
+
+# Karpathy Guidelines
+
+Bias caution over speed. For trivial tasks, use judgment.
+Derived from [karpathy-guidelines](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/skills/karpathy-guidelines/SKILL.md).
+
+## 1. Think Before Coding
+
+- State assumptions; if uncertain, ask
+- Present multiple interpretations — do not pick silently
+- Push back when a simpler approach exists
+- If unclear, stop and name what is confusing
+
+## 2. Simplicity First
+
+- No features beyond what was asked
+- No abstractions for single-use code
+- No speculative configurability or impossible-path error handling
+- If 200 lines could be 50, rewrite
+
+## 3. Surgical Changes
+
+- Touch only what the request requires; match existing style
+- Do not refactor adjacent code or delete unrelated dead code
+- Remove orphans only your change made unused
+
+## 4. Goal-Driven Execution
+
+- Define verifiable success criteria before coding
+- Multi-step: `step → verify` per item; loop until checks pass
