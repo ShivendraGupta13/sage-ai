@@ -4,7 +4,7 @@
 > **Architecture:** [architecture.md](architecture.md)  
 > **Product scope:** [feature-document.md](../feature-document.md)  
 > **Orion reference (ingest only):** [orion-api-documentation.md](orion-api-documentation.md)  
-> **Stack:** Java **25** (LTS) · Spring Boot **4.1** · Google ADK 1.5.0 · LangChain4j / Ollama  
+> **Stack:** Java **21** (LTS) · Spring Boot **4.1** · Google ADK 1.5.0 · LangChain4j / Ollama  
 > **Purpose:** How to use [Google ADK for Java](https://google.github.io/adk-docs/get-started/java/) for Sage's ask-time agent orchestration.
 
 ---
@@ -87,6 +87,8 @@ flowchart TB
 ```
 
 **Pipeline:** `SageRoot` (`SequentialAgent`) → `QueryInterpret` → `ParallelRetrieve` → `ResultMerger` → `KnowledgeCardSynth`.
+
+**Package home:** Agent and tool classes live under `com.company.sage.adk` (`agents/`, `tools/`, `SageAgents` factory); HTTP clients under `com.company.sage.clients.graphrag`. See [architecture.md §2](architecture.md#2-project-structure).
 
 ---
 

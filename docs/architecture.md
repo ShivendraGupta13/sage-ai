@@ -72,7 +72,7 @@ This document specifies:
 
 | Component | Version / choice |
 |-----------|------------------|
-| Java | **25** (LTS) |
+| Java | **21** (LTS; Spring Boot 4.1 supports 17–26 — bump to 25 when toolchain is available) |
 | Spring Boot | **4.1** (Spring Framework 7.x via Boot) |
 | Google Java ADK | 1.5.0 (+ LangChain4j bridge for local LLM) |
 | Graph store | **Neo4j Community Edition** (Docker, free / GPLv3) |
@@ -82,32 +82,37 @@ This document specifies:
 ### Repository layout
 
 ```text
-sage-ai/
+sage-ai/                             # Maven project root (this repo)
+├── pom.xml                          # Java 21 · Spring Boot 4.1 · Google ADK
 ├── feature-document.md              # Product scope and acceptance criteria
 ├── docs/
 │   ├── architecture.md              # This document — system boundaries and contracts
 │   ├── google-java-adk-usage.md     # ADK agent tree, tools, and wiring
 │   ├── orion-api-documentation.md   # Orion HTTP API reference (ingest source)
-│   └── RAG_Design.md                # Draft RAG internals — not authoritative
+│   └── GraphRAG_DESIGN.md           # Python Graph RAG proposal — not this Java app
 ├── postman/                         # Orion fixtures for Python ingest stub/offline mode
 │   ├── sage ai.postman_collection.json
 │   └── *.json                       # Captured response payloads
 │
-├── sage/                            # Java 25 · Spring Boot 4.1 · Google ADK (:8080)
-│   └── src/main/java/com/company/sage/
-│       ├── SageApplication.java
-│       ├── chat/                    # POST /ask, SSE streaming
-│       ├── clients/graphrag/        # GraphRagApiClient → /retrieve, /health
-│       ├── model/                   # KnowledgeCard, RetrieveHit DTOs, Intent enum
-│       └── adk/                     # IntentClassify, GraphRagRetrieve, Synth, factory
-│
-└── graph-rag-service/               # Python — FastAPI (:8000)
-    └── app/
-        ├── main.py                  # FastAPI entry
-        ├── api/                     # /retrieve, /ingest, /health
-        ├── ingest/                  # Orion sync (PDF ingest later)
-        ├── retrieval/               # Vector + graph traversal
-        └── store/                   # Neo4j + vector index (internal)
+├── src/main/java/com/company/sage/  # Ask orchestration (:8080)
+│   ├── SageApplication.java
+│   ├── chat/                        # POST /ask, SSE streaming
+│   ├── clients/graphrag/            # HTTP clients → /retrieve/semantic, /retrieve/graph, /health
+│   ├── model/                       # KnowledgeCard, RetrieveHit DTOs
+│   ├── adk/
+│   │   ├── SageAgents.java          # Agent factory (SequentialAgent SageRoot)
+│   │   ├── agents/                  # QueryInterpret, SemanticSearch, GraphTraversal, Synth
+│   │   └── tools/                   # SemanticSearch, GraphTraversal, ResultMerger FunctionTools
+│   ├── merge/                       # Deterministic ResultMerger scoring logic
+│   └── config/                      # LLM / retrieval / scoring Spring config
+├── src/main/resources/
+│   └── application.yml
+└── src/test/java/com/company/sage/
+    └── SageApplicationTests.java
+
+# Separate service (not in this Maven module) — Python FastAPI (:8000)
+# graph-rag-service/
+#   └── app/ … ingest, retrieval, Neo4j store
 ```
 
 **Boundary rule:** Java owns ask orchestration and intent classification. Python owns Orion ingest, Neo4j, and retrieval. Both share only HTTP contracts defined in [§12](#12-inter-service-api-contracts). Java has **no** Orion client.
@@ -199,7 +204,7 @@ flowchart TB
 
 | Responsibility | Technology |
 |----------------|------------|
-| Public API (`POST /ask`, SSE) | Spring Boot **4.1** · Java **25** |
+| Public API (`POST /ask`, SSE) | Spring Boot **4.1** · Java **21** |
 | Agent orchestration | Google Java ADK 1.5.0 |
 | **Query interpretation** | ADK `QueryInterpret` → `problemStatement` + `techNeeded[]` |
 | **Parallel search fan-out** | ADK `ParallelAgent` → `SemanticSearchAgent` + `GraphTraversalAgent` |
@@ -642,7 +647,7 @@ Never hardcode cookies or API keys. Treat `postman/` fixtures as confidential.
 ## 15. Deployment topology
 
 ```text
-:8080  sage-java      Spring Boot 4.1 + ADK + Web Chat (Java 25)
+:8080  sage-java      Spring Boot 4.1 + ADK + Web Chat (Java 21)
 :8000  graph-rag      FastAPI + Neo4j client + retrieval
 :7687  neo4j          Neo4j Community Edition (Docker)
 :11434 ollama         Local LLM for ADK agents

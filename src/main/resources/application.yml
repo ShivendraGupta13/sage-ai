@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+sage:
+  python:
+    base-url: http://localhost:8000
+  adk:
+    llm:
+      base-url: http://localhost:11434
+      model-name: llama3.2:3b
+  retrieval:
+    top-k: 5
+    min-score: 0.60
+  scoring:
+    w1: 0.6
+    w2: 0.4
+    dual-match-boost: 0.1

@@ -30,7 +30,6 @@ $RECYCLE.BIN/
 
 # Agent skills (local installs; not project source)
 .agents/
-.cursor/skills/
 skills-lock.json
 
 # Cursor / editor local state
