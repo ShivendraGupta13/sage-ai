@@ -314,4 +314,4 @@ Offline/stub mode: set `ORION_API_KEY=stub` → seed script uses local/offline d
 
 ## Validation
 
-Shapes validated from committed fixtures only. Live HTTP validation was not possible from the documentation environment (network restricted).
+Shapes documented from the committed Postman collection. Live HTTP validation was not possible from the documentation environment (network restricted).
