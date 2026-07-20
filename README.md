@@ -22,7 +22,7 @@ Ports: Neo4j Bolt `:7687`, Browser `:7474`.
 cd ../graph-rag-service
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-# Offline seed uses Orion fixtures from this repo:
+# Offline seed may use the Postman collection from this repo:
 # python scripts/seed_orion.py --offline ../sage-ai/orion-apis
 uvicorn app.main:app --reload --port 8000
 ```
@@ -40,7 +40,7 @@ Base URL for Graph RAG (default): `SAGE_GRAPH_RAG_BASE_URL=http://localhost:8000
 
 ### 4. Ask via Postman or curl
 
-Import Orion fixtures / collections from [`orion-apis/`](orion-apis/).
+Import [`orion-apis/sage ai.postman_collection.json`](orion-apis/sage%20ai.postman_collection.json) (Orion ingest collection — only file under `orion-apis/`).
 
 ```bash
 curl -N -X POST http://localhost:8080/ask \
@@ -54,7 +54,8 @@ curl -N -X POST http://localhost:8080/ask \
 |-----|---------|
 | [feature-document.md](feature-document.md) | Product scope F0–F8 |
 | [docs/SPEC.md](docs/SPEC.md) | Master spec + contract index |
-| [docs/contracts/](docs/contracts/) | Inter-service API contracts |
+| [docs/contracts/ask-api.md](docs/contracts/ask-api.md) | Sage public ask/health contract |
+| [docs/contracts/retrieve-api.md](docs/contracts/retrieve-api.md) | Graph RAG retrieve contract |
 | [docs/architecture.md](docs/architecture.md) | System design |
 | [docs/google-java-adk-usage.md](docs/google-java-adk-usage.md) | Google Java ADK agent tree |
 | [docs/orion-api-documentation.md](docs/orion-api-documentation.md) | Orion ingest API (Python only) |

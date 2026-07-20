@@ -1,6 +1,6 @@
 # Orion API Documentation
 
-HTTP reference for Orion endpoints used by Sage's **seed script (F0)**. Captured from `orion-apis/sage ai.postman_collection.json` and validated against fixture payloads in `orion-apis/`.
+HTTP reference for Orion endpoints used by Sage's **seed script (F0)**. Captured from [`orion-apis/sage ai.postman_collection.json`](../orion-apis/sage%20ai.postman_collection.json). Request/response shapes below are documented from that collection — individual fixture JSON payloads are **not** committed.
 
 > **Architecture note:** Nexus (`nexus.talentica.com`) is a web portal that calls this same Orion API. There is no separate Nexus backend. Sage uses the Orion API directly with `api-key` authentication — Nexus and Orion API are the same data source.
 
@@ -53,7 +53,7 @@ See [architecture.md §6](architecture.md#6-orion-api--ingest-only-never-at-ask-
 | `Cookie: auth-token=<JWT>; cf_clearance=<value>` | Yes | Browser-style session; both values redacted in fixtures |
 | `api-key: <value>` | On `apiorion` host | Present in Postman captures for production host |
 
-Stub mode (`ORION_API_KEY=stub`) reads committed `orion-apis/*.json` fixtures — no live HTTP.
+Stub mode (`ORION_API_KEY=stub`) uses the Postman collection / local caches configured by the Python seed script — no live HTTP. Only `orion-apis/sage ai.postman_collection.json` is committed in this repo.
 
 ---
 
@@ -130,7 +130,7 @@ Cookie: auth-token=<redacted>; cf_clearance=<redacted>
 | `customersValueAdd.teamId` | object | Team on card |
 | `customersValueAdd.ticketLink` | string | Citation URL |
 
-**Fixture:** `orion-apis/valueAddsByTag?tag=OpenTelemetry.json`
+**Source:** Postman collection request for `valueAddsByTag` (see `orion-apis/sage ai.postman_collection.json`).
 
 ---
 
@@ -186,7 +186,7 @@ Host: apiorion.talentica.com
 | `teamSize` | number | Context (often 0 in fixtures) |
 | `startDate` | string (date) | Temporal context |
 
-**Fixture:** `orion-apis/https-::apiorion.talentica.com:technology:getTechDigest:label?techDigestLabel=OpenTelemetry.json`
+**Source:** Postman collection request for `getTechDigest/label` (see `orion-apis/sage ai.postman_collection.json`).
 
 ---
 
@@ -231,7 +231,7 @@ Host: apiorion.talentica.com
 ]
 ```
 
-**Fixture:** `orion-apis/https-::apiorion.talentica.com:tech:categories.json`
+**Source:** Postman collection request for `tech/categories` (see `orion-apis/sage ai.postman_collection.json`).
 
 ---
 
@@ -291,7 +291,7 @@ Host: apidev-orion.talentica.com
 
 **Note:** No `summary` field at the top level — unlike `valueAddsByTag` which nests summary under `fileDetails`.
 
-**Fixture:** `orion-apis/Hard Problems for the financial year.json`
+**Source:** Postman collection request for `hardProblemsFinancialYear` (see `orion-apis/sage ai.postman_collection.json`).
 
 ---
 
@@ -304,7 +304,7 @@ Host: apidev-orion.talentica.com
 | API key | `api-key: <value>` | `apiorion.talentica.com` | Steps 1, 2, 3 (preferred for seed script) |
 | Cookie | `Cookie: auth-token=<JWT>; cf_clearance=<value>` | `apidev-orion.talentica.com` | Step 4 (dev host; browser session only) |
 
-Offline/stub mode: set `ORION_API_KEY=stub` → seed script reads `orion-apis/*.json` fixtures instead of making live HTTP calls.
+Offline/stub mode: set `ORION_API_KEY=stub` → seed script uses local/offline data configured against the Postman collection; only `orion-apis/sage ai.postman_collection.json` is committed here.
 
 ## Pagination and errors
 
