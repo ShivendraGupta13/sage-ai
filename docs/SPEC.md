@@ -8,10 +8,11 @@ Master index for the Sage expertise-locator POC. Product requirements live in th
 |-------|-----|---------|
 | 1 | [feature-document.md](../feature-document.md) | Product scope F0–F8, Knowledge Card, non-goals |
 | 2 | [architecture.md](architecture.md) | System design, ownership, ask lifecycle, §12 contracts |
-| 3 | [contracts/ask-api.md](contracts/ask-api.md) | Sage public `POST /ask` SSE + `GET /health` |
-| 4 | [contracts/retrieve-api.md](contracts/retrieve-api.md) | Graph RAG `/retrieve/*` (what Java calls) |
-| 5 | [google-java-adk-usage.md](google-java-adk-usage.md) | ADK agent tree, tools, fail-soft behavior |
-| 6 | [orion-api-documentation.md](orion-api-documentation.md) | Orion ingest HTTP (Python seed only) |
+| 3 | [spec-coverage-map.md](spec-coverage-map.md) | What future specs must cover (Spring / ADK / Graph RAG) + ownership split |
+| 4 | [contracts/ask-api.md](contracts/ask-api.md) | Sage public `POST /ask` SSE + `GET /health` |
+| 5 | [contracts/retrieve-api.md](contracts/retrieve-api.md) | Graph RAG `/retrieve/*` (what Java calls) |
+| 6 | [google-java-adk-usage.md](google-java-adk-usage.md) | ADK agent tree, tools, fail-soft behavior |
+| 7 | [orion-api-documentation.md](orion-api-documentation.md) | Orion ingest HTTP (Python seed only) |
 
 ## Sister service (Python)
 
