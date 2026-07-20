@@ -1,0 +1,2936 @@
+[
+    {
+        "fileDetails": {
+            "id": 1046,
+            "ticketId": 414,
+            "fileName": "Rupeek Mail - Observability @Rupeek.pdf",
+            "teamId": 52,
+            "title": "Application monitoring platform from NewRelic to OpenTelemetry",
+            "summary": "- **Title:** Cost Reduction and Transition to a Self-Managed Observability Stack at Rupeek\n\n- **Challenges/Problems:**\n  - Monthly observability expenditure with NewRelic around $7000 deemed excessive.\n  - High per-user and data-ingestion fees contributed significantly to costs.\n  - Need to maintain comparable functionality while reducing costs by at least 50%.\n\n- **Solution:**\n  - Conducted a thorough cost analysis of NewRelic and validated findings with peer companies.\n  - Engaged with multiple engineering teams to identify critical observability features needing migration.\n  - Implemented a cost-effective observability stack with Prometheus, Loki, Grafana, Tempo, and OpenTelemetry, replacing NewRelic.\n  - Developed scripts to facilitate migration of alerts and routing rules from NewRelic and PagerDuty to the new Prometheus Alert Manager.\n\n- **Results/Impact:**\n  - Successful infrastructure migration completed; APM migration is currently underway.\n  - Positioned to achieve a dramatic reduction in observability costs by September 2023 while preserving essential functionalities.\n  - Established a basis for ongoing improvements, including enhancing the robustness and cost-effectiveness of the new stack.",
+            "techDigests": "OpenTelemetry, Prometheus, Grafana, Loki",
+            "tags": "Fintech, Observability, Cloud, Migration"
+        },
+        "customersValueAdd": {
+            "id": 178025,
+            "title": "Application monitoring platform from NewRelic to OpenTelemetry",
+            "ownerId": [
+                {
+                    "id": 65,
+                    "name": "Hemant Sachdeva",
+                    "email": "Hemant.Sachdeva@talentica.com",
+                    "userId": null
+                }
+            ],
+            "teamId": {
+                "id": 52,
+                "teamName": "Rupeek",
+                "vantixTeamName": "Rupeek Fintech Private Limited",
+                "teamShortName": "Rupeek",
+                "teamJiraName": "Rupeek",
+                "teamJiraLink": null,
+                "teamType": null,
+                "noOfHoursPerSP": 8.0,
+                "teamLeads": [
+                    {
+                        "id": 164,
+                        "name": "Tonmoy",
+                        "role": "LEAD",
+                        "userTeamRoles": [
+                            {
+                                "id": 4792,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 52,
+                                    "teamName": "Rupeek",
+                                    "vantixTeamName": "Rupeek Fintech Private Limited",
+                                    "teamShortName": "Rupeek",
+                                    "teamJiraName": "Rupeek",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "tonmoy.kaushik@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "ACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 62,
+                        "name": "Siddharth",
+                        "role": "LEAD",
+                        "userTeamRoles": [
+                            {
+                                "id": 3210,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 128,
+                                    "teamName": "Mflex",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Mflex",
+                                    "teamJiraName": "Mflex",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4793,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 52,
+                                    "teamName": "Rupeek",
+                                    "vantixTeamName": "Rupeek Fintech Private Limited",
+                                    "teamShortName": "Rupeek",
+                                    "teamJiraName": "Rupeek",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "Siddharth.Malviya@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "INACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 81,
+                        "name": "Nilesh Padwal",
+                        "role": "M4",
+                        "userTeamRoles": [
+                            {
+                                "id": 4130,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 22,
+                                    "teamName": "Deal Vector",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "DV",
+                                    "teamJiraName": "Deal Vector",
+                                    "teamJiraLink": null,
+                                    "teamType": "EARLY",
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": null,
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4131,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 60,
+                                    "teamName": "Autodesk - Admin",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "PG-Admin",
+                                    "teamJiraName": "Plangrid - Admin",
+                                    "teamJiraLink": "https://jira.autodesk.com/",
+                                    "teamType": "BIG_TECH",
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2023,
+                                        7,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4133,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 34,
+                                    "teamName": "Mynd",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Mynd",
+                                    "teamJiraName": "Mynd",
+                                    "teamJiraLink": "https://homeunion.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2014,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2024,
+                                        1,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4134,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 71,
+                                    "teamName": "Roostify - HSBC",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Roostify",
+                                    "teamJiraName": "HSBC",
+                                    "teamJiraLink": "https://roostify.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2024,
+                                        3,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4135,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 30,
+                                    "teamName": "Spinwheel",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Spinwheel",
+                                    "teamJiraName": "Spinwheel",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2022,
+                                        12,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2024,
+                                        3,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4136,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 18,
+                                    "teamName": "Autodesk - NextGen Field + Forms",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "PG-NxtGen",
+                                    "teamJiraName": "NGF",
+                                    "teamJiraLink": "https://jira.autodesk.com/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4139,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 109,
+                                    "teamName": "Wyng-Services",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Wyng",
+                                    "teamJiraName": "Services",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4141,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 11,
+                                    "teamName": "Intuit",
+                                    "vantixTeamName": "Intuit",
+                                    "teamShortName": "Intuit",
+                                    "teamJiraName": "Intuit",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": true,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4143,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 5,
+                                    "teamName": "Autodesk - RFI+Submittals",
+                                    "vantixTeamName": "Autodesk",
+                                    "teamShortName": "PG-RFI",
+                                    "teamJiraName": "RFIS,SUBMITTALS",
+                                    "teamJiraLink": "https://jira.autodesk.com/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4144,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 76,
+                                    "teamName": "Autodesk BIM360 Issues",
+                                    "vantixTeamName": "Autodesk",
+                                    "teamShortName": "PG-Issues",
+                                    "teamJiraName": "ISSUES",
+                                    "teamJiraLink": "https://jira.autodesk.com/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        4,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4145,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 141,
+                                    "teamName": "Cequence",
+                                    "vantixTeamName": "Cequence",
+                                    "teamShortName": "Cequence",
+                                    "teamJiraName": "Cequence",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        4,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4146,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 110,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles life",
+                                    "teamJiraName": "Circles.Life",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4147,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 72,
+                                    "teamName": "Orion",
+                                    "vantixTeamName": "",
+                                    "teamShortName": "Orion",
+                                    "teamJiraName": "Orion",
+                                    "teamJiraLink": "http://172.29.101.194:8080/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2021,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4148,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 122,
+                                    "teamName": "Wyng-Platform",
+                                    "vantixTeamName": "Wyng Inc.",
+                                    "teamShortName": "Wyng",
+                                    "teamJiraName": "Platform",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4149,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 73,
+                                    "teamName": "WideOrbit - AFR",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "Wideorbit - AFR",
+                                    "teamJiraName": "WIDEORBIT-AFR",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4150,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 149,
+                                    "teamName": "WideOrbit - AI",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbit - AI",
+                                    "teamJiraName": "WideOrbit-AI",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4152,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 134,
+                                    "teamName": "WideOrbit - DigitalHub",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbit Digital Hub",
+                                    "teamJiraName": "WODigitalHub",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4154,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 156,
+                                    "teamName": "Circles-KDDI-Foundation",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles-KDDI",
+                                    "teamJiraName": "KDDI",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4155,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 155,
+                                    "teamName": "Circles-TSEL",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles-TSEL",
+                                    "teamJiraName": "Circles-TSEL",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4218,
+                                "userRole": {
+                                    "id": 7,
+                                    "role": "CUSTOMER",
+                                    "priority": 0.0
+                                },
+                                "team": {
+                                    "id": 70,
+                                    "teamName": "Light Microfinance - MFI",
+                                    "vantixTeamName": "Light Microfinance Private Limited",
+                                    "teamShortName": "Light Micro finance",
+                                    "teamJiraName": "MFI",
+                                    "teamJiraLink": "https://light-microfinance-pvt-ltd.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4221,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 70,
+                                    "teamName": "Light Microfinance - MFI",
+                                    "vantixTeamName": "Light Microfinance Private Limited",
+                                    "teamShortName": "Light Micro finance",
+                                    "teamJiraName": "MFI",
+                                    "teamJiraLink": "https://light-microfinance-pvt-ltd.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4769,
+                                "userRole": {
+                                    "id": 7,
+                                    "role": "CUSTOMER",
+                                    "priority": 0.0
+                                },
+                                "team": {
+                                    "id": 69,
+                                    "teamName": "Light Microfinance - Digital Lending",
+                                    "vantixTeamName": "Light Microfinance Private Limited",
+                                    "teamShortName": "Light Micro Finance Digital Lending",
+                                    "teamJiraName": "DIGITALLENDING",
+                                    "teamJiraLink": "https://light-microfinance-pvt-ltd.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2022,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4780,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 23,
+                                    "teamName": "WideOrbit - DataBridge",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbitAnalytics",
+                                    "teamJiraName": "WIDEORBIT-ANALYTICS",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2009,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4795,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 52,
+                                    "teamName": "Rupeek",
+                                    "vantixTeamName": "Rupeek Fintech Private Limited",
+                                    "teamShortName": "Rupeek",
+                                    "teamJiraName": "Rupeek",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "Nilesh.Padwal@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "ACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 113,
+                        "name": "Hemant Sachdeva",
+                        "role": "ADMIN",
+                        "userTeamRoles": [
+                            {
+                                "id": 3881,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 48,
+                                    "teamName": "Rupeek-Satyendra",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Rupeek-S",
+                                    "teamJiraName": "Rupeek-Satyendra",
+                                    "teamJiraLink": null,
+                                    "teamType": "GROWTH",
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": null,
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3979,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 72,
+                                    "teamName": "Orion",
+                                    "vantixTeamName": "",
+                                    "teamShortName": "Orion",
+                                    "teamJiraName": "Orion",
+                                    "teamJiraLink": "http://172.29.101.194:8080/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2021,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4750,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 40,
+                                    "teamName": "FinOptSys",
+                                    "vantixTeamName": "FinOptSys",
+                                    "teamShortName": "FinOpt",
+                                    "teamJiraName": "FinOptSys",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2018,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4796,
+                                "userRole": {
+                                    "id": 1,
+                                    "role": "ADMIN",
+                                    "priority": 5.0
+                                },
+                                "team": {
+                                    "id": 52,
+                                    "teamName": "Rupeek",
+                                    "vantixTeamName": "Rupeek Fintech Private Limited",
+                                    "teamShortName": "Rupeek",
+                                    "teamJiraName": "Rupeek",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "hemant.sachdeva@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "ACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 47,
+                        "name": "Sushil",
+                        "role": "MANAGER",
+                        "userTeamRoles": [
+                            {
+                                "id": 4916,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 34,
+                                    "teamName": "Mynd",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Mynd",
+                                    "teamJiraName": "Mynd",
+                                    "teamJiraLink": "https://homeunion.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2014,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2024,
+                                        1,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4917,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 149,
+                                    "teamName": "WideOrbit - AI",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbit - AI",
+                                    "teamJiraName": "WideOrbit-AI",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4918,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 73,
+                                    "teamName": "WideOrbit - AFR",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "Wideorbit - AFR",
+                                    "teamJiraName": "WIDEORBIT-AFR",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4919,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 134,
+                                    "teamName": "WideOrbit - DigitalHub",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbit Digital Hub",
+                                    "teamJiraName": "WODigitalHub",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4920,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 23,
+                                    "teamName": "WideOrbit - DataBridge",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbitAnalytics",
+                                    "teamJiraName": "WIDEORBIT-ANALYTICS",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2009,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4921,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 52,
+                                    "teamName": "Rupeek",
+                                    "vantixTeamName": "Rupeek Fintech Private Limited",
+                                    "teamShortName": "Rupeek",
+                                    "teamJiraName": "Rupeek",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "sushil.pawar@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "ACTIVE",
+                        "customerType": null
+                    }
+                ],
+                "activeSince": [
+                    2019,
+                    6,
+                    1
+                ],
+                "endDate": null,
+                "status": "ACTIVE",
+                "isTeg": false,
+                "excludeCompliance": false,
+                "complianceByStory": true,
+                "doneStatuses": null,
+                "onTimeIssueTypes": null
+            },
+            "type": "HARD_PROBLEMS",
+            "impact": null,
+            "status": "ACCEPTED",
+            "cycleId": {
+                "id": 6,
+                "halfYearlyName": "24-25 H2",
+                "sortOrder": 14
+            },
+            "infoLink": null,
+            "submittedTime": [
+                2024,
+                10,
+                22
+            ],
+            "reviewedTime": [
+                2024,
+                11,
+                28
+            ],
+            "ticketLink": "https://talenticainnovations.freshdesk.com/a/tickets/414",
+            "ticketId": 414,
+            "customersValueAddJob": {
+                "id": 3303,
+                "fileName": "ENG - Customer Value Add - FY 24-25.xlsx",
+                "lastSuccessfulJobRun": 1775626215767
+            },
+            "techDigests": null,
+            "tags": null,
+            "techDigestModels": null,
+            "customerIconLink": "https://prod-strapi-image-bucket.s3.ap-south-1.amazonaws.com/rupeek%20logo.png",
+            "submittedDate": "2024-10-22",
+            "customerSegment": null
+        }
+    },
+    {
+        "fileDetails": {
+            "id": 2647,
+            "ticketId": 533,
+            "fileName": "Circles_IQ_GenAI_Feature.pdf",
+            "teamId": null,
+            "title": "GenAI Feature",
+            "summary": "- **Title**: Circles IQ - GenAI Feature Implementation\n- **Challenges/Problems**:\n  - Users faced difficulties with static help and keyword search, leading to wrong or irrelevant answers.\n  - Poor handling of follow-up questions reduced overall user satisfaction.\n  - Missed opportunities for personalized plan recommendations that could enhance engagement.\n  - Static systems failed to understand user intent, making it hard to retrieve tailored responses.\n  \n- **Solution**:\n  - Implemented a conversational AI system using embeddings, vector search, LLM intent classification, and orchestration for personalized plan recommendations.\n  - Deployed a multi-agent architecture (FAQ, Recommendation, Fulfillment, Support) interconnected via an orchestrator for better context management.\n  - Utilized OpenAI embeddings for semantic search and utilized a robust fallback mechanism for error handling.\n  - Evaluated performance with metrics focusing on accuracy, relevancy, and user engagement, driven by continuous improvement strategies.\n\n- **Results/Impact**:\n  - Achieved a 75% overall pass rate in evaluation tests, with high scores in answer relevancy (91.8%) and contextual recall (99.5%).\n  - Enhanced user satisfaction through accurate, relevant, and personalized recommendations leading to increased engagement with the app.\n  - Ongoing improvements based on metrics from evaluations are designed to enhance the model continuously.",
+            "techDigests": "Conversational User Interfaces, AI-assisted Development, Semantic Search, OpenTelemetry, OpenInference, Arize, Vector Search, LLM",
+            "tags": "Fintech, Digital Advertising, e-commerce, Customer Support, Innovation Management, User Experience, Data-driven Architecture"
+        },
+        "customersValueAdd": {
+            "id": 161532,
+            "title": "GenAI Feature",
+            "ownerId": [
+                {
+                    "id": 18,
+                    "name": "Sanny Kumar",
+                    "email": "Sanny.Kumar@talentica.com",
+                    "userId": null
+                }
+            ],
+            "teamId": {
+                "id": 110,
+                "teamName": "Circles-Beyond",
+                "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                "teamShortName": "Circles life",
+                "teamJiraName": "Circles.Life",
+                "teamJiraLink": null,
+                "teamType": null,
+                "noOfHoursPerSP": 8.0,
+                "teamLeads": [
+                    {
+                        "id": 95,
+                        "name": "Sanny Kumar ",
+                        "role": "LEAD",
+                        "userTeamRoles": [
+                            {
+                                "id": 3868,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 154,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles-Beyond",
+                                    "teamJiraName": "Circles-Beyond",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3873,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 110,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles life",
+                                    "teamJiraName": "Circles.Life",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "Sanny.Kumar@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "ACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 38,
+                        "name": "Deepesh Saheb",
+                        "role": "ADMIN",
+                        "userTeamRoles": [
+                            {
+                                "id": 2762,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 30,
+                                    "teamName": "Spinwheel",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Spinwheel",
+                                    "teamJiraName": "Spinwheel",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2022,
+                                        12,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2024,
+                                        3,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3330,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 135,
+                                    "teamName": "Nexus",
+                                    "vantixTeamName": "",
+                                    "teamShortName": "Nexus",
+                                    "teamJiraName": "Nexus",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3557,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 11,
+                                    "teamName": "Intuit",
+                                    "vantixTeamName": "Intuit",
+                                    "teamShortName": "Intuit",
+                                    "teamJiraName": "Intuit",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": true,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3558,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 11,
+                                    "teamName": "Intuit",
+                                    "vantixTeamName": "Intuit",
+                                    "teamShortName": "Intuit",
+                                    "teamJiraName": "Intuit",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": true,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3869,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 154,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles-Beyond",
+                                    "teamJiraName": "Circles-Beyond",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3871,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 155,
+                                    "teamName": "Circles-TSEL",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles-TSEL",
+                                    "teamJiraName": "Circles-TSEL",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3872,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 156,
+                                    "teamName": "Circles-KDDI-Foundation",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles-KDDI",
+                                    "teamJiraName": "KDDI",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3874,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 110,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles life",
+                                    "teamJiraName": "Circles.Life",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3949,
+                                "userRole": {
+                                    "id": 1,
+                                    "role": "ADMIN",
+                                    "priority": 5.0
+                                },
+                                "team": {
+                                    "id": 72,
+                                    "teamName": "Orion",
+                                    "vantixTeamName": "",
+                                    "teamShortName": "Orion",
+                                    "teamJiraName": "Orion",
+                                    "teamJiraLink": "http://172.29.101.194:8080/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2021,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3972,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 72,
+                                    "teamName": "Orion",
+                                    "vantixTeamName": "",
+                                    "teamShortName": "Orion",
+                                    "teamJiraName": "Orion",
+                                    "teamJiraLink": "http://172.29.101.194:8080/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2021,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4207,
+                                "userRole": {
+                                    "id": 7,
+                                    "role": "CUSTOMER",
+                                    "priority": 0.0
+                                },
+                                "team": {
+                                    "id": 70,
+                                    "teamName": "Light Microfinance - MFI",
+                                    "vantixTeamName": "Light Microfinance Private Limited",
+                                    "teamShortName": "Light Micro finance",
+                                    "teamJiraName": "MFI",
+                                    "teamJiraLink": "https://light-microfinance-pvt-ltd.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4759,
+                                "userRole": {
+                                    "id": 7,
+                                    "role": "CUSTOMER",
+                                    "priority": 0.0
+                                },
+                                "team": {
+                                    "id": 69,
+                                    "teamName": "Light Microfinance - Digital Lending",
+                                    "vantixTeamName": "Light Microfinance Private Limited",
+                                    "teamShortName": "Light Micro Finance Digital Lending",
+                                    "teamJiraName": "DIGITALLENDING",
+                                    "teamJiraLink": "https://light-microfinance-pvt-ltd.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2022,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "Deepesh.Saheb@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "ACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 122,
+                        "name": "Vinil Pansare",
+                        "role": "MANAGER",
+                        "userTeamRoles": [
+                            {
+                                "id": 3982,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 103,
+                                    "teamName": "Web Dev",
+                                    "vantixTeamName": "",
+                                    "teamShortName": "Web Dev",
+                                    "teamJiraName": "Web Dev",
+                                    "teamJiraLink": null,
+                                    "teamType": "EARLY",
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": true,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3983,
+                                "userRole": {
+                                    "id": 2,
+                                    "role": "MANAGER",
+                                    "priority": 3.0
+                                },
+                                "team": {
+                                    "id": 72,
+                                    "teamName": "Orion",
+                                    "vantixTeamName": "",
+                                    "teamShortName": "Orion",
+                                    "teamJiraName": "Orion",
+                                    "teamJiraLink": "http://172.29.101.194:8080/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2021,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3984,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 46,
+                                    "teamName": "HDFC Credila",
+                                    "vantixTeamName": "CREDILA FINANCIAL SERVICES LIMITED",
+                                    "teamShortName": "HDFCCredilla",
+                                    "teamJiraName": "HDFC Credila",
+                                    "teamJiraLink": "https://id.atlassian.com/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2020,
+                                        11,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": "ready for uat,uat qa done,deployed on uat,in qa,prod deployed,prod verified,qa completed,ready for tech review",
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3985,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 75,
+                                    "teamName": "Juniper - Paragon-EMS",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Paragon-EMS",
+                                    "teamJiraName": "Paragon",
+                                    "teamJiraLink": "https://id.atlassian.com/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": "staging testable,done,approved,closed,ready for customer review,qa review,qa test plan review,g4-g5 testing,g4-g5 test failed,g3 test failed,deployed,production review,production ready,validated in eop",
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3986,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 125,
+                                    "teamName": "SFA-GMS",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Sports for all",
+                                    "teamJiraName": "GMS",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        10,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3987,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 94,
+                                    "teamName": "SFA-Kirti",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Sports for all",
+                                    "teamJiraName": "Kirti",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        10,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2025,
+                                        2,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3988,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 8,
+                                    "teamName": "StructuredWeb",
+                                    "vantixTeamName": "StructuredWeb",
+                                    "teamShortName": "SW",
+                                    "teamJiraName": "StructuredWeb",
+                                    "teamJiraLink": "https://structuredweb.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2021,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3990,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 110,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles life",
+                                    "teamJiraName": "Circles.Life",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 3991,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 146,
+                                    "teamName": "JRD-Web",
+                                    "vantixTeamName": "Paragon",
+                                    "teamShortName": "JRD-Web",
+                                    "teamJiraName": "JRD-Web",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": "staging testable,done,approved,closed,ready for customer review,qa review,qa test plan review,g4-g5 testing,g4-g5 test failed,g3 test failed,deployed,production review,production ready,validated in eop",
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4836,
+                                "userRole": {
+                                    "id": 5,
+                                    "role": "WATCHER",
+                                    "priority": 1.0
+                                },
+                                "team": {
+                                    "id": 111,
+                                    "teamName": "Sema4-Context",
+                                    "vantixTeamName": "Sema4.ai",
+                                    "teamShortName": "Sema4.ai",
+                                    "teamJiraName": "Context",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "Vinil.Pansare@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "ACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 81,
+                        "name": "Nilesh Padwal",
+                        "role": "M4",
+                        "userTeamRoles": [
+                            {
+                                "id": 4130,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 22,
+                                    "teamName": "Deal Vector",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "DV",
+                                    "teamJiraName": "Deal Vector",
+                                    "teamJiraLink": null,
+                                    "teamType": "EARLY",
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": null,
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4131,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 60,
+                                    "teamName": "Autodesk - Admin",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "PG-Admin",
+                                    "teamJiraName": "Plangrid - Admin",
+                                    "teamJiraLink": "https://jira.autodesk.com/",
+                                    "teamType": "BIG_TECH",
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2023,
+                                        7,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4133,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 34,
+                                    "teamName": "Mynd",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Mynd",
+                                    "teamJiraName": "Mynd",
+                                    "teamJiraLink": "https://homeunion.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2014,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2024,
+                                        1,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4134,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 71,
+                                    "teamName": "Roostify - HSBC",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Roostify",
+                                    "teamJiraName": "HSBC",
+                                    "teamJiraLink": "https://roostify.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2024,
+                                        3,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4135,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 30,
+                                    "teamName": "Spinwheel",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Spinwheel",
+                                    "teamJiraName": "Spinwheel",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2022,
+                                        12,
+                                        1
+                                    ],
+                                    "endDate": [
+                                        2024,
+                                        3,
+                                        1
+                                    ],
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4136,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 18,
+                                    "teamName": "Autodesk - NextGen Field + Forms",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "PG-NxtGen",
+                                    "teamJiraName": "NGF",
+                                    "teamJiraLink": "https://jira.autodesk.com/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": null,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4139,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 109,
+                                    "teamName": "Wyng-Services",
+                                    "vantixTeamName": null,
+                                    "teamShortName": "Wyng",
+                                    "teamJiraName": "Services",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4141,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 11,
+                                    "teamName": "Intuit",
+                                    "vantixTeamName": "Intuit",
+                                    "teamShortName": "Intuit",
+                                    "teamJiraName": "Intuit",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "INACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": true,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4143,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 5,
+                                    "teamName": "Autodesk - RFI+Submittals",
+                                    "vantixTeamName": "Autodesk",
+                                    "teamShortName": "PG-RFI",
+                                    "teamJiraName": "RFIS,SUBMITTALS",
+                                    "teamJiraLink": "https://jira.autodesk.com/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4144,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 76,
+                                    "teamName": "Autodesk BIM360 Issues",
+                                    "vantixTeamName": "Autodesk",
+                                    "teamShortName": "PG-Issues",
+                                    "teamJiraName": "ISSUES",
+                                    "teamJiraLink": "https://jira.autodesk.com/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        4,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4145,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 141,
+                                    "teamName": "Cequence",
+                                    "vantixTeamName": "Cequence",
+                                    "teamShortName": "Cequence",
+                                    "teamJiraName": "Cequence",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        4,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4146,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 110,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles life",
+                                    "teamJiraName": "Circles.Life",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4147,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 72,
+                                    "teamName": "Orion",
+                                    "vantixTeamName": "",
+                                    "teamShortName": "Orion",
+                                    "teamJiraName": "Orion",
+                                    "teamJiraLink": "http://172.29.101.194:8080/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2021,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4148,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 122,
+                                    "teamName": "Wyng-Platform",
+                                    "vantixTeamName": "Wyng Inc.",
+                                    "teamShortName": "Wyng",
+                                    "teamJiraName": "Platform",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4149,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 73,
+                                    "teamName": "WideOrbit - AFR",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "Wideorbit - AFR",
+                                    "teamJiraName": "WIDEORBIT-AFR",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        5,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4150,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 149,
+                                    "teamName": "WideOrbit - AI",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbit - AI",
+                                    "teamJiraName": "WideOrbit-AI",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4152,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 134,
+                                    "teamName": "WideOrbit - DigitalHub",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbit Digital Hub",
+                                    "teamJiraName": "WODigitalHub",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4154,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 156,
+                                    "teamName": "Circles-KDDI-Foundation",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles-KDDI",
+                                    "teamJiraName": "KDDI",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4155,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 155,
+                                    "teamName": "Circles-TSEL",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles-TSEL",
+                                    "teamJiraName": "Circles-TSEL",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2025,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4218,
+                                "userRole": {
+                                    "id": 7,
+                                    "role": "CUSTOMER",
+                                    "priority": 0.0
+                                },
+                                "team": {
+                                    "id": 70,
+                                    "teamName": "Light Microfinance - MFI",
+                                    "vantixTeamName": "Light Microfinance Private Limited",
+                                    "teamShortName": "Light Micro finance",
+                                    "teamJiraName": "MFI",
+                                    "teamJiraLink": "https://light-microfinance-pvt-ltd.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4221,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 70,
+                                    "teamName": "Light Microfinance - MFI",
+                                    "vantixTeamName": "Light Microfinance Private Limited",
+                                    "teamShortName": "Light Micro finance",
+                                    "teamJiraName": "MFI",
+                                    "teamJiraLink": "https://light-microfinance-pvt-ltd.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2023,
+                                        1,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4769,
+                                "userRole": {
+                                    "id": 7,
+                                    "role": "CUSTOMER",
+                                    "priority": 0.0
+                                },
+                                "team": {
+                                    "id": 69,
+                                    "teamName": "Light Microfinance - Digital Lending",
+                                    "vantixTeamName": "Light Microfinance Private Limited",
+                                    "teamShortName": "Light Micro Finance Digital Lending",
+                                    "teamJiraName": "DIGITALLENDING",
+                                    "teamJiraLink": "https://light-microfinance-pvt-ltd.atlassian.net/",
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2022,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4780,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 23,
+                                    "teamName": "WideOrbit - DataBridge",
+                                    "vantixTeamName": "WideOrbit LLC.",
+                                    "teamShortName": "WideOrbitAnalytics",
+                                    "teamJiraName": "WIDEORBIT-ANALYTICS",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2009,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            },
+                            {
+                                "id": 4795,
+                                "userRole": {
+                                    "id": 4,
+                                    "role": "M4",
+                                    "priority": 4.0
+                                },
+                                "team": {
+                                    "id": 52,
+                                    "teamName": "Rupeek",
+                                    "vantixTeamName": "Rupeek Fintech Private Limited",
+                                    "teamShortName": "Rupeek",
+                                    "teamJiraName": "Rupeek",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2019,
+                                        6,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": true,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "Nilesh.Padwal@talentica.com",
+                        "isTeg": false,
+                        "createdDate": null,
+                        "status": "ACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 231,
+                        "name": "Aakruti Shitut",
+                        "role": "LEAD",
+                        "userTeamRoles": [
+                            {
+                                "id": 4915,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 110,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles life",
+                                    "teamJiraName": "Circles.Life",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "Aakruti.Shitut@talentica.com",
+                        "isTeg": false,
+                        "createdDate": [
+                            2026,
+                            5,
+                            12
+                        ],
+                        "status": "ACTIVE",
+                        "customerType": null
+                    },
+                    {
+                        "id": 236,
+                        "name": "Praveen Upadhyay",
+                        "role": "LEAD",
+                        "userTeamRoles": [
+                            {
+                                "id": 4969,
+                                "userRole": {
+                                    "id": 3,
+                                    "role": "LEAD",
+                                    "priority": 2.0
+                                },
+                                "team": {
+                                    "id": 110,
+                                    "teamName": "Circles-Beyond",
+                                    "vantixTeamName": "Circles Life Asia Technology Pte. Ltd.",
+                                    "teamShortName": "Circles life",
+                                    "teamJiraName": "Circles.Life",
+                                    "teamJiraLink": null,
+                                    "teamType": null,
+                                    "noOfHoursPerSP": 8.0,
+                                    "activeSince": [
+                                        2024,
+                                        2,
+                                        1
+                                    ],
+                                    "endDate": null,
+                                    "status": "ACTIVE",
+                                    "isTeg": false,
+                                    "excludeCompliance": false,
+                                    "complianceByStory": false,
+                                    "doneStatuses": null,
+                                    "onTimeIssueTypes": null
+                                }
+                            }
+                        ],
+                        "email": "Praveen.Upadhyay@talentica.com",
+                        "isTeg": false,
+                        "createdDate": [
+                            2026,
+                            6,
+                            5
+                        ],
+                        "status": "ACTIVE",
+                        "customerType": null
+                    }
+                ],
+                "activeSince": [
+                    2024,
+                    2,
+                    1
+                ],
+                "endDate": null,
+                "status": "ACTIVE",
+                "isTeg": false,
+                "excludeCompliance": false,
+                "complianceByStory": false,
+                "doneStatuses": null,
+                "onTimeIssueTypes": null
+            },
+            "type": "GENAI_PROBLEMS",
+            "impact": null,
+            "status": "ACCEPTED",
+            "cycleId": {
+                "id": 8,
+                "halfYearlyName": "25-26 H2",
+                "sortOrder": 16
+            },
+            "infoLink": null,
+            "submittedTime": [
+                2026,
+                3,
+                4
+            ],
+            "reviewedTime": null,
+            "ticketLink": "https://talenticainnovations.freshdesk.com/a/tickets/533",
+            "ticketId": 533,
+            "customersValueAddJob": null,
+            "techDigests": null,
+            "tags": null,
+            "techDigestModels": null,
+            "customerIconLink": "https://prod-strapi-image-bucket.s3.ap-south-1.amazonaws.com/circles.png",
+            "submittedDate": "2026-03-04",
+            "customerSegment": null
+        }
+    }
+]

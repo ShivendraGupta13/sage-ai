@@ -2,16 +2,17 @@ server:
   port: 8080
 
 sage:
-  python:
-    base-url: http://localhost:8000
+  graph-rag:
+    base-url: ${SAGE_GRAPH_RAG_BASE_URL:http://localhost:8000}
   adk:
     llm:
-      base-url: http://localhost:11434
-      model-name: llama3.2:3b
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      model-name: ${SAGE_LLM_MODEL:llama3.2:3b}
   retrieval:
-    top-k: 5
-    min-score: 0.60
+    top-k: ${SAGE_RETRIEVAL_TOP_K:5}
+    min-score: ${SAGE_RETRIEVAL_MIN_SCORE:0.60}
   scoring:
-    w1: 0.6
-    w2: 0.4
-    dual-match-boost: 0.1
+    w1: ${SAGE_SCORING_W1:0.6}
+    w2: ${SAGE_SCORING_W2:0.4}
+    dual-match-boost: ${SAGE_SCORING_DUAL_BOOST:0.1}
+    min-score: ${SAGE_SCORING_MIN_SCORE:0.60}

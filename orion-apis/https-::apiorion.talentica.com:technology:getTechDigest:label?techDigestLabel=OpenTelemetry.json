@@ -1,0 +1,29 @@
+[
+    {
+        "digestId": 1305,
+        "customerName": "SFA",
+        "link": "https://prod-strapi-image-bucket.s3.ap-south-1.amazonaws.com/sfa%20logo.jpeg",
+        "teamSize": 0,
+        "projectName": "Sports For All",
+        "startDate": "2023-10-01",
+        "customerDescription": null
+    },
+    {
+        "digestId": 1344,
+        "customerName": "OpenGov",
+        "link": "https://prod-strapi-image-bucket.s3.ap-south-1.amazonaws.com/opengov_inc_logo.jpeg",
+        "teamSize": 0,
+        "projectName": "OpenGov",
+        "startDate": "2022-02-01",
+        "customerDescription": null
+    },
+    {
+        "digestId": 1366,
+        "customerName": "PineLabs",
+        "link": "https://prod-strapi-image-bucket.s3.ap-south-1.amazonaws.com/pine-labs.png",
+        "teamSize": 0,
+        "projectName": "Pine Labs Private Limited",
+        "startDate": "2021-07-01",
+        "customerDescription": null
+    }
+]

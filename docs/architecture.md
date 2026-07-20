@@ -86,11 +86,12 @@ sage-ai/                             # Maven project root (this repo)
 ├── pom.xml                          # Java 21 · Spring Boot 4.1 · Google ADK
 ├── feature-document.md              # Product scope and acceptance criteria
 ├── docs/
+│   ├── SPEC.md                      # Master index
 │   ├── architecture.md              # This document — system boundaries and contracts
 │   ├── google-java-adk-usage.md     # ADK agent tree, tools, and wiring
 │   ├── orion-api-documentation.md   # Orion HTTP API reference (ingest source)
-│   └── GraphRAG_DESIGN.md           # Python Graph RAG proposal — not this Java app
-├── postman/                         # Orion fixtures for Python ingest stub/offline mode
+│   └── contracts/                   # Inter-service API contracts (ask + retrieve)
+├── orion-apis/                      # Orion fixtures for Python ingest stub/offline mode
 │   ├── sage ai.postman_collection.json
 │   └── *.json                       # Captured response payloads
 │
@@ -111,11 +112,13 @@ sage-ai/                             # Maven project root (this repo)
     └── SageApplicationTests.java
 
 # Separate service (not in this Maven module) — Python FastAPI (:8000)
-# graph-rag-service/
+# graph-rag-service/                 # Owns Neo4j docker-compose, schema, retrieve APIs
+#   ├── docker-compose.yml           # Neo4j (+ optional graph-rag container)
+#   ├── GraphRAG_Schema_Data_Ingestion.md
 #   └── app/ … ingest, retrieval, Neo4j store
 ```
 
-**Boundary rule:** Java owns ask orchestration and intent classification. Python owns Orion ingest, Neo4j, and retrieval. Both share only HTTP contracts defined in [§12](#12-inter-service-api-contracts). Java has **no** Orion client.
+**Boundary rule:** Java owns ask orchestration and intent classification. Python owns Orion ingest, Neo4j, and retrieval. Both share only HTTP contracts defined in [§12](#12-inter-service-api-contracts) and [contracts/](contracts/). Java has **no** Orion client. Neo4j is started only from `graph-rag-service`, never from this repo.
 
 ---
 
@@ -280,7 +283,7 @@ Agent wiring detail: [google-java-adk-usage.md](google-java-adk-usage.md).
 | 3 (parallel) | `GET /technology/getTechDigest/label?techDigestLabel={label}` | Enrich `Technology` nodes | Coverage context |
 | 4 (gap-fill) | `GET /customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7` | Any remaining `HardProblem` nodes | ⚠️ D4 — confirm cycleId |
 
-Full API reference: [orion-api-documentation.md](orion-api-documentation.md). Offline seed reads `postman/*.json` fixtures.
+Full API reference: [orion-api-documentation.md](orion-api-documentation.md). Offline seed reads `orion-apis/*.json` fixtures.
 
 ### Primary ingest payload — `valueAddsByTag`
 
@@ -482,6 +485,8 @@ The Knowledge Card is the JSON payload sent in the `result` SSE event. It is the
 
 ## 12. Inter-service API contracts
 
+Canonical copies live under [contracts/](contracts/) (`ask-api.md`, `retrieve-api.md`). Runtime retrieve DTOs: sister `graph-rag-service/app/models/api_contracts.py`. See [contracts/README.md](contracts/README.md) for SoT rules.
+
 ### Sage Java — public
 
 #### `POST /ask`
@@ -610,7 +615,7 @@ Triggers F0 seed script. Java does **not** call this on the ask path.
 
 ### Orion API — external (Python seed script only)
 
-See [orion-api-documentation.md](orion-api-documentation.md). Offline seed reads `postman/*.json` fixtures; live seed uses `ORION_API_KEY` env var on the Python service only. Java has no Orion credentials.
+See [orion-api-documentation.md](orion-api-documentation.md). Offline seed reads `orion-apis/*.json` fixtures; live seed uses `ORION_API_KEY` env var on the Python service only. Java has no Orion credentials.
 
 ---
 
@@ -640,7 +645,7 @@ See [orion-api-documentation.md](orion-api-documentation.md). Offline seed reads
 | Sage Java | `SAGE_GRAPH_RAG_BASE_URL` only (no Orion credentials) |
 | Graph RAG Python | `ORION_API_KEY`, `ORION_AUTH_TOKEN` (ingest-sync only); Neo4j auth if configured |
 
-Never hardcode cookies or API keys. Treat `postman/` fixtures as confidential.
+Never hardcode cookies or API keys. Treat `orion-apis/` fixtures as confidential.
 
 ---
 
@@ -681,7 +686,7 @@ Generate `correlationId` per ask; propagate to Graph RAG client and logs.
 | Component | Stub behavior |
 |-----------|---------------|
 | Graph RAG client | Mock or local Python with seeded Neo4j index |
-| Orion ingest | Python maps to `postman/*.json` fixtures |
+| Orion ingest | Python maps to `orion-apis/*.json` fixtures |
 | ADK agents | Full tree against stub `retrieveFromGraph` |
 
 Eval calls the **same** `POST /ask` entrypoint as the product UI. Assert: no hallucinated names, `gapFlag=true` for out-of-domain queries, intent passed on retrieve, P95 < 8 s.
