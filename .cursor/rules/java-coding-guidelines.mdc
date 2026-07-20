@@ -1,0 +1,24 @@
+---
+description: Java style, DI, and exception handling for Sage
+globs: "**/*.{java,yml}"
+alwaysApply: false
+---
+
+# Java Coding Guidelines
+
+## Style
+
+- Java 21, Spring Boot 4.x; package root `com.company.sage`
+- Constructor injection only; no field `@Autowired`
+- Prefer `record` for DTOs; 4-space indent
+- Match existing style; do not add Lombok unless already used
+- Config under `sage.*`; secrets from env only — never hardcode
+- Comments explain WHY (business/contract reasons), not WHAT
+
+## Exceptions
+
+- Retrieval tools: fail-soft — catch, return empty list, continue other path
+- Unrecoverable ask: SSE `error` event `{"message":"..."}` — not a generic REST body
+- Never swallow exceptions; log with `correlationId` when available
+- Error messages: helpful, no internals/stack traces to clients
+- Do not invent Orion calls from Java; retrieval via Python Graph RAG client
