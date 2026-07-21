@@ -11,11 +11,11 @@ Expertise locator / prior-art concierge. Java `:8080` owns ask orchestration (AD
 
 ## Sister service
 
-Python Graph RAG `:8000` owns Neo4j, embeddings, ingest. Java never hits Neo4j or Orion at ask-time — only HTTP retrieve.
+Python Graph RAG `:8000` owns Neo4j, embeddings, ingest. Java never hits Neo4j or Orion at ask-time — only HTTP retrieve. Start Neo4j only from `graph-rag-service` (not this repo).
 
 ## Read first
 
-- `docs/SPEC.md`, `docs/architecture.md`, `docs/contracts/`, `feature-document.md`
+- `docs/feature-document.md`, `docs/SPEC.md`, `docs/architecture.md`, `docs/contracts/`, `docs/google-java-adk-usage.md`
 
 ## Before changing
 
@@ -26,7 +26,7 @@ Python Graph RAG `:8000` owns Neo4j, embeddings, ingest. Java never hits Neo4j o
 
 ## Docs
 
-Update `README.md` / contracts when APIs, env vars, setup, or user-visible behavior change. Skip for pure refactors and test-only edits.
+Update `README.md` / `docs/contracts/` when APIs, env vars, setup, or user-visible behavior change. Skip for pure refactors and test-only edits. Env for Graph RAG base URL: `SAGE_GRAPH_RAG_BASE_URL`.
 
 ## Logs
 

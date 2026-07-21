@@ -2,7 +2,7 @@
 
 > **Status:** Pre-implementation guide — updated Jul 16 2026 (query interpretation, ParallelAgent, hybrid search)  
 > **Architecture:** [architecture.md](architecture.md)  
-> **Product scope:** [feature-document.md](../feature-document.md)  
+> **Product scope:** [feature-document.md](feature-document.md)  
 > **Orion reference (ingest only):** [orion-api-documentation.md](orion-api-documentation.md)  
 > **Stack:** Java **21** (LTS) · Spring Boot **4.1** · Google ADK 1.5.0 · LangChain4j / Ollama  
 > **Purpose:** How to use [Google ADK for Java](https://google.github.io/adk-docs/get-started/java/) for Sage's ask-time agent orchestration.
@@ -262,7 +262,7 @@ sequenceDiagram
 
 | | |
 |---|---|
-| **Endpoint** | `POST {SAGE_PYTHON_BASE_URL}/retrieve/semantic` |
+| **Endpoint** | `POST {SAGE_GRAPH_RAG_BASE_URL}/retrieve/semantic` |
 | **Args** | `problemStatement` (string from `QueryInterpret`), `topK` (int, default *(⚠️ D3)*) |
 | **Returns** | JSON `semantic_hits[]` per [architecture.md §12](architecture.md#12-inter-service-api-contracts) |
 | **Fail-soft** | Return `"[]"` on any exception — never abort the ask; graph path still runs |
@@ -271,7 +271,7 @@ sequenceDiagram
 
 | | |
 |---|---|
-| **Endpoint** | `POST {SAGE_PYTHON_BASE_URL}/retrieve/graph` |
+| **Endpoint** | `POST {SAGE_GRAPH_RAG_BASE_URL}/retrieve/graph` |
 | **Args** | `techNeeded` (string[] from `QueryInterpret`), `topK` (int, default *(⚠️ D3)*) |
 | **Returns** | JSON `graph_hits[]` per [architecture.md §12](architecture.md#12-inter-service-api-contracts) |
 | **Fail-soft** | Return `"[]"` on any exception — semantic path still contributes |
@@ -411,8 +411,8 @@ Assemble a Knowledge Card from merged_hits and query_interpretation.
 
 ```yaml
 sage:
-  python:
-    base-url: http://localhost:8000   # Python retrieval service
+  graph-rag:
+    base-url: http://localhost:8000   # SAGE_GRAPH_RAG_BASE_URL
   adk:
     llm:
       base-url: http://localhost:11434   # ⚠️ D1 — validate model + hardware
@@ -428,7 +428,7 @@ sage:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `SAGE_PYTHON_BASE_URL` | `http://localhost:8000` | Python retrieval service base URL |
+| `SAGE_GRAPH_RAG_BASE_URL` | `http://localhost:8000` | Graph RAG retrieval service base URL |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Local LLM for ADK *(⚠️ D1)* |
 | `SAGE_RETRIEVAL_TOP_K` | `5` | Top-N results *(⚠️ D3)* |
 | `SAGE_SCORING_W1` | `0.6` | Vector similarity weight *(⚠️ D2)* |
