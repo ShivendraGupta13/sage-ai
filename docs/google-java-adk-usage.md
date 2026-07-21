@@ -2,7 +2,7 @@
 
 > **Status:** Pre-implementation guide — updated Jul 16 2026 (query interpretation, ParallelAgent, hybrid search)  
 > **Architecture:** [architecture.md](architecture.md)  
-> **Product scope:** [feature-document.md](../feature-document.md)  
+> **Product scope:** [feature-document.md](feature-document.md)  
 > **Orion reference (ingest only):** [orion-api-documentation.md](orion-api-documentation.md)  
 > **Stack:** Java **21** (LTS) · Spring Boot **4.1** · Google ADK 1.5.0 · LangChain4j / Ollama  
 > **Purpose:** How to use [Google ADK for Java](https://google.github.io/adk-docs/get-started/java/) for Sage's ask-time agent orchestration.

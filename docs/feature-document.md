@@ -317,7 +317,7 @@ The POC must exercise each target technology meaningfully (not deeply). Indicati
 | **MLflow** | Logs metrics/experiments (F8) |
 
 > Learning outcome to report: "we used each technology end-to-end and understand its role and trade-offs" — not production mastery.  
-> **Ownership detail:** Spring Boot hosts/transports; ADK owns agents; Graph RAG retrieves. Spring AI is out of the POC ask-path (would overlap ADK). See [docs/spec-coverage-map.md](docs/spec-coverage-map.md).
+> **Ownership detail:** Spring Boot hosts/transports; ADK owns agents; Graph RAG retrieves. Spring AI is out of the POC ask-path (would overlap ADK). See [spec-coverage-map.md](spec-coverage-map.md).
 
 ---
 
@@ -349,7 +349,7 @@ The POC must exercise each target technology meaningfully (not deeply). Indicati
 1. **Local model + hardware** — Which local LLM and on which machine? Affects latency bar, answer quality, and the local embedding model choice.
 2. **Orion API credentials** — Confirm the `api-key` (`53e72eed-…`) and cookie tokens are valid and stable for the POC duration. The seed script (F0) is blocked on live API access.
 3. **Financial year cycle IDs** — Seed uses `cycleId=8,7`. Confirm these are the correct/current cycles, or whether additional cycle IDs should be included.
-4. **Final team/topic ownership split** — owner: project lead.
+4. ~~**Final tech ownership split (Spring / ADK / Graph RAG)**~~ — **Resolved:** see [spec-coverage-map.md](spec-coverage-map.md) §3. (People/roster assignment remains a project-lead call.)
 5. ~~**Database technology**~~ — **Resolved: Neo4j only** (graph traversal + native vector index in one store).
 6. **Confidence score formula** — The per-result score is a weighted blend of semantic similarity and graph relationship strength. Exact weights TBD in tech spec:
    - What weight ratio between semantic (vector) and graph scores?

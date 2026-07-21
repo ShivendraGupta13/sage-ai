@@ -6,7 +6,7 @@ Master index for the Sage expertise-locator POC. Product requirements live in th
 
 | Order | Doc | Purpose |
 |-------|-----|---------|
-| 1 | [feature-document.md](../feature-document.md) | Product scope F0–F8, Knowledge Card, non-goals |
+| 1 | [feature-document.md](feature-document.md) | Product scope F0–F8, Knowledge Card, non-goals |
 | 2 | [architecture.md](architecture.md) | System design, ownership, ask lifecycle, §12 contracts |
 | 3 | [spec-coverage-map.md](spec-coverage-map.md) | What future specs must cover (Spring / ADK / Graph RAG) + ownership split |
 | 4 | [contracts/ask-api.md](contracts/ask-api.md) | Sage public `POST /ask` SSE + `GET /health` |

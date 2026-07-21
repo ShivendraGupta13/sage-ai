@@ -1,7 +1,7 @@
 # Spec coverage map — Spring, Google ADK, Graph RAG
 
 > **Purpose:** Checklist of what **future tech specs must cover** per technology topic.  
-> **Not a replacement for:** [feature-document.md](../feature-document.md), [architecture.md](architecture.md), or [google-java-adk-usage.md](google-java-adk-usage.md).  
+> **Not a replacement for:** [feature-document.md](feature-document.md), [architecture.md](architecture.md), or [google-java-adk-usage.md](google-java-adk-usage.md).  
 > **Rule of thumb:** *Spring hosts and transports; ADK reasons and orchestrates agents; Graph RAG retrieves.*
 
 ---
@@ -87,46 +87,29 @@ Specs for this topic must cover:
 
 ---
 
-
-
-## 4. Spring AI vs Google ADK — overlap and ownership
-
-
-
-### 4.1 Where they fight
-
-Feature-document learning map once listed **“Java + Spring AI”** for query interpretation, SSE, retrieval orchestration, and Knowledge Card assembly, while **Google ADK** was listed for agent orchestration. Those are the **same ask-path jobs**. If both libraries own them, specs and code diverge.
-
-
-| Responsibility                  | If owned by Spring AI            | If owned by Google ADK          |
-| ------------------------------- | -------------------------------- | ------------------------------- |
-| Query interpretation LLM call   | `ChatClient` / advisors          | `LlmAgent` QueryInterpret       |
-| Parallel retrieve orchestration | Spring `@Async` / custom fan-out | `ParallelAgent`                 |
-| Tool calls to retrieve APIs     | Spring AI tool calling           | ADK FunctionTools               |
-| Knowledge Card synthesis        | Spring AI prompt + stream        | `LlmAgent` KnowledgeCardSynth   |
-| Streaming answer path           | Spring AI token stream           | ADK `Event` stream → Spring SSE |
-
-
-Doing both creates duplicate agent trees, two prompt homes, and unclear fail-soft behavior.
-
-### 4.2 Locked ownership (POC)
-
-Matches [architecture.md](architecture.md) and [google-java-adk-usage.md](google-java-adk-usage.md); corrects the older feature-doc §12 wording.
-
-
-| Concern                                                    | Owner                           | Why                                                                                                                                |
-| ---------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Agent tree, LLM agents, tool orchestration, session/events | **Google ADK**                  | POC learning goal; ADK’s value is workflow agents (`SequentialAgent` / `ParallelAgent`); already specified                         |
-| HTTP/SSE, DI, config, retrieve clients, health             | **Spring Boot**                 | Natural web shell; ADK is not the public API layer                                                                                 |
-| Deterministic merge + confidence scoring                   | **Spring/Java (non-LLM)**       | Must be stable and unit-testable; not an LLM responsibility                                                                        |
-| LLM model access for ADK                                   | **LangChain4j bridge → Ollama** | Already the ADK Java path; avoids a second ChatModel stack                                                                         |
-| **Spring AI library**                                      | **Out of POC ask-path**         | Spring AI ChatClient owning interpretation/orchestration would fight ADK. Treat learning map as **Spring Boot shell + ADK agents** |
-
-
-
-
-### 4.3 One-line rule
+## 3. Ownership decision (POC)
 
 **Spring hosts and transports; ADK reasons and orchestrates agents; Graph RAG retrieves.**
 
-Spring AI may appear later only as an explicit learning spike **outside** the ask pipeline — not as a parallel owner of agents, tools, or card synthesis.
+### Where they fight
+
+Spring AI (`ChatClient`, tool calling, advisors, streaming) and Google ADK both cover the same ask-path jobs. If both own them, specs and code diverge.
+
+| Responsibility | If Spring AI | If Google ADK |
+| --- | --- | --- |
+| Query interpretation | `ChatClient` / advisors | `LlmAgent` QueryInterpret |
+| Parallel retrieve orchestration | Spring `@Async` / custom fan-out | `ParallelAgent` |
+| Tool calls to retrieve APIs | Spring AI tool calling | ADK FunctionTools |
+| Knowledge Card synthesis | Spring AI prompt + stream | `LlmAgent` KnowledgeCardSynth |
+| Streaming answer path | Spring AI token stream | ADK `Event` stream → Spring SSE |
+
+Doing both means duplicate agent trees, two prompt homes, and unclear fail-soft.
+
+### Locked for POC
+
+- **Spring Boot** — `POST /ask` SSE, config/DI, Graph RAG HTTP clients, health, host for deterministic merge/scoring. Not the agent tree.
+- **Google ADK** — query interpret → parallel retrieve agents → merge tool → Knowledge Card synth; sessions and event stream. LLM access via LangChain4j → Ollama only.
+- **Graph RAG (Python)** — Neo4j, embeddings, Orion/PDF ingest, `/retrieve/*`. Not ask orchestration or the Knowledge Card.
+- **Spring AI** — out of the ask path. Do not add `spring-ai-*` to `pom.xml` for interpretation, tools, orchestration, or card synthesis.
+
+Detail: [architecture.md](architecture.md), [google-java-adk-usage.md](google-java-adk-usage.md).

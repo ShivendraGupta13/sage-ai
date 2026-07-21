@@ -15,7 +15,7 @@ Python Graph RAG `:8000` owns Neo4j, embeddings, ingest. Java never hits Neo4j o
 
 ## Read first
 
-- `feature-document.md`, `docs/SPEC.md`, `docs/architecture.md`, `docs/contracts/`, `docs/google-java-adk-usage.md`
+- `docs/feature-document.md`, `docs/SPEC.md`, `docs/architecture.md`, `docs/contracts/`, `docs/google-java-adk-usage.md`
 
 ## Before changing
 

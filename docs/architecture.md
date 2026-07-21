@@ -1,6 +1,6 @@
 # Architecture
 
-> **Product scope:** [feature-document.md](../feature-document.md)  
+> **Product scope:** [feature-document.md](feature-document.md)  
 > **Related:** [google-java-adk-usage.md](google-java-adk-usage.md), [orion-api-documentation.md](orion-api-documentation.md)  
 > **Last updated:** Jul 16 2026 — reflects query interpretation, parallel hybrid search (semantic + Graph RAG), confidence scoring, Postman/SSE client, Neo4j-only DB
 
@@ -84,8 +84,8 @@ This document specifies:
 ```text
 sage-ai/                             # Maven project root (this repo)
 ├── pom.xml                          # Java 21 · Spring Boot 4.1 · Google ADK
-├── feature-document.md              # Product scope and acceptance criteria
 ├── docs/
+│   ├── feature-document.md          # Product scope and acceptance criteria
 │   ├── SPEC.md                      # Master index
 │   ├── architecture.md              # This document — system boundaries and contracts
 │   ├── google-java-adk-usage.md     # ADK agent tree, tools, and wiring
@@ -218,6 +218,8 @@ flowchart TB
 > **Web chat UI:** deferred post-POC. POC client is Postman only.
 
 **Does not own:** Orion HTTP, Neo4j, PDF parsing, embedding models, semantic search logic, graph traversal logic.
+
+Spring AI is excluded from the ask path (would overlap ADK). See [spec-coverage-map.md](spec-coverage-map.md) §3.
 
 ### Retrieval Service — Python (`:8000`)
 
