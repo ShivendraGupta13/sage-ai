@@ -486,7 +486,90 @@ The Knowledge Card is the JSON payload sent in the `result` SSE event. It is the
 
 ## 12. Inter-service API contracts
 
-Canonical copies live under [contracts/](contracts/) (`ask-api.md`, `retrieve-api.md`). Runtime retrieve DTOs: sister `graph-rag-service/app/models/api_contracts.py`. SoT rules: [SPEC.md](SPEC.md#contract-source-of-truth).
+Success request/response field tables live under [contracts/](contracts/) (`ask-api.md`, `retrieve-api.md`). Runtime retrieve DTOs: sister `graph-rag-service/app/models/api_contracts.py`. SoT rules: [SPEC.md](SPEC.md#contract-source-of-truth).
+
+**Application HTTP errors** (both services) use one shared shape defined in this section — not duplicated in the contract files.
+
+### Shared HTTP `Error` schema
+
+Extended RFC 7807 Problem Details. Prefer `application/problem+json` where the stack allows; otherwise JSON with the **same fields**. Every application error uses this shape; only values change (`code`, `message`, `detail`, `status`, `errors` contents).
+
+| Field | Type | Required | Role |
+|-------|------|----------|------|
+| `type` | string (URI) | yes | Problem type; POC uses `about:blank` unless a stable URN is added later |
+| `title` | string | yes | Short label matching the status (`Bad Request`, `Unprocessable Entity`, `Internal Server Error`) |
+| `status` | int | yes | Echoes HTTP status |
+| `code` | string | yes | Machine-readable identifier for **this** failure (not a frozen enum — choose a specific code per case, e.g. `QUERY_BLANK`, `TOP_K_OUT_OF_RANGE`, `NEO4J_UNAVAILABLE`) |
+| `message` | string | yes | User-friendly (UI-safe; no stack traces, host internals, or secrets) |
+| `detail` | string | yes | Developer-facing summary (may name fields/dependencies; never secrets/tokens) |
+| `instance` | string | yes | Request path (e.g. `/ask`, `/retrieve/semantic`) |
+| `correlationId` | string | yes | Trace id; use `"unknown"` only if none was generated yet |
+| `errors` | object[] | yes | Field errors; always present — `[]` when not field validation |
+
+Each `errors[]` item:
+
+| Field | Type | Required | Role |
+|-------|------|----------|------|
+| `field` | string | yes | JSON field name |
+| `reason` | string | yes | Why it failed |
+| `rejectedValue` | string \| null | yes | Stringified rejected value, or `null` if absent |
+
+Example (`422` validation):
+
+```json
+{
+  "type": "about:blank",
+  "title": "Unprocessable Entity",
+  "status": 422,
+  "code": "TOP_K_OUT_OF_RANGE",
+  "message": "Some search options are invalid. Check your input and try again.",
+  "detail": "top_k must be between 1 and 20",
+  "instance": "/retrieve/semantic",
+  "correlationId": "c0ffee-...",
+  "errors": [
+    {
+      "field": "top_k",
+      "reason": "must be between 1 and 20",
+      "rejectedValue": "50"
+    }
+  ]
+}
+```
+
+Example (`500` internal — `errors` empty):
+
+```json
+{
+  "type": "about:blank",
+  "title": "Internal Server Error",
+  "status": 500,
+  "code": "NEO4J_UNAVAILABLE",
+  "message": "Knowledge search is temporarily unavailable.",
+  "detail": "Neo4j bolt handshake failed: Unable to connect to neo4j:7687",
+  "instance": "/retrieve/graph",
+  "correlationId": "c0ffee-...",
+  "errors": []
+}
+```
+
+#### SSE mid-stream `error` (ask only)
+
+After `POST /ask` has opened the stream, unrecoverable failures emit an SSE `error` event (not a second HTTP status body), then close without `done`. Same vocabulary, lighter payload:
+
+| Field | Required |
+|-------|----------|
+| `message` | yes |
+| `detail` | yes |
+| `code` | yes |
+| `correlationId` | yes |
+
+#### Global Exception Handling (Sage Java)
+
+Sage maps non-SSE failures through Spring `@RestControllerAdvice` (global exception handling) into this shared Error JSON — validation / bad request → `4xx`, unexpected → `5xx`. Once the ask SSE stream is open, failures are emitted as the SSE `error` subset above by the stream handler, not as a second Problem Details response.
+
+Graph RAG should return the **same** HTTP Error fields (framework-specific wiring on the Python side).
+
+`GET /health` is not this schema: process up → `200` with `status: "ok" | "degraded"` and reachability flags.
 
 ### Sage Java — public
 
@@ -495,7 +578,9 @@ Canonical copies live under [contracts/](contracts/) (`ask-api.md`, `retrieve-ap
 | | |
 |---|---|
 | **Request** | `{ "query": "string" }` |
-| **Response** | `text/event-stream` (SSE) — sequence of events below |
+| **Response** | `text/event-stream` (SSE) on success path |
+
+Pre-SSE validation / bad JSON → HTTP `400` with shared Error schema above (stream does not start).
 
 SSE event sequence:
 
@@ -506,8 +591,8 @@ SSE event sequence:
 | `status` | `{"message":"Searching knowledge base…"}` | Parallel search launched |
 | `status` | `{"message":"Ranking results…"}` | Both searches returned |
 | `result` | Full Knowledge Card JSON (§11) | After `KnowledgeCardSynth` |
-| `done` | `{}` | Stream close |
-| `error` | `{"message":"..."}` | On any unrecoverable error |
+| `done` | `{}` | Stream close (success) |
+| `error` | `{"message","detail","code","correlationId"}` | Mid-stream unrecoverable; then close without `done` |
 
 #### `GET /health`
 
@@ -552,6 +637,8 @@ Vector similarity search on `problemStatement`.
 }
 ```
 
+Errors: validation → `422`, Neo4j/internal → `500` — shared Error schema above. Java fail-softs retrieve `5xx` to `[]`.
+
 #### `POST /retrieve/graph`
 
 Cypher graph traversal on `techNeeded[]` tags.
@@ -588,12 +675,15 @@ Cypher graph traversal on `techNeeded[]` tags.
 }
 ```
 
+Same `422` / `500` Error rules as semantic.
+
 **Common rules for both retrieve endpoints:**
 
 | Field | Rule |
 |-------|------|
 | `hits` | Always an array — never `null` |
 | Empty result | `200` with `hits: []` — never error on no-match |
+| Validation / internal | `422` / `500` with shared Error schema above; Java fail-softs `5xx` to `[]` |
 | `passage` | Extractive from indexed `fileDetails.summary` — never LLM-paraphrased at this boundary |
 | `metadata` | Must include all fields needed to build Knowledge Card — Java never calls Orion |
 
@@ -607,6 +697,8 @@ Triggers F0 seed script. Java does **not** call this on the ask path.
 { "force_refresh": false }
 ```
 → `202 Accepted` `{ "job_id": "...", "status": "started" }`
+
+Errors → `422` / `500` with the shared Error schema (`instance` `/admin/reseed`).
 
 #### `GET /health`
 

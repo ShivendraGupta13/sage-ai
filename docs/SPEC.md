@@ -38,7 +38,7 @@ Master index for the Sage expertise-locator POC. Product requirements live in th
 | Sage public ask/health | [contracts/ask-api.md](contracts/ask-api.md) | Java Spring controllers (when implemented) |
 | Graph RAG retrieve/health/reseed | [contracts/retrieve-api.md](contracts/retrieve-api.md) | `graph-rag-service/app/models/api_contracts.py` |
 
-Architecture narrative also appears in [architecture.md §12](architecture.md#12-inter-service-api-contracts). If narrative and these files diverge, **the contract files + `api_contracts.py` win** for field names and shapes.
+Success field names/shapes: if narrative and contract files diverge, **the contract files + `api_contracts.py` win**. Application HTTP / SSE **error** shape: [architecture.md §12](architecture.md#12-inter-service-api-contracts) wins (not duplicated in contracts).
 
 Rules:
 
@@ -46,7 +46,7 @@ Rules:
 2. Python must not change field names, casing, or types without updating `api_contracts.py` and [contracts/retrieve-api.md](contracts/retrieve-api.md).
 3. Mixed casing is intentional: camelCase domain fields (`problemStatement`, `vectorScore`) and snake_case transport knobs (`top_k`, `doc_id`).
 4. IDs (`doc_id`, `personId`, `teamId`) are always strings.
-5. Empty retrieval → `200` + `hits: []`; Neo4j failure → `500` + `detail`; Java fail-softs to empty hits.
+5. Empty retrieval → `200` + `hits: []` (never an error). Application HTTP errors use the shared Error schema in [architecture.md §12](architecture.md#12-inter-service-api-contracts) (stable fields; `code` is a free-form string specific to the failure — not a frozen enum). Retrieve validation → `422`; Neo4j/internal → `500`; Java fail-softs retrieve `5xx` to empty hits. Ask pre-SSE → `400`; mid-stream → SSE `error` (`message`, `detail`, `code`, `correlationId`) then close without `done`.
 6. Ask-time never calls Orion (ingest/reseed only on Python).
 
 ## Ports

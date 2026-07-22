@@ -3,7 +3,9 @@
 APIs that **sage-ai** calls on **graph-rag-service** (`:8000`).
 
 Runtime SoT: [`app/models/api_contracts.py`](../../../graph-rag-service/app/models/api_contracts.py).  
-Must stay identical to that module and to [architecture.md §12](../architecture.md#12-inter-service-api-contracts).
+Must stay identical to that module and to [architecture.md §12](../architecture.md#12-inter-service-api-contracts) for success fields.
+
+Application HTTP errors use the shared Error schema in [architecture.md §12](../architecture.md#12-inter-service-api-contracts) — not redefined here.
 
 Base URL (Java): `SAGE_GRAPH_RAG_BASE_URL` (default `http://localhost:8000`).
 
@@ -54,6 +56,13 @@ Vector similarity search on `problemStatement`. Called by Java `SemanticSearchAg
 }
 ```
 
+### Errors
+
+| Status | When |
+|--------|------|
+| `422` | Validation (e.g. `top_k` out of range) — shared Error schema |
+| `500` | Neo4j / internal — shared Error schema; Java fail-softs to `[]` |
+
 ---
 
 ## `POST /retrieve/graph`
@@ -101,6 +110,10 @@ Cypher graph traversal on `techNeeded[]` tags. Called by Java `GraphTraversalAge
 }
 ```
 
+### Errors
+
+Same as semantic: `422` validation, `500` Neo4j/internal — [architecture §12](../architecture.md#12-inter-service-api-contracts). Java fail-softs `5xx` to `[]`.
+
 ---
 
 ## Shared hit `metadata`
@@ -126,7 +139,7 @@ Identical for semantic and graph hits:
 |--------------|------|
 | `hits` | Always an array — never `null` |
 | Empty result | `200` with `hits: []` — never error on no-match |
-| Neo4j / internal failure | `500` with `{"detail": "..."}`; Java fail-softs to `[]` |
+| HTTP errors | Shared Error schema in [architecture §12](../architecture.md#12-inter-service-api-contracts); Java fail-softs `5xx` to `[]` |
 | `passage` | Extractive from indexed summary — never LLM-paraphrased at this boundary |
 | `metadata` | Card-complete — Java never calls Orion at ask-time |
 | `personId` / `teamId` / `doc_id` | Always strings |
@@ -143,6 +156,8 @@ Identical for semantic and graph hits:
   "neo4j_reachable": true
 }
 ```
+
+Process up → `200`. Use `status: "degraded"` when `neo4j_reachable` is false (not the Error schema).
 
 ---
 
@@ -161,3 +176,7 @@ Java does **not** call this during ask.
 ```json
 { "job_id": "...", "status": "started" }
 ```
+
+### Errors
+
+`422` / `500` — shared Error schema ([architecture §12](../architecture.md#12-inter-service-api-contracts)); `instance` `/admin/reseed`.
