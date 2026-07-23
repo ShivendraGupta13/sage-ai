@@ -69,4 +69,48 @@ public class SageAgents {
                 .subAgents(semanticSearchAgent, graphTraversalAgent)
                 .build();
     }
+
+    @Bean
+    public LlmAgent merger(BaseLlm adkModel, com.company.sage.adk.tools.ResultMergerTool mergerTool) {
+        return LlmAgent.builder()
+                .name("ResultMerger")
+                .model(adkModel)
+                .tools(List.of(FunctionTool.create(mergerTool, "merge")))
+                .instruction("Call merge with semantic_hits and graph_hits. Output the merged_hits result.")
+                .outputKey("merged_hits")
+                .build();
+    }
+
+    @Bean
+    public LlmAgent synth(BaseLlm adkModel) {
+        return LlmAgent.builder()
+                .name("KnowledgeCardSynth")
+                .model(adkModel)
+                .instruction("""
+                    Assemble a Knowledge Card from merged_hits and query_interpretation.
+                    - query: echo the original user question
+                    - problemStatement / techNeeded: from query_interpretation
+                    - directAnswer: one sentence derived from the top result
+                    - results[]: from merged_hits — map all fields directly; do NOT paraphrase summary/passage
+                    - gapFlag: true if merged_hits is empty
+                    - gapMessage: "No internal prior art found — this may be a candidate Hard Problem" when gapFlag=true
+                    - Never invent teams, people, or documents
+                    - Emit strict JSON matching the Knowledge Card schema in architecture.md §11
+                    """)
+                .outputKey("knowledge_card")
+                .build();
+    }
+
+    @Bean
+    public com.google.adk.agents.SequentialAgent sageRootAgent(
+            LlmAgent queryInterpret,
+            ParallelAgent parallelRetrieve,
+            LlmAgent merger,
+            LlmAgent synth) {
+
+        return com.google.adk.agents.SequentialAgent.builder()
+                .name("SageRoot")
+                .subAgents(queryInterpret, parallelRetrieve, merger, synth)
+                .build();
+    }
 }
