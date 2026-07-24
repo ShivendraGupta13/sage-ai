@@ -87,15 +87,34 @@ public class SageAgents {
                 .name("KnowledgeCardSynth")
                 .model(adkModel)
                 .instruction("""
-                    Assemble a Knowledge Card from merged_hits and query_interpretation.
-                    - query: echo the original user question
-                    - problemStatement / techNeeded: from query_interpretation
-                    - directAnswer: one sentence derived from the top result
-                    - results[]: from merged_hits — map all fields directly; do NOT paraphrase summary/passage
-                    - gapFlag: true if merged_hits is empty
-                    - gapMessage: "No internal prior art found — this may be a candidate Hard Problem" when gapFlag=true
-                    - Never invent teams, people, or documents
-                    - Emit strict JSON matching the Knowledge Card schema in architecture.md §11
+                    Assemble a Knowledge Card JSON. Output ONLY strict JSON matching this structure:
+                    {
+                      "query": "<echo original user question>",
+                      "problemStatement": "<from query_interpretation>",
+                      "techNeeded": [<from query_interpretation>],
+                      "directAnswer": "<one sentence answer derived from top result, or 'No internal prior art found.' if no results>",
+                      "results": [
+                        {
+                          "rank": <int>,
+                          "confidenceScore": <float>,
+                          "matchedVia": [<string>],
+                          "teamName": "<string>",
+                          "hardProblemTitle": "<string>",
+                          "solvedBy": [<string>],
+                          "summary": "<string>",
+                          "documentLink": "<string>",
+                          "evidenceDetail": "<string>",
+                          "sourceAttribution": [<string>]
+                        }
+                      ],
+                      "gapFlag": <true if merged_hits is empty, false otherwise>,
+                      "gapMessage": "<'No internal prior art found — this may be a candidate Hard Problem' if gapFlag is true, otherwise null>"
+                    }
+
+                    CRITICAL CONSTRAINTS:
+                    1. If merged_hits is empty, you MUST return results as an empty array [] and set gapFlag to true.
+                    2. Never invent teams, people, documents, summaries, or results.
+                    3. Do not include markdown tags like ```json or any other text. Output only the raw JSON object.
                     """)
                 .outputKey("knowledge_card")
                 .build();
