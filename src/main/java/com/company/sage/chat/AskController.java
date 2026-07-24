@@ -116,8 +116,9 @@ public class AskController {
                             if (s != null && s.state().containsKey("query_interpretation")) {
                                 String interpretationJson = s.state().get("query_interpretation").toString();
                                 try {
+                                    String cleanedJson = cleanJson(interpretationJson);
                                     @SuppressWarnings("unchecked")
-                                    Map<String, Object> interpretation = objectMapper.readValue(interpretationJson, Map.class);
+                                    Map<String, Object> interpretation = objectMapper.readValue(cleanedJson, Map.class);
                                     String problem = (String) interpretation.get("problemStatement");
                                     @SuppressWarnings("unchecked")
                                     List<String> tech = (List<String>) interpretation.get("techNeeded");
@@ -197,20 +198,28 @@ public class AskController {
     private Object cleanAndParseJson(Object raw) {
         if (raw == null) return null;
         String str = raw.toString().trim();
-        if (str.startsWith("```json")) {
-            str = str.substring(7);
-        } else if (str.startsWith("```")) {
-            str = str.substring(3);
-        }
-        if (str.endsWith("```")) {
-            str = str.substring(0, str.length() - 3);
-        }
-        str = str.trim();
+        String cleaned = cleanJson(str);
         try {
-            return objectMapper.readValue(str, Object.class);
+            return objectMapper.readValue(cleaned, Object.class);
         } catch (Exception e) {
             log.warn("Failed to parse Knowledge Card JSON, returning raw string: {}", e.getMessage());
-            return str;
+            return raw;
         }
+    }
+
+    private String cleanJson(String str) {
+        if (str == null) return "";
+        str = str.trim();
+        int firstBrace = str.indexOf('{');
+        int lastBrace = str.lastIndexOf('}');
+        if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+            return str.substring(firstBrace, lastBrace + 1);
+        }
+        int firstBracket = str.indexOf('[');
+        int lastBracket = str.lastIndexOf(']');
+        if (firstBracket != -1 && lastBracket != -1 && lastBracket > firstBracket) {
+            return str.substring(firstBracket, lastBracket + 1);
+        }
+        return str;
     }
 }
