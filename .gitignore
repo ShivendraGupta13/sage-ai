@@ -146,7 +146,6 @@ junit.xml
 # Local Graph RAG retrieve captures / offline fixtures (keep on disk; do not commit)
 CombinedHardProblemsWithDocs*.json
 docs/hardprpblem_list.txt
-scripts/capture_retrieve_fixtures.py
 src/test/resources/fixtures/graphrag/
 
 # OS / package archives

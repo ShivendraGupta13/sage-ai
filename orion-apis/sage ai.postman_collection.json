@@ -1,342 +1,748 @@
 {
   "info": {
     "_postman_id": "37682f1e-bb34-4ddc-a599-d364b910f27d",
-    "name": "sage ai",
+    "name": "Sage AI",
+    "description": "Single collection for Orion ingest APIs and Sage ask/retrieve APIs.\n\n- **Orion** \u2014 seed/discovery (set `orionApiKey`, `orionCookie`)\n- **Sage AI** \u2014 `GET /health`, Graph RAG retrieve, `POST /ask`\n\nVariables: `baseUrl` (8080), `graphRagBaseUrl` (8000).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "3556289"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "graphRagBaseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "correlationId",
+      "value": "postman-local-001"
+    },
+    {
+      "key": "orionApiKey",
+      "value": "53e72eed-6f0b-4d5b-9cc5-088487d969b9"
+    },
+    {
+      "key": "orionCookie",
+      "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
+    }
+  ],
   "item": [
     {
-      "name": "https://apidev-orion.talentica.com/customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "accept",
-            "value": "application/json, text/plain, */*"
+      "name": "Orion",
+      "description": "Orion ingest / discovery endpoints used for Graph RAG seeding (Python only). Set `orionApiKey` and `orionCookie` collection variables.",
+      "item": [
+        {
+          "name": "GET hardProblemsFinancialYear",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "accept",
+                "value": "application/json, text/plain, */*"
+              },
+              {
+                "key": "accept-language",
+                "value": "en-US,en;q=0.9"
+              },
+              {
+                "key": "origin",
+                "value": "https://dev-orion.talentica.com"
+              },
+              {
+                "key": "referer",
+                "value": "https://dev-orion.talentica.com/"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{orionCookie}}"
+              }
+            ],
+            "url": {
+              "raw": "https://apidev-orion.talentica.com/customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7",
+              "protocol": "https",
+              "host": [
+                "apidev-orion",
+                "talentica",
+                "com"
+              ],
+              "path": [
+                "customers",
+                "valueAdd",
+                "hardProblemsFinancialYear"
+              ],
+              "query": [
+                {
+                  "key": "cycleId",
+                  "value": "8,7"
+                }
+              ]
+            },
+            "description": "Hard problems for financial-year cycles. Used by seed/offline capture."
           },
-          {
-            "key": "accept-language",
-            "value": "en-US,en;q=0.9"
+          "response": []
+        },
+        {
+          "name": "GET tech/categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "accept",
+                "value": "application/json, text/plain, */*"
+              },
+              {
+                "key": "accept-language",
+                "value": "en-US,en;q=0.9"
+              },
+              {
+                "key": "api-key",
+                "value": "{{orionApiKey}}"
+              },
+              {
+                "key": "origin",
+                "value": "https://nexus.talentica.com"
+              },
+              {
+                "key": "referer",
+                "value": "https://nexus.talentica.com/"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{orionCookie}}"
+              }
+            ],
+            "url": {
+              "raw": "https://apiorion.talentica.com/tech/categories",
+              "protocol": "https",
+              "host": [
+                "apiorion",
+                "talentica",
+                "com"
+              ],
+              "path": [
+                "tech",
+                "categories"
+              ]
+            },
+            "description": "Technology category taxonomy."
           },
-          {
-            "key": "origin",
-            "value": "https://dev-orion.talentica.com"
+          "response": []
+        },
+        {
+          "name": "GET valueAddsByTag",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "accept",
+                "value": "application/json, text/plain, */*"
+              },
+              {
+                "key": "accept-language",
+                "value": "en-US,en;q=0.9"
+              },
+              {
+                "key": "api-key",
+                "value": "{{orionApiKey}}"
+              },
+              {
+                "key": "origin",
+                "value": "https://nexus.talentica.com"
+              },
+              {
+                "key": "referer",
+                "value": "https://nexus.talentica.com/"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{orionCookie}}"
+              }
+            ],
+            "url": {
+              "raw": "https://apiorion.talentica.com/valueAdd/valueAddsByTag?tag=OpenTelemetry",
+              "protocol": "https",
+              "host": [
+                "apiorion",
+                "talentica",
+                "com"
+              ],
+              "path": [
+                "valueAdd",
+                "valueAddsByTag"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "OpenTelemetry"
+                }
+              ]
+            },
+            "description": "Value-adds filtered by technology tag."
           },
-          {
-            "key": "priority",
-            "value": "u=1, i"
+          "response": []
+        },
+        {
+          "name": "GET getTechDigest/label",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "accept",
+                "value": "application/json, text/plain, */*"
+              },
+              {
+                "key": "accept-language",
+                "value": "en-US,en;q=0.9"
+              },
+              {
+                "key": "api-key",
+                "value": "{{orionApiKey}}"
+              },
+              {
+                "key": "origin",
+                "value": "https://nexus.talentica.com"
+              },
+              {
+                "key": "referer",
+                "value": "https://nexus.talentica.com/"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{orionCookie}}"
+              }
+            ],
+            "url": {
+              "raw": "https://apiorion.talentica.com/technology/getTechDigest/label?techDigestLabel=OpenTelemetry",
+              "protocol": "https",
+              "host": [
+                "apiorion",
+                "talentica",
+                "com"
+              ],
+              "path": [
+                "technology",
+                "getTechDigest",
+                "label"
+              ],
+              "query": [
+                {
+                  "key": "techDigestLabel",
+                  "value": "OpenTelemetry"
+                }
+              ]
+            },
+            "description": "Tech digest by label."
           },
-          {
-            "key": "referer",
-            "value": "https://dev-orion.talentica.com/"
-          },
-          {
-            "key": "sec-ch-ua",
-            "value": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\""
-          },
-          {
-            "key": "sec-ch-ua-mobile",
-            "value": "?0"
-          },
-          {
-            "key": "sec-ch-ua-platform",
-            "value": "\"macOS\""
-          },
-          {
-            "key": "sec-fetch-dest",
-            "value": "empty"
-          },
-          {
-            "key": "sec-fetch-mode",
-            "value": "cors"
-          },
-          {
-            "key": "sec-fetch-site",
-            "value": "same-site"
-          },
-          {
-            "key": "user-agent",
-            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
-          },
-          {
-            "key": "Cookie",
-            "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
-          }
-        ],
-        "url": {
-          "raw": "https://apidev-orion.talentica.com/customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7",
-          "protocol": "https",
-          "host": [
-            "apidev-orion",
-            "talentica",
-            "com"
-          ],
-          "path": [
-            "customers",
-            "valueAdd",
-            "hardProblemsFinancialYear"
-          ],
-          "query": [
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sage AI",
+      "description": "Sage Java public APIs (`:8080`) and Graph RAG retrieve (`:8000`).\n\n**Prerequisites**\n1. Graph RAG on `:8000` (Neo4j up)\n2. Sage: `./mvnw spring-boot:run`\n3. Optional: Ollama for query interpretation\n\n**SSE tip:** For `POST /ask`, Postman shows the event stream in the response body.\n\nContracts: `docs/contracts/ask-api.md`, `docs/contracts/retrieve-api.md`",
+      "item": [
+        {
+          "name": "Health",
+          "item": [
             {
-              "key": "cycleId",
-              "value": "8,7"
+              "name": "GET /health",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                },
+                "description": "Process health + Graph RAG reachability.\n\n- `200` with `status: \"ok\"` when both retrieve paths are reachable\n- `200` with `status: \"degraded\"` when a reachability flag is false"
+              },
+              "response": [
+                {
+                  "name": "ok",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/health",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "health"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"status\": \"ok\",\n  \"semanticServiceReachable\": true,\n  \"graphServiceReachable\": true\n}"
+                }
+              ]
             }
           ]
         },
-        "description": "Generated from cURL: curl 'https://apidev-orion.talentica.com/customers/valueAdd/hardProblemsFinancialYear?cycleId=8,7' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -b 'cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA' \\\n  -H 'origin: https://dev-orion.talentica.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://dev-orion.talentica.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'"
-      },
-      "response": []
-    },
-    {
-      "name": "https://apiorion.talentica.com/tech/categories",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "accept",
-            "value": "application/json, text/plain, */*"
-          },
-          {
-            "key": "accept-language",
-            "value": "en-US,en;q=0.9"
-          },
-          {
-            "key": "api-key",
-            "value": "53e72eed-6f0b-4d5b-9cc5-088487d969b9"
-          },
-          {
-            "key": "origin",
-            "value": "https://nexus.talentica.com"
-          },
-          {
-            "key": "priority",
-            "value": "u=1, i"
-          },
-          {
-            "key": "referer",
-            "value": "https://nexus.talentica.com/"
-          },
-          {
-            "key": "sec-ch-ua",
-            "value": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\""
-          },
-          {
-            "key": "sec-ch-ua-mobile",
-            "value": "?0"
-          },
-          {
-            "key": "sec-ch-ua-platform",
-            "value": "\"macOS\""
-          },
-          {
-            "key": "sec-fetch-dest",
-            "value": "empty"
-          },
-          {
-            "key": "sec-fetch-mode",
-            "value": "cors"
-          },
-          {
-            "key": "sec-fetch-site",
-            "value": "same-site"
-          },
-          {
-            "key": "user-agent",
-            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
-          },
-          {
-            "key": "Cookie",
-            "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
-          }
-        ],
-        "url": {
-          "raw": "https://apiorion.talentica.com/tech/categories",
-          "protocol": "https",
-          "host": [
-            "apiorion",
-            "talentica",
-            "com"
-          ],
-          "path": [
-            "tech",
-            "categories"
-          ]
-        },
-        "description": "Generated from cURL: curl 'https://apiorion.talentica.com/tech/categories' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'api-key: 53e72eed-6f0b-4d5b-9cc5-088487d969b9' \\\n  -b 'cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA' \\\n  -H 'origin: https://nexus.talentica.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://nexus.talentica.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'"
-      },
-      "response": []
-    },
-    {
-      "name": "https://apiorion.talentica.com/valueAdd/valueAddsByTag?tag=OpenTelemetry",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "accept",
-            "value": "application/json, text/plain, */*"
-          },
-          {
-            "key": "accept-language",
-            "value": "en-US,en;q=0.9"
-          },
-          {
-            "key": "api-key",
-            "value": "53e72eed-6f0b-4d5b-9cc5-088487d969b9"
-          },
-          {
-            "key": "origin",
-            "value": "https://nexus.talentica.com"
-          },
-          {
-            "key": "priority",
-            "value": "u=1, i"
-          },
-          {
-            "key": "referer",
-            "value": "https://nexus.talentica.com/"
-          },
-          {
-            "key": "sec-ch-ua",
-            "value": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\""
-          },
-          {
-            "key": "sec-ch-ua-mobile",
-            "value": "?0"
-          },
-          {
-            "key": "sec-ch-ua-platform",
-            "value": "\"macOS\""
-          },
-          {
-            "key": "sec-fetch-dest",
-            "value": "empty"
-          },
-          {
-            "key": "sec-fetch-mode",
-            "value": "cors"
-          },
-          {
-            "key": "sec-fetch-site",
-            "value": "same-site"
-          },
-          {
-            "key": "user-agent",
-            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
-          },
-          {
-            "key": "Cookie",
-            "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
-          }
-        ],
-        "url": {
-          "raw": "https://apiorion.talentica.com/valueAdd/valueAddsByTag?tag=OpenTelemetry",
-          "protocol": "https",
-          "host": [
-            "apiorion",
-            "talentica",
-            "com"
-          ],
-          "path": [
-            "valueAdd",
-            "valueAddsByTag"
-          ],
-          "query": [
+        {
+          "name": "Retrieve (Graph RAG)",
+          "description": "Sister service on `:8000`. Example bodies/responses from recorded happy-path ticket 232.",
+          "item": [
             {
-              "key": "tag",
-              "value": "OpenTelemetry"
+              "name": "POST /retrieve/semantic \u2014 ticket 232",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Correlation-ID",
+                    "value": "{{correlationId}}",
+                    "description": "Optional. Propagated by Java ask clients when calling Graph RAG."
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"problemStatement\": \"Enhancing Event Processing Stability in Adcolony Exchange. - Revenue data loss due to instability from bulk spot termination of AWS EC2 instances, leading to latency issues. - Timeouts on SSP/Publisher platforms causing discrepancies in billing data, affecting relationships with Publishers and Bidders. - Loss of billing and analytics dat\",\n  \"top_k\": 5,\n  \"min_score\": 0.6,\n  \"use_llm\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{graphRagBaseUrl}}/retrieve/semantic",
+                  "host": [
+                    "{{graphRagBaseUrl}}"
+                  ],
+                  "path": [
+                    "retrieve",
+                    "semantic"
+                  ]
+                },
+                "description": "Vector similarity search on `problemStatement`. Called by Java `SemanticSearchAgent`.\n\nRecorded happy path: Enhancing Event Processing Stability in Adcolony Exchange.\n\n- Sage always sends `use_llm: false`\n- Empty match \u2192 `200` with `hits: []`\n\nContract: `docs/contracts/retrieve-api.md`"
+              },
+              "response": [
+                {
+                  "name": "200 hits (recorded 232)",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Correlation-ID",
+                        "value": "{{correlationId}}"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"problemStatement\": \"Enhancing Event Processing Stability in Adcolony Exchange. - Revenue data loss due to instability from bulk spot termination of AWS EC2 instances, leading to latency issues. - Timeouts on SSP/Publisher platforms causing discrepancies in billing data, affecting relationships with Publishers and Bidders. - Loss of billing and analytics dat\",\n  \"top_k\": 5,\n  \"min_score\": 0.6,\n  \"use_llm\": false\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{graphRagBaseUrl}}/retrieve/semantic",
+                      "host": [
+                        "{{graphRagBaseUrl}}"
+                      ],
+                      "path": [
+                        "retrieve",
+                        "semantic"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"hits\": [\n    {\n      \"doc_id\": \"177858\",\n      \"source\": \"orion_metadata\",\n      \"vectorScore\": 0.9377578496932983,\n      \"passage\": \"- **Title**: Enhancing Event Processing Stability in Adcolony Exchange\\n\\n- **Challenges/Problems**:\\n  - Revenue data loss due to instability from bulk spot termination of AWS EC2 instances, leading to latency issues.\\n  - \\u2026\",\n      \"metadata\": {\n        \"title\": \"Enhancing Event Processing Stability in Adcolony Exchange\",\n        \"teamName\": \"Digital Turbine - AppEngg\",\n        \"teamId\": \"82\",\n        \"people\": [\n          {\n            \"personId\": \"2\",\n            \"name\": \"Sushant Dey\"\n          }\n        ],\n        \"technologies\": [\n          \"AdTech\",\n          \"On-Demand Instances\",\n          \"Microservices\",\n          \"Cloud Computing\",\n          \"Apache Kafka\",\n          \"EC2\"\n        ],\n        \"documentLink\": [\n          \"https://\\u2026/document.pdf?REDACTED\"\n        ],\n        \"category\": \"HARD_PROBLEMS\",\n        \"sourceAttribution\": \"Orion API\"\n      }\n    }\n  ],\n  \"query_time_ms\": 1798,\n  \"total_found\": 5\n}"
+                }
+              ]
+            },
+            {
+              "name": "POST /retrieve/graph \u2014 ticket 232",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Correlation-ID",
+                    "value": "{{correlationId}}",
+                    "description": "Optional. Propagated by Java ask clients when calling Graph RAG."
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"techNeeded\": [\n    \"Microservices\",\n    \"Kafka\",\n    \"On-Demand Instances\",\n    \"EC2\",\n    \"Cloud Computing\",\n    \"Advertising Technology\"\n  ],\n  \"top_k\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{graphRagBaseUrl}}/retrieve/graph",
+                  "host": [
+                    "{{graphRagBaseUrl}}"
+                  ],
+                  "path": [
+                    "retrieve",
+                    "graph"
+                  ]
+                },
+                "description": "Cypher graph traversal on `techNeeded[]`. Called by Java `GraphTraversalAgent`.\n\nRecorded happy path: ticket 232 tech tags (Microservices, Kafka, EC2, \u2026).\n\nContract: `docs/contracts/retrieve-api.md`"
+              },
+              "response": [
+                {
+                  "name": "200 hits (recorded 232)",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "X-Correlation-ID",
+                        "value": "{{correlationId}}"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"techNeeded\": [\n    \"Microservices\",\n    \"Kafka\",\n    \"On-Demand Instances\",\n    \"EC2\",\n    \"Cloud Computing\",\n    \"Advertising Technology\"\n  ],\n  \"top_k\": 5\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{graphRagBaseUrl}}/retrieve/graph",
+                      "host": [
+                        "{{graphRagBaseUrl}}"
+                      ],
+                      "path": [
+                        "retrieve",
+                        "graph"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"hits\": [\n    {\n      \"doc_id\": \"177858\",\n      \"source\": \"orion_metadata\",\n      \"graphScore\": 1.0,\n      \"matchedTags\": [\n        \"Microservices\",\n        \"Apache Kafka\",\n        \"On-Demand Instances\",\n        \"EC2\",\n        \"Cloud Computing\",\n        \"AdTech\"\n      ],\n      \"pathDescription\": \"Technology[Microservices] \\u2192 HardProblem[Enhancing Event Processing Stability in Adcolony Exchange] \\u2192 Team[Digital Turbine - AppEngg]\",\n      \"passage\": \"- **Title**: Enhancing Event Processing Stability in Adcolony Exchange\\n\\n- **Challenges/Problems**:\\n  - Revenue data loss due to instability from bulk spot termination of AWS EC2 instances, leading to latency issues.\\n  - \\u2026\",\n      \"metadata\": {\n        \"title\": \"Enhancing Event Processing Stability in Adcolony Exchange\",\n        \"teamName\": \"Digital Turbine - AppEngg\",\n        \"teamId\": \"82\",\n        \"people\": [\n          {\n            \"personId\": \"2\",\n            \"name\": \"Sushant Dey\"\n          }\n        ],\n        \"technologies\": [\n          \"AdTech\",\n          \"On-Demand Instances\",\n          \"Microservices\",\n          \"Cloud Computing\",\n          \"Apache Kafka\",\n          \"EC2\"\n        ],\n        \"documentLink\": [\n          \"https://\\u2026/document.pdf?REDACTED\"\n        ],\n        \"category\": \"HARD_PROBLEMS\",\n        \"sourceAttribution\": \"Orion API\"\n      }\n    }\n  ],\n  \"query_time_ms\": 1214,\n  \"total_found\": 5\n}"
+                }
+              ]
+            },
+            {
+              "name": "POST /retrieve/semantic \u2014 ticket 257",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Correlation-ID",
+                    "value": "{{correlationId}}",
+                    "description": "Optional. Propagated by Java ask clients when calling Graph RAG."
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"problemStatement\": \"Implement GDPR data deletion for Issues v2. - Required permanent deletion of client data from 31 tables and external services. - Integration with external services (Oss and Activity) for related data deletion. - Optimization of queries due to performance issues with large datasets. - Ensuring that the deletion process init\",\n  \"top_k\": 5,\n  \"min_score\": 0.6,\n  \"use_llm\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{graphRagBaseUrl}}/retrieve/semantic",
+                  "host": [
+                    "{{graphRagBaseUrl}}"
+                  ],
+                  "path": [
+                    "retrieve",
+                    "semantic"
+                  ]
+                },
+                "description": "Second recorded happy path: Implement GDPR data deletion for Issues v2."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /retrieve/graph \u2014 ticket 257",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Correlation-ID",
+                    "value": "{{correlationId}}",
+                    "description": "Optional. Propagated by Java ask clients when calling Graph RAG."
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"techNeeded\": [\n    \"AWS SQS\",\n    \"Microservices\",\n    \"API\",\n    \"Deletion Process\",\n    \"Fault Tolerance\",\n    \"GDPR Compliance\"\n  ],\n  \"top_k\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{graphRagBaseUrl}}/retrieve/graph",
+                  "host": [
+                    "{{graphRagBaseUrl}}"
+                  ],
+                  "path": [
+                    "retrieve",
+                    "graph"
+                  ]
+                },
+                "description": "Graph retrieve for ticket 257 tech tags (AWS SQS, GDPR Compliance, \u2026)."
+              },
+              "response": []
             }
           ]
         },
-        "description": "Generated from cURL: curl 'https://apiorion.talentica.com/valueAdd/valueAddsByTag?tag=OpenTelemetry' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'api-key: 53e72eed-6f0b-4d5b-9cc5-088487d969b9' \\\n  -b 'cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA' \\\n  -H 'origin: https://nexus.talentica.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://nexus.talentica.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'"
-      },
-      "response": []
-    },
-    {
-      "name": "https://apiorion.talentica.com/technology/getTechDigest/label?techDigestLabel=OpenTelemetry",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "accept",
-            "value": "application/json, text/plain, */*"
-          },
-          {
-            "key": "accept-language",
-            "value": "en-US,en;q=0.9"
-          },
-          {
-            "key": "api-key",
-            "value": "53e72eed-6f0b-4d5b-9cc5-088487d969b9"
-          },
-          {
-            "key": "origin",
-            "value": "https://nexus.talentica.com"
-          },
-          {
-            "key": "priority",
-            "value": "u=1, i"
-          },
-          {
-            "key": "referer",
-            "value": "https://nexus.talentica.com/"
-          },
-          {
-            "key": "sec-ch-ua",
-            "value": "\"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\""
-          },
-          {
-            "key": "sec-ch-ua-mobile",
-            "value": "?0"
-          },
-          {
-            "key": "sec-ch-ua-platform",
-            "value": "\"macOS\""
-          },
-          {
-            "key": "sec-fetch-dest",
-            "value": "empty"
-          },
-          {
-            "key": "sec-fetch-mode",
-            "value": "cors"
-          },
-          {
-            "key": "sec-fetch-site",
-            "value": "same-site"
-          },
-          {
-            "key": "user-agent",
-            "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
-          },
-          {
-            "key": "Cookie",
-            "value": "cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA"
-          }
-        ],
-        "url": {
-          "raw": "https://apiorion.talentica.com/technology/getTechDigest/label?techDigestLabel=OpenTelemetry",
-          "protocol": "https",
-          "host": [
-            "apiorion",
-            "talentica",
-            "com"
-          ],
-          "path": [
-            "technology",
-            "getTechDigest",
-            "label"
-          ],
-          "query": [
+        {
+          "name": "Ask",
+          "item": [
             {
-              "key": "techDigestLabel",
-              "value": "OpenTelemetry"
+              "name": "POST /ask \u2014 ticket 232 (Adcolony event processing)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/event-stream"
+                  },
+                  {
+                    "key": "X-Correlation-ID",
+                    "value": "{{correlationId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"query\": \"How did we solve: Enhancing Event Processing Stability in Adcolony Exchange?\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/ask",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ask"
+                  ]
+                },
+                "description": "Streams SSE: status \u2192 result (Knowledge Card) \u2192 done.\n\nRecorded happy-path ask aligned with retrieve fixture ticket 232."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /ask \u2014 ticket 257 (GDPR deletion)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/event-stream"
+                  },
+                  {
+                    "key": "X-Correlation-ID",
+                    "value": "{{correlationId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"query\": \"How did we solve: Implement GDPR data deletion for Issues v2?\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/ask",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ask"
+                  ]
+                },
+                "description": "Recorded happy-path ask aligned with retrieve fixture ticket 257."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /ask \u2014 gap / out of domain",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "text/event-stream"
+                  },
+                  {
+                    "key": "X-Correlation-ID",
+                    "value": "{{correlationId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"query\": \"Who invented cold fusion pizza delivery drones?\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/ask",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ask"
+                  ]
+                },
+                "description": "Expect Knowledge Card with `gapFlag: true` when retrieval returns no usable hits."
+              },
+              "response": []
+            },
+            {
+              "name": "POST /ask \u2014 empty query (400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "X-Correlation-ID",
+                    "value": "{{correlationId}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"query\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/ask",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ask"
+                  ]
+                },
+                "description": "Validation failure before the SSE stream opens. Expect HTTP `400` with shared Error schema."
+              },
+              "response": []
             }
           ]
-        },
-        "description": "Generated from cURL: curl 'https://apiorion.talentica.com/technology/getTechDigest/label?techDigestLabel=OpenTelemetry' \\\n  -H 'accept: application/json, text/plain, */*' \\\n  -H 'accept-language: en-US,en;q=0.9' \\\n  -H 'api-key: 53e72eed-6f0b-4d5b-9cc5-088487d969b9' \\\n  -b 'cf_clearance=WTQFLTsPups634ynYghJVn2xrNr9EoyjdrDwxZs3lhA-1780913041-1.2.1.1-7VS1revXSpVeU2EFGCPd_qpivGy6Bi_LbI0HHsePMQGWFLJ.RzCFiEXuhSqYjDRj5HXLJ8IyIPGZwGqBq7gYyKF131ka4lN14M5.RkJeqcsDCu7jXFGDz8HMAr0v6_f1Hvq85BkTY1JmhfyhIVRsDswL3vAbGomH7.LZYnIlAxj3FL5Dp2OSK1qO3I7soOZeuDjGV9InnOfBw1jVSKG.tPig5QUQiqurnWRka9vtEn.wENRiswpOmqks1X3hYX6ak8dtBp25a1f4S3zLIuzQWjkdSCyja8ol8t2x8Bpzic2R6EwCd5AbAIkUBPHCw2WJ4pME9b821m78hQmhxtJemw; auth-token=eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJzb2Z0dGVrSldUIiwic3ViIjoicmFodWwuc2hlZGFtQHRhbGVudGljYS5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiaWF0IjoxNzgzOTI3MjY4LCJleHAiOjE3ODQ1MzIwNjh9.x7P10ajiJCYiVnddliA105x673BcM1ruJ0Lu52rgPfVDAKLZpl3NPtpyri8QJr05A4lqH_jSHn6DehNWrrsRnA' \\\n  -H 'origin: https://nexus.talentica.com' \\\n  -H 'priority: u=1, i' \\\n  -H 'referer: https://nexus.talentica.com/' \\\n  -H 'sec-ch-ua: \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"' \\\n  -H 'sec-ch-ua-mobile: ?0' \\\n  -H 'sec-ch-ua-platform: \"macOS\"' \\\n  -H 'sec-fetch-dest: empty' \\\n  -H 'sec-fetch-mode: cors' \\\n  -H 'sec-fetch-site: same-site' \\\n  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36'"
-      },
-      "response": []
+        }
+      ]
     }
   ]
 }

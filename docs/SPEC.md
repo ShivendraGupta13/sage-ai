@@ -142,7 +142,7 @@ sage-ai/
 │   └── contracts/
 │       ├── ask-api.md          # Public POST /ask + GET /health
 │       └── retrieve-api.md     # What Java may call on :8000
-├── orion-apis/                 # Postman collection (ingest capture / offline seed aid)
+├── orion-apis/                 # Postman: Orion ingest + Sage ask/retrieve
 ├── src/main/java/com/company/sage/
 │   ├── SageApplication.java
 │   ├── chat/                   # POST /ask, SSE, health
