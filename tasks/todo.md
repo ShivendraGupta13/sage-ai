@@ -46,3 +46,13 @@ Source of truth for `/build`: [plan.md](plan.md) · Spec: [docs/SPEC.md](../docs
 ### Checkpoint: Complete
 - [ ] SPEC success criteria 1–10 satisfied for Java POC
 - [ ] Ready for code review / CEO demo with seeded sister service
+
+---
+
+## Workstream: Retrieve fixture capture (offline Java)
+
+- [x] `scripts/capture_retrieve_fixtures.py` + `src/test/resources/fixtures/graphrag/`
+- [x] Captured 67 hard-problem retrieve pairs; `manifest.json` complete
+- [x] `happy-path-queries.json` (232 + 257, both-paths)
+- [x] `RecordedRetrieveFixtureTest`, `ResultMergerRecordedFixtureTest`, GraphRagClient recorded fixture test
+- [ ] Review + push to `fix/adk-list-arg-deserialization` (do **not** merge to `main`)

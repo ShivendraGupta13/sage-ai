@@ -760,10 +760,11 @@ Full tables: [contracts/ask-api.md](contracts/ask-api.md).
 Rules:
 
 1. Java never invents retrieve response fields.
-2. Mixed casing is intentional: camelCase domain fields (`problemStatement`, `vectorScore`) and snake_case transport knobs (`top_k`, `doc_id`).
+2. Mixed casing is intentional: camelCase domain fields (`problemStatement`, `vectorScore`) and snake_case transport knobs (`top_k`, `doc_id`, `min_score`, `use_llm`).
 3. IDs (`doc_id`, `personId`, `teamId`) are always strings.
 4. Empty retrieval → `200` + `hits: []` (not an error). Java fail-softs retrieve `5xx` to empty hits.
-5. If narrative docs and contract files disagree on success field shapes, **contract files + `api_contracts.py` win**.
+5. Semantic retrieve always sends `use_llm: false` — Sage owns LLM (Ollama/ADK); Graph RAG must not run its own LLM path.
+6. If narrative docs and contract files disagree on success field shapes, **contract files + `api_contracts.py` win**.
 
 ---
 

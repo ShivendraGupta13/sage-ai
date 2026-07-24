@@ -5,7 +5,8 @@ import com.company.sage.model.AskRequest;
 import com.company.sage.model.AskStatusPayload;
 import com.company.sage.model.ErrorResponse;
 import com.company.sage.model.ValidationError;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.company.sage.util.LlmJson;
+import com.company.sage.util.ToolArgs;
 import com.google.adk.agents.SequentialAgent;
 import com.google.adk.runner.InMemoryRunner;
 import com.google.adk.sessions.GetSessionConfig;
@@ -39,7 +40,6 @@ public class AskController {
     private static final Logger log = LoggerFactory.getLogger(AskController.class);
 
     private final SequentialAgent sageRootAgent;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public AskController(SequentialAgent sageRootAgent) {
         this.sageRootAgent = sageRootAgent;
@@ -114,13 +114,11 @@ public class AskController {
                         if ("QueryInterpret".equals(author) && turnComplete && queryInterpreted.compareAndSet(false, true)) {
                             Session s = runner.sessionService().getSession(sessionKey, GetSessionConfig.builder().build()).blockingGet();
                             if (s != null && s.state().containsKey("query_interpretation")) {
-                                String interpretationJson = s.state().get("query_interpretation").toString();
+                                Object interpretationRaw = s.state().get("query_interpretation");
                                 try {
-                                    @SuppressWarnings("unchecked")
-                                    Map<String, Object> interpretation = objectMapper.readValue(interpretationJson, Map.class);
+                                    Map<String, Object> interpretation = LlmJson.parseMap(interpretationRaw);
                                     String problem = (String) interpretation.get("problemStatement");
-                                    @SuppressWarnings("unchecked")
-                                    List<String> tech = (List<String>) interpretation.get("techNeeded");
+                                    List<String> tech = ToolArgs.asStringList(interpretation.get("techNeeded"));
 
                                     // 2. Emit status: problem state and tech context identified
                                     emitter.send(SseEmitter.event()
@@ -150,8 +148,11 @@ public class AskController {
                             Session s = runner.sessionService().getSession(sessionKey, GetSessionConfig.builder().build()).blockingGet();
                             if (s != null && s.state().containsKey("knowledge_card")) {
                                 Object cardRaw = s.state().get("knowledge_card");
-                                Object cardParsed = cleanAndParseJson(cardRaw);
-                                
+                                Object cardParsed = LlmJson.parseOrRaw(cardRaw);
+                                if (cardParsed instanceof String) {
+                                    log.warn("Failed to parse Knowledge Card JSON, returning raw string");
+                                }
+
                                 // 5. Emit final result payload
                                 emitter.send(SseEmitter.event()
                                         .name("result")
@@ -192,25 +193,5 @@ public class AskController {
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_EVENT_STREAM)
                 .body(emitter);
-    }
-
-    private Object cleanAndParseJson(Object raw) {
-        if (raw == null) return null;
-        String str = raw.toString().trim();
-        if (str.startsWith("```json")) {
-            str = str.substring(7);
-        } else if (str.startsWith("```")) {
-            str = str.substring(3);
-        }
-        if (str.endsWith("```")) {
-            str = str.substring(0, str.length() - 3);
-        }
-        str = str.trim();
-        try {
-            return objectMapper.readValue(str, Object.class);
-        } catch (Exception e) {
-            log.warn("Failed to parse Knowledge Card JSON, returning raw string: {}", e.getMessage());
-            return str;
-        }
     }
 }

@@ -611,7 +611,8 @@ Vector similarity search on `problemStatement`.
 {
   "problemStatement": "Safely fetching external images from emails without SSRF exposure",
   "top_k": 5,
-  "min_score": 0.60
+  "min_score": 0.60,
+  "use_llm": false
 }
 
 // Response 200

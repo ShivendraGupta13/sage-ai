@@ -66,6 +66,35 @@ class DtoFixtureTest {
     }
 
     @Test
+    void testDocumentLinkArrayDeserializationTakesFirst() throws Exception {
+        String json = """
+                {
+                  "hits": [{
+                    "doc_id": "178025",
+                    "source": "orion_metadata",
+                    "vectorScore": 0.83,
+                    "passage": "Implemented a server-side proxy...",
+                    "metadata": {
+                      "title": "SSRF-safe external image loader",
+                      "documentLink": [
+                        "https://example.com/a.pdf",
+                        "https://example.com/b.pdf"
+                      ]
+                    }
+                  }],
+                  "query_time_ms": 210,
+                  "total_found": 1
+                }
+                """;
+
+        RetrieveResponse response = objectMapper.readValue(json, RetrieveResponse.class);
+
+        assertThat(response.getHits()).hasSize(1);
+        assertThat(response.getHits().get(0).getMetadata().getDocumentLink())
+                .isEqualTo("https://example.com/a.pdf");
+    }
+
+    @Test
     void testGraphRetrieveResponseDeserialization() throws Exception {
         String json = """
                 {
@@ -118,6 +147,7 @@ class DtoFixtureTest {
         assertThat(json).contains("\"problemStatement\":\"SSRF exposure prevention\"");
         assertThat(json).contains("\"top_k\":10");
         assertThat(json).contains("\"min_score\":0.75");
+        assertThat(json).contains("\"use_llm\":false");
     }
 
     @Test

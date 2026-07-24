@@ -16,11 +16,13 @@ public class LlmConfig {
 
     @Bean
     public ChatModel langchain4jChatModel(LlmProperties properties) {
-        return OllamaChatModel.builder()
+        ChatModel ollama = OllamaChatModel.builder()
                 .baseUrl(properties.getBaseUrl())
                 .modelName(properties.getModelName())
                 .timeout(Duration.ofSeconds(60))
                 .build();
+        // ADK sequential context uses multi-part text; Ollama requires a single TextContent.
+        return new OllamaCompatibleChatModel(ollama);
     }
 
     @Bean

@@ -40,12 +40,18 @@ Base URL for Graph RAG (default): `SAGE_GRAPH_RAG_BASE_URL=http://localhost:8000
 
 ### 4. Ask via Postman or curl
 
-Import [`orion-apis/sage ai.postman_collection.json`](orion-apis/sage%20ai.postman_collection.json) (Orion ingest collection — only file under `orion-apis/`).
+Import [`postman/Sage-AI.postman_collection.json`](postman/Sage-AI.postman_collection.json) into Postman (`baseUrl` → `http://localhost:8080`, `graphRagBaseUrl` → `http://localhost:8000`).
+
+Requests included: `GET /health`, `POST /retrieve/semantic`, `POST /retrieve/graph`, `POST /ask` (happy path, alternate query, gap path, empty-query `400`).
+
+For Orion offline seed data only, use [`orion-apis/sage ai.postman_collection.json`](orion-apis/sage%20ai.postman_collection.json) — that is not the Sage ask API.
 
 ```bash
 curl -N -X POST http://localhost:8080/ask \
   -H "Content-Type: application/json" \
   -d '{"query":"How did we migrate to OpenTelemetry?"}'
+
+curl -s http://localhost:8080/health
 ```
 
 ## Documentation
@@ -68,6 +74,8 @@ Run unit and integration tests:
 ```bash
 ./mvnw test
 ```
+`./mvnw test` does **not** need live Graph RAG. Optional local retrieve fixtures under `src/test/resources/fixtures/graphrag/` are gitignored; recorded-fixture tests skip when they are absent.
+
 *Note:* To run the optional gated Ollama connection spike test, set `OLLAMA_SPIKE=true`:
 ```bash
 OLLAMA_SPIKE=true ./mvnw test -Dtest=QueryInterpretSpikeTest

@@ -31,6 +31,8 @@ public class SemanticSearchTool {
 
     /**
      * Executes semantic search using the given problem statement.
+     * Structured hits are written to session state key {@code semantic_hits} (ADK
+     * {@code outputKey} would overwrite with the agent's final text).
      */
     public List<RetrieveHit> semanticSearch(
             @Schema(name = "problemStatement", description = "The extracted problem statement to search prior art for", optional = false)
@@ -46,10 +48,20 @@ public class SemanticSearchTool {
             SemanticRetrieveRequest req = new SemanticRetrieveRequest(
                     problemStatement, finalTopK, retrievalProperties.getMinScore());
             RetrieveResponse response = graphRagClient.retrieveSemantic(req, correlationId);
-            return response != null ? response.getHits() : new ArrayList<>();
+            List<RetrieveHit> hits = response != null && response.getHits() != null
+                    ? response.getHits()
+                    : new ArrayList<>();
+            if (toolContext != null) {
+                toolContext.state().put("semantic_hits", hits);
+            }
+            return hits;
         } catch (Exception e) {
             log.error("Fail-soft in SemanticSearchTool: {}", e.getMessage());
-            return new ArrayList<>();
+            List<RetrieveHit> empty = new ArrayList<>();
+            if (toolContext != null) {
+                toolContext.state().put("semantic_hits", empty);
+            }
+            return empty;
         }
     }
 }

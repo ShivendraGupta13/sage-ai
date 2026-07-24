@@ -7,7 +7,7 @@ sage:
   adk:
     llm:
       base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
-      model-name: ${SAGE_LLM_MODEL:llama3.2:3b}
+      model-name: ${SAGE_LLM_MODEL:llama3.2}
   retrieval:
     top-k: ${SAGE_RETRIEVAL_TOP_K:5}
     min-score: ${SAGE_RETRIEVAL_MIN_SCORE:0.60}

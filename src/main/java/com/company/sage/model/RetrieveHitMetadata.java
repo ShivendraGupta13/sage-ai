@@ -1,5 +1,7 @@
 package com.company.sage.model;
 
+import com.company.sage.util.StringOrFirstArrayDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +15,8 @@ public class RetrieveHitMetadata {
     private String teamId = "0";
     private List<RetrievePerson> people = new ArrayList<>();
     private List<String> technologies = new ArrayList<>();
+
+    @JsonDeserialize(using = StringOrFirstArrayDeserializer.class)
     private String documentLink;
     private String category = "HARD_PROBLEMS";
     private String sourceAttribution = "Orion API";

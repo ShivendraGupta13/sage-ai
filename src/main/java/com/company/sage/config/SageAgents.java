@@ -44,7 +44,6 @@ public class SageAgents {
                     Call semanticSearch with the problemStatement from query_interpretation.
                     Report only tool results. Never invent teams, people, or documents.
                     """)
-                .outputKey("semantic_hits")
                 .build();
     }
 
@@ -58,7 +57,6 @@ public class SageAgents {
                     Call graphTraversal with the techNeeded array from query_interpretation.
                     Report only tool results. Never invent teams, people, or documents.
                     """)
-                .outputKey("graph_hits")
                 .build();
     }
 
@@ -76,8 +74,9 @@ public class SageAgents {
                 .name("ResultMerger")
                 .model(adkModel)
                 .tools(List.of(FunctionTool.create(mergerTool, "merge")))
-                .instruction("Call merge with semantic_hits and graph_hits. Output the merged_hits result.")
-                .outputKey("merged_hits")
+                .instruction(
+                        "Call merge with no arguments. It reads semantic_hits and graph_hits from session state "
+                                + "and writes merged_hits. Acknowledge when done.")
                 .build();
     }
 

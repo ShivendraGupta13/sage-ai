@@ -393,3 +393,18 @@ flowchart BT
 ## Open Questions
 
 None blocking planning — D1–D3 approved in SPEC. Sister Graph RAG must be seeded for live demos (outside this plan).
+---
+
+## Workstream: Retrieve fixture capture (offline Java)
+
+**Branch:** `fix/adk-list-arg-deserialization` (push only; do not merge to `main` from this workstream).
+
+Captured live `/retrieve/semantic` + `/retrieve/graph` for 67 hard problems into `src/test/resources/fixtures/graphrag/`. Java DTO/client/merger tests replay happy-path recorded JSON without Python.
+
+### Tasks
+- [x] Capture script + folder layout
+- [x] Loop capture all tickets → `manifest.json`
+- [x] `happy-path-queries.json` (tickets 232, 257 — both paths)
+- [x] Offline Java fixture tests
+- [x] README / fixtures README
+- [ ] Code review + Bugbot; push to PR branch (no merge)

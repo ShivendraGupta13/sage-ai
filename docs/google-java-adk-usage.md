@@ -264,6 +264,7 @@ sequenceDiagram
 |---|---|
 | **Endpoint** | `POST {SAGE_GRAPH_RAG_BASE_URL}/retrieve/semantic` |
 | **Args** | `problemStatement` (string from `QueryInterpret`), `topK` (int, default *(⚠️ D3)*) |
+| **Outbound body** | Includes `use_llm: false` — Sage owns LLM (Ollama/ADK); Graph RAG must not run its own LLM path |
 | **Returns** | JSON `semantic_hits[]` per [architecture.md §12](architecture.md#12-inter-service-api-contracts) |
 | **Fail-soft** | Return `"[]"` on any exception — never abort the ask; graph path still runs |
 
@@ -276,9 +277,9 @@ sequenceDiagram
 | **Returns** | JSON `graph_hits[]` per [architecture.md §12](architecture.md#12-inter-service-api-contracts) |
 | **Fail-soft** | Return `"[]"` on any exception — semantic path still contributes |
 
-### `ResultMergerTool.merge(semanticHits, graphHits)`
+### `ResultMergerTool.merge(toolContext)`
 
-Pure Java — no LLM call. Deterministic merge logic:
+Pure Java — no LLM call. Reads `semantic_hits` / `graph_hits` from session state (written by the retrieve tools; do **not** use ADK `outputKey` for those keys or the agent's final text will overwrite structured hits). Deterministic merge logic:
 
 1. Collect all hits from both lists.
 2. Deduplicate by `doc_id` — if same `doc_id` in both: merge into one record with `matchedVia: ["semantic","graph"]`.
@@ -288,7 +289,7 @@ Pure Java — no LLM call. Deterministic merge logic:
    ```
 4. Filter out hits below `min_score` threshold *(⚠️ D2)*.
 5. Sort descending by `confidenceScore`; take top-N *(⚠️ D3)*.
-6. Write to session key `merged_hits`.
+6. Write to session key `merged_hits` via `toolContext.state().put` (no `outputKey` on the merger agent).
 
 `techNeeded[]` is produced by `QueryInterpret` **before** the parallel tool calls, then passed to `GraphTraversalTool`.
 
@@ -332,7 +333,7 @@ public class SageAgents {
                 Call semanticSearch with the problemStatement from query_interpretation.
                 Report only tool results. Never invent teams, people, or documents.
                 """)
-            .outputKey("semantic_hits")
+            // structured hits written by SemanticSearchTool into session state
             .build();
 
         // Step 2b: graph traversal agent
@@ -344,7 +345,6 @@ public class SageAgents {
                 Call graphTraversal with the techNeeded array from query_interpretation.
                 Report only tool results. Never invent teams, people, or documents.
                 """)
-            .outputKey("graph_hits")
             .build();
 
         // Step 2: parallel fan-out
@@ -359,8 +359,7 @@ public class SageAgents {
             .name("ResultMerger")
             .model(adkModel)
             .tools(List.of(FunctionTool.create(mergerTool, "merge")))
-            .instruction("Call merge with semantic_hits and graph_hits. Output the merged_hits result.")
-            .outputKey("merged_hits")
+            .instruction("Call merge with no arguments. It reads semantic_hits and graph_hits from session state and writes merged_hits.")
             .build();
 
         // Step 4: Knowledge Card synthesis

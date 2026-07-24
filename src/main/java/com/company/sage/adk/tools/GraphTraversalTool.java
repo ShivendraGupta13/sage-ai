@@ -5,6 +5,7 @@ import com.company.sage.config.RetrievalProperties;
 import com.company.sage.model.GraphRetrieveRequest;
 import com.company.sage.model.RetrieveHit;
 import com.company.sage.model.RetrieveResponse;
+import com.company.sage.util.FlexibleStringList;
 import com.google.adk.tools.Annotations.Schema;
 import com.google.adk.tools.ToolContext;
 import java.util.ArrayList;
@@ -31,24 +32,39 @@ public class GraphTraversalTool {
 
     /**
      * Executes graph traversal search using the technology tags.
+     * Structured hits are written to session state key {@code graph_hits}.
+     *
+     * <p>{@code techNeeded} uses {@link FlexibleStringList} so ADK can bind either a JSON
+     * array or a string without throwing {@code MismatchedInputException}.
      */
     public List<RetrieveHit> graphTraversal(
             @Schema(name = "techNeeded", description = "The list of tech stack tags or patterns to traverse", optional = false)
-            List<String> techNeeded,
+            FlexibleStringList techNeeded,
             @Schema(name = "topK", description = "The maximum number of matches to retrieve", optional = true)
             Integer topK,
             ToolContext toolContext) {
 
         String correlationId = toolContext != null ? toolContext.sessionId() : "unknown";
         int finalTopK = topK != null ? topK : retrievalProperties.getTopK();
+        List<String> tags = techNeeded != null ? techNeeded.asList() : List.of();
 
         try {
-            GraphRetrieveRequest req = new GraphRetrieveRequest(techNeeded, finalTopK);
+            GraphRetrieveRequest req = new GraphRetrieveRequest(tags, finalTopK);
             RetrieveResponse response = graphRagClient.retrieveGraph(req, correlationId);
-            return response != null ? response.getHits() : new ArrayList<>();
+            List<RetrieveHit> hits = response != null && response.getHits() != null
+                    ? response.getHits()
+                    : new ArrayList<>();
+            if (toolContext != null) {
+                toolContext.state().put("graph_hits", hits);
+            }
+            return hits;
         } catch (Exception e) {
             log.error("Fail-soft in GraphTraversalTool: {}", e.getMessage());
-            return new ArrayList<>();
+            List<RetrieveHit> empty = new ArrayList<>();
+            if (toolContext != null) {
+                toolContext.state().put("graph_hits", empty);
+            }
+            return empty;
         }
     }
 }

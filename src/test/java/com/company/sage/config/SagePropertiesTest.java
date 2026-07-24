@@ -28,7 +28,7 @@ class SagePropertiesTest {
 
         assertThat(llmProperties).isNotNull();
         assertThat(llmProperties.getBaseUrl()).isEqualTo("http://localhost:11434");
-        assertThat(llmProperties.getModelName()).isEqualTo("llama3.2:3b");
+        assertThat(llmProperties.getModelName()).isEqualTo("llama3.2");
 
         assertThat(retrievalProperties).isNotNull();
         assertThat(retrievalProperties.getTopK()).isEqualTo(5);

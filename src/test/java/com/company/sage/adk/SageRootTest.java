@@ -13,6 +13,7 @@ import com.company.sage.clients.graphrag.GraphRagClient;
 import com.company.sage.config.RetrievalProperties;
 import com.company.sage.config.SageAgents;
 import com.company.sage.config.ScoringProperties;
+import com.company.sage.model.MergedHit;
 import com.company.sage.model.RetrieveHit;
 import com.company.sage.model.RetrieveResponse;
 import com.google.adk.agents.LlmAgent;
@@ -63,8 +64,9 @@ class SageRootTest {
     @Test
     void testSageRootPipelineEndToEnd() {
         // Mock downstream client responses
-        RetrieveHit hit1 = new RetrieveHit("101", "sem-source", 0.85, null, null, null, "SSRF protection using Spring Security", null);
-        RetrieveHit hit2 = new RetrieveHit("202", "graph-source", null, 0.75, null, null, "Graph search matched SSRF proxy rules", null);
+        // Same docId → dual-match path (graph-only cannot clear min_score with w2=0.4)
+        RetrieveHit hit1 = new RetrieveHit("101", "sem-source", 1.0, null, null, null, "SSRF protection using Spring Security", null);
+        RetrieveHit hit2 = new RetrieveHit("101", "graph-source", null, 1.0, List.of("Java"), null, "Graph search matched SSRF proxy rules", null);
 
         when(graphRagClient.retrieveSemantic(any(), anyString()))
                 .thenReturn(new RetrieveResponse(List.of(hit1), 100, 1));
@@ -115,11 +117,7 @@ class SageRootTest {
                             .flatMap(c -> c.parts().get().stream())
                             .anyMatch(p -> p.functionResponse().isPresent());
                     if (!hasResponse) {
-                        Map<String, Object> args = Map.of(
-                            "semanticHits", List.of(Map.of("doc_id", "101", "source", "sem-source", "vectorScore", 0.85, "passage", "SSRF protection")),
-                            "graphHits", List.of(Map.of("doc_id", "202", "source", "graph-source", "graphScore", 0.75, "passage", "SSRF proxy"))
-                        );
-                        responsePart = Part.fromFunctionCall("merge", args);
+                        responsePart = Part.fromFunctionCall("merge", Map.of());
                     } else {
                         responsePart = Part.fromText("Merging completed");
                     }
@@ -180,9 +178,13 @@ class SageRootTest {
         assertThat(session).isNotNull();
 
         assertThat(session.state().get("query_interpretation")).isNotNull();
-        assertThat(session.state().get("semantic_hits")).isNotNull();
-        assertThat(session.state().get("graph_hits")).isNotNull();
-        assertThat(session.state().get("merged_hits")).isNotNull();
+        assertThat(session.state().get("semantic_hits")).isInstanceOf(List.class);
+        assertThat(session.state().get("graph_hits")).isInstanceOf(List.class);
+        @SuppressWarnings("unchecked")
+        List<MergedHit> merged = (List<MergedHit>) session.state().get("merged_hits");
+        assertThat(merged).isNotNull();
+        assertThat(merged).extracting(MergedHit::getDocId).containsExactly("101");
+        assertThat(merged.get(0).getMatchedVia()).contains("semantic", "graph");
         assertThat(session.state().get("knowledge_card")).isNotNull();
 
         System.out.println("End-to-End Pipeline Knowledge Card: " + session.state().get("knowledge_card"));
