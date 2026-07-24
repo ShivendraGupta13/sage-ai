@@ -1,0 +1,119 @@
+description: "Sage E2E Evaluation Suite"
+
+providers:
+  - id: "file://ask_provider.py"
+
+tests:
+  # Happy paths for golden / in-domain queries (expect gapFlag = false)
+  - vars:
+      query_id: "q1"
+      query: "How to protect against SSRF in our API Gateway proxy?"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+      - type: javascript
+        value: "JSON.parse(output).problemStatement.toLowerCase().includes('ssrf')"
+
+  - vars:
+      query_id: "q2"
+      query: "What is the team name responsible for Payments Platform?"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+
+  - vars:
+      query_id: "q3"
+      query: "How to safely render arbitrary HTML emails without CSS injection?"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+
+  - vars:
+      query_id: "q4"
+      query: "Is there any document about Orion API authorization proxy?"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+
+  - vars:
+      query_id: "q5"
+      query: "SSRF-safe external image loader documentation"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+
+  # Out of domain queries (expect gapFlag = true and Hard Problem message check)
+  - vars:
+      query_id: "q6"
+      query: "How to cook a pepperoni pizza?"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === true"
+      - type: javascript
+        value: "JSON.parse(output).gapMessage.includes('candidate Hard Problem')"
+
+  - vars:
+      query_id: "q7"
+      query: "What is the capital of France?"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === true"
+      - type: javascript
+        value: "JSON.parse(output).gapMessage.includes('candidate Hard Problem')"
+
+  - vars:
+      query_id: "q8"
+      query: "Can you recommend a good action movie from 2025?"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === true"
+
+  - vars:
+      query_id: "q9"
+      query: "How to reverse a binary tree in Rust?"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === true"
+
+  - vars:
+      query_id: "q10"
+      query: "Weather forecast for Tokyo tomorrow"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === true"
+
+  # Specific technical queries (expect gapFlag = false)
+  - vars:
+      query_id: "q11"
+      query: "Spring Boot WebMvc security configure rules"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+
+  - vars:
+      query_id: "q12"
+      query: "SSRF mitigation using got-scrubbing library"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+
+  - vars:
+      query_id: "q13"
+      query: "Payments platform team id and Priya Sharma details"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+
+  - vars:
+      query_id: "q14"
+      query: "SSRF proxy restrictions in payments gateway"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === false"
+
+  - vars:
+      query_id: "q15"
+      query: "Cypher query performance tuning in Neo4j"
+    assert:
+      - type: javascript
+        value: "JSON.parse(output).gapFlag === true"
