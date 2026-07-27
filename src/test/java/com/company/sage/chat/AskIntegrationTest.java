@@ -36,8 +36,8 @@ class AskIntegrationTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-            .setMessageConverters(new MappingJackson2HttpMessageConverter())
-            .build();
+                .setMessageConverters(new MappingJackson2HttpMessageConverter())
+                .build();
     }
 
     @Test
@@ -46,16 +46,16 @@ class AskIntegrationTest {
         RetrieveHit graphHit = new RetrieveHit("DOC-102", "Node Image Sanitizer", 0.0, 1.0, List.of("graph"), "Passage 2", "Source B", null);
 
         when(graphRagClient.retrieveSemantic(any(), any()))
-            .thenReturn(new RetrieveResponse(List.of(semHit), 10L, 1));
+                .thenReturn(new RetrieveResponse(List.of(semHit), 10L, 1));
         when(graphRagClient.retrieveGraph(any(), any()))
-            .thenReturn(new RetrieveResponse(List.of(graphHit), 8L, 1));
+                .thenReturn(new RetrieveResponse(List.of(graphHit), 8L, 1));
 
         MvcResult result = mockMvc.perform(post("/ask")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Correlation-Id", "test-correlation-123")
-                .content("{\"query\":\"How did we solve SSRF in node services?\"}"))
-            .andExpect(status().isOk())
-            .andReturn();
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Correlation-Id", "test-correlation-123")
+                        .content("{\"query\":\"How did we solve SSRF in node services?\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
 
         String responseContent = result.getResponse().getContentAsString();
 
@@ -73,16 +73,16 @@ class AskIntegrationTest {
     @Test
     void shouldProduceGapCardWhenRetrievalReturnsNoHits() throws Exception {
         when(graphRagClient.retrieveSemantic(any(), any()))
-            .thenReturn(new RetrieveResponse(List.of(), 0L, 0));
+                .thenReturn(new RetrieveResponse(List.of(), 0L, 0));
         when(graphRagClient.retrieveGraph(any(), any()))
-            .thenReturn(new RetrieveResponse(List.of(), 0L, 0));
+                .thenReturn(new RetrieveResponse(List.of(), 0L, 0));
 
         MvcResult result = mockMvc.perform(post("/ask")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("X-Correlation-Id", "test-correlation-gap")
-                .content("{\"query\":\"Unseen problem statement\"}"))
-            .andExpect(status().isOk())
-            .andReturn();
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Correlation-Id", "test-correlation-gap")
+                        .content("{\"query\":\"Unseen problem statement\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
 
         String responseContent = result.getResponse().getContentAsString();
 
