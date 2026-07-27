@@ -61,13 +61,13 @@ public class SageAskService {
             double minScore = properties.retrieval().minScore();
 
             SemanticRetrieveRequest semReq = new SemanticRetrieveRequest(interpretation.problemStatement(), topK, minScore, false);
-            GraphRetrieveRequest graphReq = new GraphRetrieveRequest(interpretation.techNeeded(), topK);
 
             List<RetrieveHit> semanticHits;
             List<RetrieveHit> graphHits;
             List<String> techNeeded = interpretation.techNeeded() != null ? interpretation.techNeeded() : List.of();
 
             if (!techNeeded.isEmpty()) {
+                GraphRetrieveRequest graphReq = new GraphRetrieveRequest(techNeeded, topK);
                 CompletableFuture<RetrieveResponse> semFuture = CompletableFuture.supplyAsync(
                     () -> graphRagClient.retrieveSemantic(semReq, correlationId)
                 );
@@ -81,8 +81,14 @@ public class SageAskService {
             } else {
                 RetrieveResponse semResp = graphRagClient.retrieveSemantic(semReq, correlationId);
                 semanticHits = (semResp != null && semResp.hits() != null) ? semResp.hits() : List.of();
-                RetrieveResponse graphResp = graphRagClient.retrieveGraph(graphReq, correlationId);
-                graphHits = (graphResp != null && graphResp.hits() != null) ? graphResp.hits() : List.of();
+                techNeeded = TechNeededRecovery.fromSemanticHits(semanticHits);
+                if (!techNeeded.isEmpty()) {
+                    GraphRetrieveRequest graphReq = new GraphRetrieveRequest(techNeeded, topK);
+                    RetrieveResponse graphResp = graphRagClient.retrieveGraph(graphReq, correlationId);
+                    graphHits = (graphResp != null && graphResp.hits() != null) ? graphResp.hits() : List.of();
+                } else {
+                    graphHits = List.of();
+                }
             }
 
             // Event 4: status "Ranking results…"
@@ -104,7 +110,7 @@ public class SageAskService {
             KnowledgeCard card = new KnowledgeCard(
                 rawQuery,
                 interpretation.problemStatement(),
-                interpretation.techNeeded(),
+                techNeeded,
                 directAnswer,
                 mergedResults,
                 gapFlag,

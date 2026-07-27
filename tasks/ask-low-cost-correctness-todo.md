@@ -10,7 +10,7 @@
   - Verify: unit test on formatter + AskIntegrationTest asserts one-liner shape  
   - Files: `DirectAnswerFormatter.java` (new), `SageAskService.java`, test
 
-- [ ] **T4 — techNeeded recovery (small)**  
+- [x] **T4 — techNeeded recovery (small)**  
   - Acceptance: Empty interpret tags + semantic `technologies` → graph called with recovered tags; card `techNeeded` reflects recovery.  
   - Verify: unit `TechNeededRecoveryTest` + ask/integration mock sequence  
   - Files: `TechNeededRecovery.java` (new), `SageAskService.java`, tests

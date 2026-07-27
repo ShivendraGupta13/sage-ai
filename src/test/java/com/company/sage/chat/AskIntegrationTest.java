@@ -3,6 +3,7 @@ package com.company.sage.chat;
 import com.company.sage.clients.graphrag.GraphRagClient;
 import com.company.sage.model.QueryInterpretation;
 import com.company.sage.model.RetrieveHit;
+import com.company.sage.model.RetrieveMetadata;
 import com.company.sage.model.RetrieveResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -95,10 +96,41 @@ class AskIntegrationTest {
     }
 
     @Test
+    void shouldRecoverTechNeededOnCardWhenInterpretTagsEmpty() throws Exception {
+        when(queryInterpreter.interpret(any(), any()))
+            .thenReturn(new QueryInterpretation("Preventing SSRF when loading images", List.of()));
+
+        RetrieveMetadata meta = new RetrieveMetadata(
+            "SSRF-safe external image loader", "Payments Platform", "42",
+            List.of(), List.of("SSRF mitigation", "Node.js"),
+            List.of("https://ticket/1234"), "HARD_PROBLEMS", "Orion API"
+        );
+        RetrieveHit semHit = new RetrieveHit(
+            "178025", "orion_metadata", 0.9, null, List.of(), null,
+            "Implemented a server-side proxy...", meta
+        );
+
+        when(graphRagClient.retrieveSemantic(any(), any()))
+            .thenReturn(new RetrieveResponse(List.of(semHit), 10L, 1));
+        when(graphRagClient.retrieveGraph(any(), any()))
+            .thenReturn(new RetrieveResponse(List.of(), 5L, 0));
+
+        MvcResult result = mockMvc.perform(post("/ask")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-Correlation-Id", "test-correlation-recover")
+                .content("{\"query\":\"How did we solve SSRF?\"}"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+        assertThat(responseContent).contains("\"techNeeded\":[\"SSRF mitigation\",\"Node.js\"]");
+        assertThat(responseContent).contains("team has solved this");
+        assertThat(responseContent).contains("Payments Platform");
+    }
+
+    @Test
     void shouldProduceGapCardWhenRetrievalReturnsNoHits() throws Exception {
         when(graphRagClient.retrieveSemantic(any(), any()))
-            .thenReturn(new RetrieveResponse(List.of(), 0L, 0));
-        when(graphRagClient.retrieveGraph(any(), any()))
             .thenReturn(new RetrieveResponse(List.of(), 0L, 0));
 
         MvcResult result = mockMvc.perform(post("/ask")
