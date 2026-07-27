@@ -85,6 +85,7 @@ class AskIntegrationTest {
         assertThat(responseContent).contains("event:result");
         assertThat(responseContent).contains("\"confidenceScore\":0.6");
         assertThat(responseContent).contains("\"gapFlag\":false");
+        assertThat(responseContent).contains("team has solved this");
         assertThat(responseContent).contains("event:done");
         // Raw query must not be echoed as problemStatement when interpreter succeeds
         assertThat(responseContent).contains("\"query\":\"How did we solve SSRF in node services?\"");

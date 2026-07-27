@@ -99,9 +99,7 @@ public class SageAskService {
             // Synthesis / Knowledge Card construction
             boolean gapFlag = mergedResults.isEmpty();
             String gapMessage = gapFlag ? "No internal prior art found — this may be a candidate Hard Problem" : null;
-            String directAnswer = !gapFlag && !mergedResults.isEmpty()
-                ? (mergedResults.get(0).summary() != null ? mergedResults.get(0).summary() : mergedResults.get(0).hardProblemTitle())
-                : "No internal prior art found.";
+            String directAnswer = DirectAnswerFormatter.format(mergedResults);
 
             KnowledgeCard card = new KnowledgeCard(
                 rawQuery,

@@ -5,7 +5,7 @@
   - Verify: `./mvnw test -Dtest=AskIntegrationTest`  
   - Files: `SageAskService.java`, optionally thin unit test
 
-- [ ] **T2 — Route-first `directAnswer` (tiny)**  
+- [x] **T2 — Route-first `directAnswer` (tiny)**  
   - Acceptance: Non-empty results → `Yes — N team(s)… (title).`; empty → existing no-prior-art string.  
   - Verify: unit test on formatter + AskIntegrationTest asserts one-liner shape  
   - Files: `DirectAnswerFormatter.java` (new), `SageAskService.java`, test
