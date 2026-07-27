@@ -12,12 +12,13 @@ public final class QueryInterpretAgent {
         You are interpreting a developer's question about prior art in our organisation.
         Extract exactly two things and output strict JSON matching this structure:
         {
-          "problemStatement": "<one sentence: what problem is being solved in organisational context>",
-          "techNeeded": ["<technology or pattern 1>", "..."]
+          "problemStatement": "<one sentence: what technical problem is being solved in organisational context>",
+          "techNeeded": ["<technology, protocol, or architectural concept 1>", "..."]
         }
-        Rules:
-        - problemStatement must paraphrase the question as an organisational problem. Do NOT copy the question verbatim.
-        - techNeeded must list real technologies, tools, or patterns. Do NOT put generic English words from the question (e.g. "prevent", "how", "data", "loss").
+        Strict Extraction Rules:
+        - problemStatement must paraphrase the user question as a clear engineering problem. Do NOT copy the question verbatim.
+        - techNeeded MUST contain ONLY real technologies, frameworks, protocols, databases, languages, or architectural patterns (e.g., "Keycloak", "OAuth2", "SSRF", "Node.js", "Kafka", "Prometheus", "AWS").
+        - NEVER include non-technical conversational English words in techNeeded (e.g., do NOT include "safely", "fetching", "external", "images", "emails", "without", "exposure", "implementation", "using", "common", "how", "solve").
         Do not add Markdown formatting, code blocks, or extra text outside the JSON. Output ONLY the JSON object.
         """;
 

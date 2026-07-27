@@ -35,9 +35,17 @@ Source of truth for `/build`: [plan.md](plan.md) · Spec: [docs/SPEC.md](../docs
 - [x] Task 10: `POST /ask` SSE bridge + validation + correlationId
 - [x] Task 11: Ask integration tests (mocked Graph RAG)
 
-### Checkpoint: Ask E2E (mocked)
-- [x] Full SSE sequence asserted in tests
-- [x] Human demo dry-run with sister seed when available
+## Phase 3.1: ADK Pipeline Re-Alignment & Refactoring (One-by-One TDD)
+- [x] Task 15: Prompt Instruction Refinement for `QueryInterpretAgent` & `KnowledgeCardSynthAgent`
+- [x] Task 16: `SageAskService` ADK `InMemoryRunner` Refactoring & Option A/C Fail-Soft Fallback
+- [x] Task 17: Unit & Integration Tests Update (`SageAskServiceTest`, `AskIntegrationTest`)
+- [x] Task 18: E2E Docker & Postman Verification (Ollama Online vs. Offline)
+
+### Checkpoint: ADK Re-Alignment
+- [x] ADK `SequentialAgent` tree (`SageRoot`) executes via `InMemoryRunner`
+- [x] `techNeeded` contains refined LLM technical tags (no English stop-words)
+- [x] Option A + Option C fail-soft fallback verified (Ollama online & offline)
+- [x] `./mvnw test` 100% green (48/48 active tests passing)
 
 ## Phase 5: Eval + MLflow tracking + docs
 - [ ] Task 12: F8 Promptfoo golden set

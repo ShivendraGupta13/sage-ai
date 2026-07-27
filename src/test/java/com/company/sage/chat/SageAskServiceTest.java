@@ -128,9 +128,17 @@ class SageAskServiceTest {
     }
 
     @Test
-    void shouldFallbackGracefullyWhenLlmThrowsException() {
+    void shouldFallbackGracefullyWithOptionAFailsafeWhenLlmThrowsException() {
         when(adkLlm.generateContent(any(LlmRequest.class), anyBoolean()))
                 .thenReturn(Flowable.error(new RuntimeException("Connection refused to Ollama")));
+
+        com.company.sage.model.CardResult hit = new com.company.sage.model.CardResult(
+                1, 0.85, List.of("semantic"), "Core Platform", "EC2 Spot Loss",
+                "HARD_PROBLEMS", List.of("Alice Smith"), "Kafka checkpointing introduced to save state",
+                "http://doc", "Evidence", List.of("Orion API")
+        );
+        when(resultMerger.merge(any(), any(), any(), any(Integer.class)))
+                .thenReturn(List.of(hit));
 
         askService = new SageAskService(graphRagClient, resultMerger, properties, adkLlm);
         AskRequest request = new AskRequest("How did we solve spot instance termination in AWS?");

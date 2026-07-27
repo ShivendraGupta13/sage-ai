@@ -6,6 +6,7 @@ import com.company.sage.merge.ResultMerger;
 import com.company.sage.model.*;
 import com.company.sage.adk.agents.QueryInterpretAgent;
 import com.company.sage.adk.agents.QueryInterpretationParser;
+import com.google.adk.agents.SequentialAgent;
 import com.google.adk.models.BaseLlm;
 import com.google.adk.models.LlmRequest;
 import com.google.adk.models.LlmResponse;
@@ -20,6 +21,18 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * SageAskService orchestrates the ask-time execution pipeline.
+ * Architectural Pipeline Alignment :
+ * 1. Query Interpretation: QueryInterpretAgent (LlmAgent) infers precise technical tags (techNeeded)
+ *    and rephrases the problem statement.
+ * 2. Parallel Search Fan-out: Parallel retrieve calls to Python Graph RAG (/retrieve/semantic & /retrieve/graph).
+ * 3. Deterministic Result Merger: ResultMerger scores and ranks hits based on vector similarity,
+ *    graph match, and dual-match boost.
+ * 4. Knowledge Card Synthesis: KnowledgeCardSynthAgent (LlmAgent) synthesizes direct solutions when online.
+ * 5. Fail-Soft Resiliency : If Ollama is offline/unavailable, fallback keyword extraction
+ *    and clear evidence-based fallback formatting are used so search results are never blocked.
+ */
 @Service
 public class SageAskService {
 
@@ -30,17 +43,38 @@ public class SageAskService {
     private final ResultMerger resultMerger;
     private final SageProperties properties;
     private final BaseLlm adkLlm;
+    private final SequentialAgent sageRootAgent;
+
+    public SageAskService(
+            GraphRagClient graphRagClient,
+            ResultMerger resultMerger,
+            SageProperties properties
+    ) {
+        this(graphRagClient, resultMerger, properties, null, null);
+    }
 
     public SageAskService(
             GraphRagClient graphRagClient,
             ResultMerger resultMerger,
             SageProperties properties,
-            @Autowired(required = false) BaseLlm adkLlm
+            BaseLlm adkLlm
+    ) {
+        this(graphRagClient, resultMerger, properties, adkLlm, null);
+    }
+
+    @Autowired
+    public SageAskService(
+            GraphRagClient graphRagClient,
+            ResultMerger resultMerger,
+            SageProperties properties,
+            @Autowired(required = false) BaseLlm adkLlm,
+            @Autowired(required = false) SequentialAgent sageRootAgent
     ) {
         this.graphRagClient = graphRagClient;
         this.resultMerger = resultMerger;
         this.properties = properties;
         this.adkLlm = adkLlm;
+        this.sageRootAgent = sageRootAgent;
     }
 
     public SseEmitter processAsk(AskRequest request, String correlationId) {
@@ -52,9 +86,10 @@ public class SageAskService {
 
             String rawQuery = request.query();
 
-            // LLM Call #1: Query Interpreter via Ollama (with fail-soft fallback)
+            // Stage 1: Query Interpretation via LLM (QueryInterpretAgent prompt) with fail-soft fallback
             QueryInterpretation interpretation = interpretQuery(rawQuery);
 
+            // Event 2: status "Identified problem state and tech context"
             sendSse(emitter, "status", new SseStatusPayload(
                     "Identified problem state and tech context",
                     interpretation.problemStatement(),
@@ -64,7 +99,7 @@ public class SageAskService {
             // Event 3: status "Searching knowledge base…"
             sendSse(emitter, "status", new SseStatusPayload("Searching knowledge base…"));
 
-            // Retrieval stage (Semantic + Graph fan-out)
+            // Stage 2: Retrieval (Semantic + Graph fan-out to Python Graph RAG)
             int topK = properties.retrieval().topK();
             double minScore = properties.retrieval().minScore();
 
@@ -79,7 +114,7 @@ public class SageAskService {
             // Event 4: status "Ranking results…"
             sendSse(emitter, "status", new SseStatusPayload("Ranking results…"));
 
-            // Merger stage
+            // Stage 3: Deterministic Result Merger
             List<CardResult> mergedResults = resultMerger.merge(
                     semanticHits,
                     graphHits,
@@ -87,7 +122,7 @@ public class SageAskService {
                     topK
             );
 
-            // Synthesis / Knowledge Card construction
+            // Stage 4: Synthesis & Knowledge Card Construction (Option A + Option C Fail-Soft)
             boolean gapFlag = mergedResults.isEmpty();
             String gapMessage = gapFlag ? "No internal prior art found — this may be a candidate Hard Problem" : null;
             String directAnswer = gapFlag ? "No internal prior art found." : synthesizeDirectAnswer(rawQuery, mergedResults);
@@ -127,6 +162,10 @@ public class SageAskService {
         return emitter;
     }
 
+    /**
+     * Interprets user query via QueryInterpretAgent LLM prompt if Ollama is reachable,
+     * otherwise applies fail-soft fallback keyword extraction.
+     */
     private QueryInterpretation interpretQuery(String rawQuery) {
         if (rawQuery == null || rawQuery.isBlank()) {
             return new QueryInterpretation("", List.of());
@@ -167,6 +206,10 @@ public class SageAskService {
         return new QueryInterpretation(rawQuery, techNeeded);
     }
 
+    /**
+     * Synthesizes 1-2 sentence direct solution using KnowledgeCardSynthAgent prompt if Ollama is reachable.
+     * Uses Option C fallback formatting if Ollama is offline so search results are never blocked.
+     */
     private String synthesizeDirectAnswer(String rawQuery, List<CardResult> mergedResults) {
         if (mergedResults == null || mergedResults.isEmpty()) {
             return "No internal prior art found.";
@@ -227,15 +270,20 @@ public class SageAskService {
         }
     }
 
+    /**
+     * Option C Fallback Formatting when LLM is offline or fails:
+     * Provides an informative header indicating LLM synthesis is offline while displaying the top hit summary.
+     */
     private String fallbackDirectAnswer(List<CardResult> mergedResults) {
         if (mergedResults == null || mergedResults.isEmpty()) {
             return "No internal prior art found.";
         }
         CardResult top = mergedResults.getFirst();
-        if (top.summary() != null && !top.summary().isBlank()) {
-            return top.summary();
-        }
-        return top.hardProblemTitle() != null ? top.hardProblemTitle() : "No internal prior art found.";
+        String summary = (top.summary() != null && !top.summary().isBlank())
+                ? top.summary()
+                : (top.hardProblemTitle() != null ? top.hardProblemTitle() : "No internal prior art found.");
+        
+        return "Direct answer synthesized from top-ranked evidence summary (LLM synthesis offline):\n\n" + summary;
     }
 
     private List<String> extractTechKeywords(String query) {
