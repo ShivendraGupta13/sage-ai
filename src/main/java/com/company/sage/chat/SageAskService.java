@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class SageAskService {
@@ -60,12 +61,29 @@ public class SageAskService {
             double minScore = properties.retrieval().minScore();
 
             SemanticRetrieveRequest semReq = new SemanticRetrieveRequest(interpretation.problemStatement(), topK, minScore, false);
-            RetrieveResponse semResp = graphRagClient.retrieveSemantic(semReq, correlationId);
-            List<RetrieveHit> semanticHits = (semResp != null && semResp.hits() != null) ? semResp.hits() : List.of();
-
             GraphRetrieveRequest graphReq = new GraphRetrieveRequest(interpretation.techNeeded(), topK);
-            RetrieveResponse graphResp = graphRagClient.retrieveGraph(graphReq, correlationId);
-            List<RetrieveHit> graphHits = (graphResp != null && graphResp.hits() != null) ? graphResp.hits() : List.of();
+
+            List<RetrieveHit> semanticHits;
+            List<RetrieveHit> graphHits;
+            List<String> techNeeded = interpretation.techNeeded() != null ? interpretation.techNeeded() : List.of();
+
+            if (!techNeeded.isEmpty()) {
+                CompletableFuture<RetrieveResponse> semFuture = CompletableFuture.supplyAsync(
+                    () -> graphRagClient.retrieveSemantic(semReq, correlationId)
+                );
+                CompletableFuture<RetrieveResponse> graphFuture = CompletableFuture.supplyAsync(
+                    () -> graphRagClient.retrieveGraph(graphReq, correlationId)
+                );
+                RetrieveResponse semResp = semFuture.join();
+                RetrieveResponse graphResp = graphFuture.join();
+                semanticHits = (semResp != null && semResp.hits() != null) ? semResp.hits() : List.of();
+                graphHits = (graphResp != null && graphResp.hits() != null) ? graphResp.hits() : List.of();
+            } else {
+                RetrieveResponse semResp = graphRagClient.retrieveSemantic(semReq, correlationId);
+                semanticHits = (semResp != null && semResp.hits() != null) ? semResp.hits() : List.of();
+                RetrieveResponse graphResp = graphRagClient.retrieveGraph(graphReq, correlationId);
+                graphHits = (graphResp != null && graphResp.hits() != null) ? graphResp.hits() : List.of();
+            }
 
             // Event 4: status "Ranking results…"
             sendSse(emitter, "status", new SseStatusPayload("Ranking results…"));
