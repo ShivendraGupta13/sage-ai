@@ -195,14 +195,14 @@ flowchart TB
 
 ```xml
 <dependency>
-  <groupId>com.google.adk</groupId>
-  <artifactId>google-adk</artifactId>
-  <version>1.5.0</version>
+   <groupId>com.google.adk</groupId>
+   <artifactId>google-adk</artifactId>
+   <version>1.5.0</version>
 </dependency>
 <dependency>
-  <groupId>com.google.adk</groupId>
-  <artifactId>google-adk-langchain4j</artifactId>
-  <version>1.5.0</version>
+<groupId>com.google.adk</groupId>
+<artifactId>google-adk-langchain4j</artifactId>
+<version>1.5.0</version>
 </dependency>
 ```
 
@@ -264,6 +264,7 @@ sequenceDiagram
 |---|---|
 | **Endpoint** | `POST {SAGE_GRAPH_RAG_BASE_URL}/retrieve/semantic` |
 | **Args** | `problemStatement` (string from `QueryInterpret`), `topK` (int, default *(⚠️ D3)*) |
+| **Outbound body** | Includes `use_llm: false` — Sage owns LLM (Ollama/ADK); Graph RAG must not run its own LLM path |
 | **Returns** | JSON `semantic_hits[]` per [architecture.md §12](architecture.md#12-inter-service-api-contracts) |
 | **Fail-soft** | Return `"[]"` on any exception — never abort the ask; graph path still runs |
 
@@ -276,9 +277,9 @@ sequenceDiagram
 | **Returns** | JSON `graph_hits[]` per [architecture.md §12](architecture.md#12-inter-service-api-contracts) |
 | **Fail-soft** | Return `"[]"` on any exception — semantic path still contributes |
 
-### `ResultMergerTool.merge(semanticHits, graphHits)`
+### `ResultMergerTool.merge(toolContext)`
 
-Pure Java — no LLM call. Deterministic merge logic:
+Pure Java — no LLM call. Reads `semantic_hits` / `graph_hits` from session state (written by the retrieve tools; do **not** use ADK `outputKey` for those keys or the agent's final text will overwrite structured hits). Deterministic merge logic:
 
 1. Collect all hits from both lists.
 2. Deduplicate by `doc_id` — if same `doc_id` in both: merge into one record with `matchedVia: ["semantic","graph"]`.
@@ -288,7 +289,7 @@ Pure Java — no LLM call. Deterministic merge logic:
    ```
 4. Filter out hits below `min_score` threshold *(⚠️ D2)*.
 5. Sort descending by `confidenceScore`; take top-N *(⚠️ D3)*.
-6. Write to session key `merged_hits`.
+6. Write to session key `merged_hits` via `toolContext.state().put` (no `outputKey` on the merger agent).
 
 `techNeeded[]` is produced by `QueryInterpret` **before** the parallel tool calls, then passed to `GraphTraversalTool`.
 
@@ -300,82 +301,80 @@ Pure Java — no LLM call. Deterministic merge logic:
 @Configuration
 public class SageAgents {
 
-    @Bean
-    public SequentialAgent sageRootAgent(
-            LangChain4jChatModel adkModel,        // ⚠️ D1 — model TBD
-            SemanticSearchTool semanticTool,
-            GraphTraversalTool graphTool,
-            ResultMergerTool mergerTool) {
+   @Bean
+   public SequentialAgent sageRootAgent(
+           LangChain4jChatModel adkModel,        // ⚠️ D1 — model TBD
+           SemanticSearchTool semanticTool,
+           GraphTraversalTool graphTool,
+           ResultMergerTool mergerTool) {
 
-        // Step 1: interpret query into problem statement + tech tags
-        LlmAgent queryInterpret = LlmAgent.builder()
-            .name("QueryInterpret")
-            .model(adkModel)
-            .instruction("""
-                You are interpreting a developer's question about prior art in our organisation.
-                Extract exactly two things and output strict JSON:
-                {
-                  "problemStatement": "<one sentence: what problem is being solved>",
-                  "techNeeded": ["<technology or pattern 1>", "..."]
-                }
-                Do not add explanation. Output only the JSON object.
-                """)
-            .outputKey("query_interpretation")
-            .build();
+      // Step 1: interpret query into problem statement + tech tags
+      LlmAgent queryInterpret = LlmAgent.builder()
+              .name("QueryInterpret")
+              .model(adkModel)
+              .instruction("""
+                      You are interpreting a developer's question about prior art in our organisation.
+                      Extract exactly two things and output strict JSON:
+                      {
+                        "problemStatement": "<one sentence: what problem is being solved>",
+                        "techNeeded": ["<technology or pattern 1>", "..."]
+                      }
+                      Do not add explanation. Output only the JSON object.
+                      """)
+              .outputKey("query_interpretation")
+              .build();
 
-        // Step 2a: semantic search agent
-        LlmAgent semanticSearch = LlmAgent.builder()
-            .name("SemanticSearchAgent")
-            .model(adkModel)
-            .tools(List.of(FunctionTool.create(semanticTool, "semanticSearch")))
-            .instruction("""
-                Call semanticSearch with the problemStatement from query_interpretation.
-                Report only tool results. Never invent teams, people, or documents.
-                """)
-            .outputKey("semantic_hits")
-            .build();
+      // Step 2a: semantic search agent
+      LlmAgent semanticSearch = LlmAgent.builder()
+              .name("SemanticSearchAgent")
+              .model(adkModel)
+              .tools(List.of(FunctionTool.create(semanticTool, "semanticSearch")))
+              .instruction("""
+                      Call semanticSearch with the problemStatement from query_interpretation.
+                      Report only tool results. Never invent teams, people, or documents.
+                      """)
+              // structured hits written by SemanticSearchTool into session state
+              .build();
 
-        // Step 2b: graph traversal agent
-        LlmAgent graphTraversal = LlmAgent.builder()
-            .name("GraphTraversalAgent")
-            .model(adkModel)
-            .tools(List.of(FunctionTool.create(graphTool, "graphTraversal")))
-            .instruction("""
-                Call graphTraversal with the techNeeded array from query_interpretation.
-                Report only tool results. Never invent teams, people, or documents.
-                """)
-            .outputKey("graph_hits")
-            .build();
+      // Step 2b: graph traversal agent
+      LlmAgent graphTraversal = LlmAgent.builder()
+              .name("GraphTraversalAgent")
+              .model(adkModel)
+              .tools(List.of(FunctionTool.create(graphTool, "graphTraversal")))
+              .instruction("""
+                      Call graphTraversal with the techNeeded array from query_interpretation.
+                      Report only tool results. Never invent teams, people, or documents.
+                      """)
+              .build();
 
-        // Step 2: parallel fan-out
-        ParallelAgent parallelRetrieve = new ParallelAgent(
-            "ParallelRetrieve",
-            List.of(semanticSearch, graphTraversal)
-        );
+      // Step 2: parallel fan-out
+      ParallelAgent parallelRetrieve = new ParallelAgent(
+              "ParallelRetrieve",
+              List.of(semanticSearch, graphTraversal)
+      );
 
-        // Step 3: deterministic merge + confidence scoring (no LLM)
-        // ⚠️ D2 — weights and threshold configured externally
-        LlmAgent merger = LlmAgent.builder()
-            .name("ResultMerger")
-            .model(adkModel)
-            .tools(List.of(FunctionTool.create(mergerTool, "merge")))
-            .instruction("Call merge with semantic_hits and graph_hits. Output the merged_hits result.")
-            .outputKey("merged_hits")
-            .build();
+      // Step 3: deterministic merge + confidence scoring (no LLM)
+      // ⚠️ D2 — weights and threshold configured externally
+      LlmAgent merger = LlmAgent.builder()
+              .name("ResultMerger")
+              .model(adkModel)
+              .tools(List.of(FunctionTool.create(mergerTool, "merge")))
+              .instruction("Call merge with no arguments. It reads semantic_hits and graph_hits from session state and writes merged_hits.")
+              .build();
 
-        // Step 4: Knowledge Card synthesis
-        LlmAgent synth = LlmAgent.builder()
-            .name("KnowledgeCardSynth")
-            .model(adkModel)
-            .instruction(SYNTH_INSTRUCTION)
-            .outputKey("knowledge_card")
-            .build();
+      // Step 4: Knowledge Card synthesis
+      LlmAgent synth = LlmAgent.builder()
+              .name("KnowledgeCardSynth")
+              .model(adkModel)
+              .instruction(SYNTH_INSTRUCTION)
+              .outputKey("knowledge_card")
+              .build();
 
-        return new SequentialAgent(
-            "SageRoot",
-            List.of(queryInterpret, parallelRetrieve, merger, synth)
-        );
-    }
+      return new SequentialAgent(
+              "SageRoot",
+              List.of(queryInterpret, parallelRetrieve, merger, synth)
+      );
+   }
 }
 ```
 
@@ -411,19 +410,19 @@ Assemble a Knowledge Card from merged_hits and query_interpretation.
 
 ```yaml
 sage:
-  graph-rag:
-    base-url: http://localhost:8000   # SAGE_GRAPH_RAG_BASE_URL
-  adk:
-    llm:
-      base-url: http://localhost:11434   # ⚠️ D1 — validate model + hardware
-      model-name: llama3.2:3b            # ⚠️ D1 — TBD
-  retrieval:
-    top-k: 5              # ⚠️ D3 — confirm
-    min-score: 0.60       # ⚠️ D2 — TBD
-  scoring:
-    w1: 0.6               # ⚠️ D2 — vector similarity weight TBD
-    w2: 0.4               # ⚠️ D2 — graph score weight TBD
-    dual-match-boost: 0.1 # ⚠️ D2 — boost for results matched by both paths TBD
+   graph-rag:
+      base-url: http://localhost:8000   # SAGE_GRAPH_RAG_BASE_URL
+   adk:
+      llm:
+         base-url: http://localhost:11434   # ⚠️ D1 — validate model + hardware
+         model-name: llama3.2:3b            # ⚠️ D1 — TBD
+   retrieval:
+      top-k: 5              # ⚠️ D3 — confirm
+      min-score: 0.60       # ⚠️ D2 — TBD
+   scoring:
+      w1: 0.6               # ⚠️ D2 — vector similarity weight TBD
+      w2: 0.4               # ⚠️ D2 — graph score weight TBD
+      dual-match-boost: 0.1 # ⚠️ D2 — boost for results matched by both paths TBD
 ```
 
 | Variable | Default | Description |

@@ -21,7 +21,8 @@ Vector similarity search on `problemStatement`. Called by Java `SemanticSearchAg
 {
   "problemStatement": "Safely fetching external images from emails without SSRF exposure",
   "top_k": 5,
-  "min_score": 0.60
+  "min_score": 0.60,
+  "use_llm": false
 }
 ```
 
@@ -30,6 +31,7 @@ Vector similarity search on `problemStatement`. Called by Java `SemanticSearchAg
 | `problemStatement` | string | required | |
 | `top_k` | int | `5` | Range 1–20 |
 | `min_score` | float | `0.60` | Range 0.0–1.0 |
+| `use_llm` | boolean | `false` | When `true`, Graph RAG may run its own LLM path. **Sage always sends `false`** because it owns query interpretation and Knowledge Card synthesis via local Ollama/ADK. |
 
 ### Response `200`
 

@@ -73,6 +73,7 @@ flowchart BT
   T10 --> T11[T11_Ask_IT]
   T10 --> T12[T12_Promptfoo_F8]
   T10 --> T13[T13_Docs_sync]
+  T10 --> T14[T14_Mlflow_F8]
 ```
 
 
@@ -158,6 +159,8 @@ flowchart BT
 
 - [ ] Happy-path deserialization; empty 200; 5xx → empty list (no throw into ask path)
 - [ ] Base URL from `SAGE_GRAPH_RAG_BASE_URL`
+- [ ] `POST /retrieve/semantic` request payload explicitly sets `"use_llm": false` per retrieve contract SoT
+- [ ] `correlationId` header propagated on downstream HTTP calls
 
 **Verification:**
 
@@ -236,7 +239,8 @@ flowchart BT
 
 **Acceptance criteria:**
 
-- [ ] Tools pass `top_k` / `min_score` from config
+- [ ] Tools pass `top_k` / `min_score` from config and enforce `"use_llm": false` on semantic search
+- [ ] Tools accept and propagate `correlationId` from execution context
 - [ ] Parallel fan-out exercised; fail-soft empty hits preserved
 
 **Verification:**
@@ -321,7 +325,7 @@ flowchart BT
 
 
 
-### Phase 5: Eval + docs
+### Phase 5: Eval + MLflow tracking + docs
 
 
 
@@ -358,9 +362,29 @@ flowchart BT
 **Files likely touched:** `README.md`, optionally tick items in `docs/spec-coverage-map.md`  
 **Estimated scope:** S
 
+#### Task 14: MLflow Experiment Tracking & Latency/Quality Metrics
+
+**Description:** Implement fail-safe MLflow experiment tracking helper / client to log runs, parameters (`SAGE_LLM_MODEL`, commit hash, `top_k`, scoring config), and metrics (end-to-end latency, LLM inference latency, retrieval latency, success/failure rate, gap rate). Ensure MLflow failures never crash `/ask`.
+
+**Acceptance criteria:**
+
+- [ ] Satisfies MLflow Phase 1 Acceptance Criteria 1–16 from `docs/SPEC.md`
+- [ ] Records parameters: LLM model, application commit, `top_k`, min score, scoring weights (`w1`, `w2`, dual boost)
+- [ ] Logs metrics: E2E latency, LLM latency, retrieval latency, success/failure status, gap flag rate
+- [ ] Fail-safe wrapper: MLflow server unavailability does NOT cause Sage request failures
+
+**Verification:**
+
+- [ ] Unit/slice tests for fail-safe logging (`./mvnw test -Dtest=*Mlflow*`)
+
+**Dependencies:** T10, T11  
+**Files likely touched:** `eval/mlflow/`*, `config/MlflowProperties.java`, integration hooks  
+**Estimated scope:** M
+
 ### Checkpoint: Complete
 
 - [ ] SPEC success criteria 1–10 satisfied for Java POC
+- [ ] MLflow Phase 1 Acceptance Criteria 1–16 satisfied
 - [ ] Ready for code review / CEO demo with seeded sister service
 
 
@@ -368,11 +392,11 @@ flowchart BT
 ## Parallelization
 
 
-| Parallel-safe       | Sequential          |
-| ------------------- | ------------------- |
-| T1 ∥ T2             | T3 after both       |
-| T3 ∥ T4 after T1+T2 | T5 after T4         |
-| T12 ∥ T13 after T10 | T6→T7→T8→T9→T10→T11 |
+| Parallel-safe             | Sequential          |
+| ------------------------- | ------------------- |
+| T1 ∥ T2                   | T3 after both       |
+| T3 ∥ T4 after T1+T2       | T5 after T4         |
+| T12 ∥ T13 ∥ T14 after T10 | T6→T7→T8→T9→T10→T11 |
 
 
 
@@ -393,3 +417,4 @@ flowchart BT
 ## Open Questions
 
 None blocking planning — D1–D3 approved in SPEC. Sister Graph RAG must be seeded for live demos (outside this plan).
+---

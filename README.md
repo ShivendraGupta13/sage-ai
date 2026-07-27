@@ -40,12 +40,17 @@ Base URL for Graph RAG (default): `SAGE_GRAPH_RAG_BASE_URL=http://localhost:8000
 
 ### 4. Ask via Postman or curl
 
-Import [`orion-apis/sage ai.postman_collection.json`](orion-apis/sage%20ai.postman_collection.json) (Orion ingest collection — only file under `orion-apis/`).
+Import [`orion-apis/sage ai.postman_collection.json`](orion-apis/sage%20ai.postman_collection.json) into Postman.
+
+- **Orion** folder — ingest/discovery (set `orionApiKey`, `orionCookie`)
+- **Sage AI** folder — `GET /health`, `POST /retrieve/semantic|graph`, `POST /ask` (`baseUrl` → `http://localhost:8080`, `graphRagBaseUrl` → `http://localhost:8000`)
 
 ```bash
 curl -N -X POST http://localhost:8080/ask \
   -H "Content-Type: application/json" \
   -d '{"query":"How did we migrate to OpenTelemetry?"}'
+
+curl -s http://localhost:8080/health
 ```
 
 ## Documentation
@@ -61,9 +66,42 @@ curl -N -X POST http://localhost:8080/ask \
 | [docs/orion-api-documentation.md](docs/orion-api-documentation.md) | Orion ingest API (Python only) |
 | Sister: `../graph-rag-service/` | Neo4j, retrieve APIs, schema/ingest |
 
-## Tests
+## Tests & Evaluations
 
+### Automated Test Suite
+Run unit and integration tests:
 ```bash
 ./mvnw test
-# Ollama spike (optional): OLLAMA_SPIKE=true ./mvnw test -Dtest=QueryInterpretSpikeTest
 ```
+
+*Note:* To run the optional gated Ollama connection spike test, set `OLLAMA_SPIKE=true`:
+```bash
+OLLAMA_SPIKE=true ./mvnw test -Dtest=QueryInterpretSpikeTest
+```
+
+### E2E Quality Evaluation (Promptfoo)
+Evaluations are run using [Promptfoo](https://promptfoo.dev) against the active `POST /ask` stream.
+1. Ensure the Java service is running: `./mvnw spring-boot:run`
+2. Run the evaluation suite:
+   ```bash
+   npx promptfoo eval -c evaluation/promptfooconfig.yaml
+   ```
+This suite evaluates Happy Paths, specific technical queries, and out-of-domain boundaries (asserting `gapFlag=true` and candidate Hard Problem notifications).
+
+---
+
+## Configuration Properties
+
+The following keys can be overridden in `src/main/resources/application.yml` or via system environment variables:
+
+| YAML Key | Environment Override | Default | Purpose |
+|---|---|---|---|
+| `sage.graph-rag.base-url` | `SAGE_GRAPH_RAG_BASE_URL` | `http://localhost:8000` | Downstream python search endpoint |
+| `sage.adk.llm.base-url` | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama service endpoint |
+| `sage.adk.llm.model-name` | `SAGE_LLM_MODEL` | `llama3.2:3b` | Ollama target model |
+| `sage.retrieval.top-k` | `SAGE_RETRIEVAL_TOP_K` | `5` | Retrieval default top-K size |
+| `sage.scoring.w1` | `SAGE_SCORING_W1` | `0.6` | Semantic search score weight |
+| `sage.scoring.w2` | `SAGE_SCORING_W2` | `0.4` | Graph search score weight |
+| `sage.scoring.dual-match-boost` | `SAGE_SCORING_DUAL_BOOST` | `0.1` | Boosting for dual matches |
+| `sage.scoring.min-score` | `SAGE_SCORING_MIN_SCORE` | `0.60` | Minimum score threshold |
+

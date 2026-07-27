@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # 1. Ollama Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  # 2. Automatically pulls the llama3.1:8b model once the Ollama container starts
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: ollama-pull
+    depends_on:
+      - ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Waiting for Ollama daemon at http://ollama:11434 to start..."
+        until ollama pull llama3.1:8b; do
+          sleep 2
+        done
+        echo "Model pulled successfully!"
+
+
+  # 3. Java Spring Boot Application Service
+  java-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sage-java-app
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - SAGE_GRAPH_RAG_BASE_URL=http://host.docker.internal:8000  # Points to the host where Python service would run if started, fail-softs if down
+      - SAGE_LLM_MODEL=llama3.1:8b
+    depends_on:
+      - ollama
+      - ollama-pull
+    restart: on-failure
+
+volumes:
+  ollama_data:

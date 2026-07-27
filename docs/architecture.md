@@ -91,7 +91,7 @@ sage-ai/                             # Maven project root (this repo)
 │   ├── google-java-adk-usage.md     # ADK agent tree, tools, and wiring
 │   ├── orion-api-documentation.md   # Orion HTTP API reference (ingest source)
 │   └── contracts/                   # ask-api.md + retrieve-api.md (no nested README)
-├── orion-apis/                      # Orion Postman collection only
+├── orion-apis/                      # Postman: Orion ingest + Sage ask/retrieve
 │   └── sage ai.postman_collection.json
 │
 ├── src/main/java/com/company/sage/  # Ask orchestration (:8080)
@@ -611,7 +611,8 @@ Vector similarity search on `problemStatement`.
 {
   "problemStatement": "Safely fetching external images from emails without SSRF exposure",
   "top_k": 5,
-  "min_score": 0.60
+  "min_score": 0.60,
+  "use_llm": false
 }
 
 // Response 200

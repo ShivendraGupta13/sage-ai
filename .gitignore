@@ -143,6 +143,11 @@ htmlcov/
 test-results/
 junit.xml
 
+# Local Graph RAG retrieve captures / offline fixtures (keep on disk; do not commit)
+CombinedHardProblemsWithDocs*.json
+docs/hardprpblem_list.txt
+src/test/resources/fixtures/graphrag/
+
 # OS / package archives
 *.dmg
 *.iso

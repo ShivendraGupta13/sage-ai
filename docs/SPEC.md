@@ -142,7 +142,7 @@ sage-ai/
 │   └── contracts/
 │       ├── ask-api.md          # Public POST /ask + GET /health
 │       └── retrieve-api.md     # What Java may call on :8000
-├── orion-apis/                 # Postman collection (ingest capture / offline seed aid)
+├── orion-apis/                 # Postman: Orion ingest + Sage ask/retrieve
 ├── src/main/java/com/company/sage/
 │   ├── SageApplication.java
 │   ├── chat/                   # POST /ask, SSE, health
@@ -215,6 +215,490 @@ Formatting: standard Spring/Java conventions via the project toolchain; no new f
 
 ---
 
+## MLflow Experiment Tracking
+
+### Purpose
+
+MLflow will be used in the Sage AI POC as an **experiment tracking and comparison layer**.
+
+The goal is to record controlled Sage AI Agent test runs so that different configurations can be compared using measurable results.
+
+MLflow is responsible for **storing, organizing, and comparing experiment data**. Metrics such as latency, success/failure, token usage, and resource utilization must be measured by Sage, the LLM runtime, or supporting instrumentation before being logged to MLflow.
+
+MLflow is not used for model training, model deployment, or production infrastructure monitoring in this POC.
+
+---
+
+### Why MLflow
+
+During the POC, Sage may be tested with different configurations such as:
+
+- LLM model/version
+- Prompt version
+- Retrieval Top-K
+- Retrieval/scoring configuration
+- Embedding configuration
+- Sage application version
+- Local hardware configuration
+
+Without experiment tracking, test results are difficult to compare over time and there is no structured history connecting:
+
+```text
+Configuration → Test Execution → Metrics → Result
+````
+
+MLflow provides this experiment history and should allow the team to answer:
+
+* Which Sage configuration performs better?
+* Did a model or configuration change improve or degrade latency?
+* Which configuration is more reliable?
+* Which Sage version produced a particular result?
+* How did retrieval and LLM performance differ between runs?
+* Which configuration provides the preferred balance between performance, reliability, and quality?
+
+---
+
+### MLflow Responsibility Boundary
+
+MLflow does not automatically produce every metric required by this specification.
+
+The responsibility is:
+
+```text
+Sage / Runtime / Instrumentation
+              |
+              | Measures
+              v
+      Parameters & Metrics
+              |
+              | Logs
+              v
+           MLflow
+              |
+       Stores & Organizes
+              |
+              v
+       MLflow Tracking UI
+              |
+              v
+        Compare Runs
+```
+
+Examples:
+
+* Sage measures end-to-end latency.
+* LLM instrumentation measures inference latency.
+* Graph RAG timing provides retrieval latency.
+* Sage test execution determines success/failure.
+* The LLM runtime provides token counts where available.
+* Supporting system instrumentation may collect resource utilization.
+* MLflow stores these values and provides experiment/run comparison.
+
+---
+
+### Experiment and Run Definition
+
+#### Experiment
+
+An MLflow experiment represents a logical collection of related Sage AI Agent test runs.
+
+Example:
+
+```text
+sage-ai-agent-evaluation
+```
+
+#### Run
+
+One MLflow run represents one controlled Sage AI Agent test/evaluation execution using a defined configuration.
+
+Example:
+
+```text
+Run: sage-eval-017
+
+Parameters
+----------
+LLM Model          = llama3.2:3b
+Prompt Version     = v3
+Retrieval Top-K    = 5
+Application Commit = abc123
+Hardware           = local-dev
+
+Metrics
+-------
+P50 Latency        = 2.1 s
+P95 Latency        = 3.7 s
+LLM Latency        = 1.9 s
+Success Rate       = 96%
+Gap Rate           = 5%
+```
+
+A configuration change being evaluated independently should be recorded as a separate run.
+
+---
+
+### Parameters to Record
+
+Parameters describe the configuration under which the experiment was executed.
+
+| Parameter                        | Why Record It?                                                          | POC                                 |
+| -------------------------------- | ----------------------------------------------------------------------- | ----------------------------------- |
+| LLM model                        | Identifies which model produced the result and enables model comparison | Required                            |
+| LLM version                      | Model versions may differ in behavior and performance                   | Required when available             |
+| Prompt version                   | Correlates prompt changes with experiment results                       | Required when versioned             |
+| Retrieval Top-K                  | Retrieval count may affect context, quality, and latency                | Required                            |
+| Retrieval min score              | Allows retrieval threshold changes to be compared                       | Required                            |
+| Scoring configuration            | Sage ranking behavior depends on configured semantic/graph weights      | Required                            |
+| Application version / Git commit | Maps the experiment to the exact Sage implementation                    | Required                            |
+| Hardware configuration           | Local LLM performance depends on the hardware used                      | Required for performance comparison |
+| Embedding model                  | Allows retrieval experiments to be correlated with embedding changes    | Optional                            |
+
+Only configuration relevant to the experiment should be logged.
+
+---
+
+## Phase 1 - Required POC Metrics
+
+Phase 1 establishes the minimum useful MLflow experiment tracking capability.
+
+### End-to-End Latency
+
+**Measures:** Time from Sage receiving a request until the final response is produced.
+
+**Measured by:** Sage request instrumentation.
+
+**Why:** Represents the actual response time experienced by the caller.
+
+**Decision enabled:** Determine whether a configuration improves or degrades overall Sage performance.
+
+**POC:** Required.
+
+---
+
+### LLM Inference Latency
+
+**Measures:** Time spent waiting for LLM generation.
+
+**Measured by:** LLM call instrumentation.
+
+**Why:** Separates model generation time from other Sage processing.
+
+**Decision enabled:** Determine whether the selected LLM is the primary latency bottleneck and compare models.
+
+**POC:** Required.
+
+---
+
+### Retrieval Latency
+
+**Measures:** Time spent retrieving context from Graph RAG.
+
+**Measured by:** Sage/Graph RAG request instrumentation.
+
+**Why:** Separates retrieval time from LLM inference time.
+
+**Decision enabled:** Determine whether slow responses originate from retrieval or generation.
+
+**POC:** Required where measurable.
+
+---
+
+### Success Rate
+
+**Measures:** Percentage of test requests that complete successfully.
+
+**Measured by:** Sage test execution.
+
+**Why:** Performance alone is insufficient if a configuration frequently fails.
+
+**Decision enabled:** Compare reliability between configurations.
+
+**POC:** Required.
+
+---
+
+### Failed Execution Count
+
+**Measures:** Number of test requests that fail.
+
+**Measured by:** Sage test execution.
+
+**Why:** Makes reliability regressions visible during experiment comparison.
+
+**Decision enabled:** Identify configurations associated with increased failures.
+
+**POC:** Required.
+
+---
+
+### Gap / No-Answer Rate
+
+**Measures:** Percentage of evaluation requests that produce `gapFlag=true`.
+
+**Measured by:** Sage evaluation/test execution.
+
+**Why:** Honest gap behavior is an explicit Sage requirement.
+
+**Decision enabled:** Determine whether retrieval or configuration changes affect Sage's ability to produce useful answers.
+
+**POC:** Required for evaluation datasets containing answerable and out-of-domain questions.
+
+---
+
+### P50 and P95 Latency
+
+**Measures:**
+
+* P50 represents typical response latency.
+* P95 represents slow-tail response latency.
+
+**Calculated from:** Request latency measurements collected during the experiment.
+
+**Why:** Average latency alone may hide slow requests.
+
+**Decision enabled:** Compare both typical and slow-tail behavior between configurations.
+
+**POC:** Required when an experiment contains enough requests for meaningful percentile calculation.
+
+---
+
+## Phase 1 - Recommended Metrics
+
+These metrics should be recorded when they are reliably available from the configured LLM/runtime.
+
+### Input Tokens
+
+**Measures:** Number of tokens supplied to the LLM.
+
+**Why:** Large prompts and retrieved context may increase inference latency.
+
+**Decision enabled:** Detect configurations that unnecessarily increase context size.
+
+**POC:** Recommended where available.
+
+---
+
+### Output Tokens
+
+**Measures:** Number of tokens generated by the LLM.
+
+**Why:** Response length directly affects generation time.
+
+**Decision enabled:** Compare response-generation characteristics between configurations.
+
+**POC:** Recommended where available.
+
+---
+
+### Tokens per Second
+
+**Measures:** Local LLM generation throughput.
+
+**Calculated from:** Generated token count and generation duration.
+
+**Why:** Local LLM models can have significantly different inference throughput.
+
+**Decision enabled:** Compare local model inference efficiency.
+
+**POC:** Recommended where available.
+
+---
+
+## Optional / Future Metrics
+
+The following metrics are technically loggable to MLflow but are not required for the initial experiment-tracking implementation.
+
+### Time to First Token
+
+Useful when Sage supports streaming responses.
+
+**POC:** Optional.
+
+### CPU Utilization
+
+Average CPU utilization during a controlled experiment.
+
+**POC:** Optional.
+
+### Peak Memory Usage
+
+Maximum memory consumed during an experiment.
+
+**POC:** Optional.
+
+### GPU Utilization
+
+Average GPU utilization when GPU inference is used.
+
+**POC:** Optional.
+
+### Peak GPU Memory / VRAM
+
+Maximum GPU memory consumed during an experiment.
+
+**POC:** Optional.
+
+Resource values should be recorded as summarized experiment-level metrics.
+
+MLflow must not be used as a replacement for continuous infrastructure monitoring.
+
+---
+
+## Quality Evaluation
+
+MLflow may also store quality evaluation results for Sage.
+
+Potential future quality metrics include:
+
+* Answer correctness
+* Answer relevance
+* Faithfulness to retrieved evidence
+* Retrieval relevance
+* Routing quality
+
+Quality metrics must only be recorded when there is a defined and repeatable evaluation method.
+
+MLflow GenAI evaluation capabilities or custom Sage evaluation logic may be used to produce these scores.
+
+The initial MLflow integration does not require introducing a new automated quality-scoring system.
+
+---
+
+## Experiment Artifacts
+
+An MLflow run may store relevant experiment artifacts such as:
+
+* Evaluation/test results
+* Sage experiment configuration
+* Prompt/template version or reference
+* Test dataset/version reference
+* Relevant experiment logs
+
+Artifacts should contain enough information to understand or reproduce the experiment.
+
+MLflow must not be treated as a general-purpose application log store.
+
+Secrets, credentials, or sensitive information must never be stored as MLflow parameters, tags, metrics, or artifacts.
+
+---
+
+## Local POC Data Flow
+
+```text
+             Controlled Test Run
+                     |
+                     v
+                  Sage AI
+                     |
+          +----------+----------+
+          |          |          |
+          v          v          v
+     Configuration Performance Reliability
+                     |
+                     v
+             Metric Calculation
+                     |
+                     v
+                MLflow Client
+                     |
+                     v
+          MLflow Tracking Server
+                     |
+              +------+------+
+              |             |
+              v             v
+        Backend Store   Artifact Store
+              |
+              v
+           MLflow UI
+              |
+              v
+        Compare Runs
+```
+
+The local MLflow setup should remain lightweight and POC-focused.
+
+Production availability, scaling, remote artifact storage, and production deployment are outside this specification.
+
+---
+
+## Run Comparison
+
+The primary objective is to compare configuration and outcome together.
+
+Example:
+
+|                |       Run A |   Run B |
+| -------------- | ----------: | ------: |
+| LLM Model      | llama3.2:3b | Model B |
+| Prompt Version |          v2 |      v3 |
+| Top-K          |           5 |       5 |
+| P50 Latency    |       2.1 s |   1.8 s |
+| P95 Latency    |       3.8 s |   2.9 s |
+| LLM Latency    |       1.9 s |   1.5 s |
+| Success Rate   |         94% |     98% |
+| Gap Rate       |          8% |      5% |
+| Tokens/sec     |          38 |      51 |
+
+This allows the team to select configurations using recorded evidence rather than manual observations.
+
+
+
+## Phase 1 Acceptance Criteria
+
+The initial MLflow integration is considered successful when:
+
+1. A local MLflow Tracking Server can be started and accessed.
+2. A controlled Sage test execution can create an MLflow run.
+3. Each run records the LLM model used.
+4. Each run records the Sage application version or Git commit.
+5. Relevant retrieval/scoring configuration is recorded.
+6. End-to-end latency is measured and logged.
+7. LLM inference latency is measured and logged.
+8. Retrieval latency is logged where measurable.
+9. Success and failure information is logged.
+10. Gap/no-answer behavior is recorded for applicable evaluation runs.
+11. P50 and P95 latency can be recorded for multi-request experiments.
+12. Token metrics are recorded when exposed by the LLM runtime.
+13. Multiple runs can be viewed and compared using MLflow.
+14. The recorded configuration is sufficient to identify what changed between compared runs.
+15. MLflow tracking does not modify the functional behavior or public contract of `POST /ask`.
+16. Failure or unavailability of MLflow must not cause the Sage request flow to fail.
+
+
+
+## MLflow Boundaries
+
+### Always
+
+* Use MLflow primarily for controlled experiment tracking and comparison.
+* Associate every run with the configuration that produced it.
+* Clearly distinguish metrics measured by Sage/runtime instrumentation from metrics stored by MLflow.
+* Record only data that supports an experiment or technical decision.
+* Keep MLflow tracking separate from Sage business behavior.
+* Keep the initial implementation lightweight and POC-focused.
+
+### Ask First
+
+* Adding new application dependencies specifically for MLflow instrumentation.
+* Changing the `POST /ask` contract.
+* Introducing automated LLM quality scoring.
+* Making MLflow mandatory for normal Sage execution.
+* Introducing remote or production MLflow infrastructure.
+* Adding continuous infrastructure telemetry to MLflow.
+
+### Never
+
+* Fail a Sage user request because MLflow is unavailable.
+* Store secrets or credentials in MLflow.
+* Use MLflow as the source of truth for Sage application configuration.
+* Use MLflow as a replacement for infrastructure monitoring.
+* Introduce model training or model deployment as part of this POC.
+* Change Sage routing, retrieval, scoring, or synthesis behavior solely to support MLflow.
+
+
+
 ## Boundaries
 
 ### Always
@@ -276,10 +760,11 @@ Full tables: [contracts/ask-api.md](contracts/ask-api.md).
 Rules:
 
 1. Java never invents retrieve response fields.
-2. Mixed casing is intentional: camelCase domain fields (`problemStatement`, `vectorScore`) and snake_case transport knobs (`top_k`, `doc_id`).
+2. Mixed casing is intentional: camelCase domain fields (`problemStatement`, `vectorScore`) and snake_case transport knobs (`top_k`, `doc_id`, `min_score`, `use_llm`).
 3. IDs (`doc_id`, `personId`, `teamId`) are always strings.
 4. Empty retrieval → `200` + `hits: []` (not an error). Java fail-softs retrieve `5xx` to empty hits.
-5. If narrative docs and contract files disagree on success field shapes, **contract files + `api_contracts.py` win**.
+5. Semantic retrieve always sends `use_llm: false` — Sage owns LLM (Ollama/ADK); Graph RAG must not run its own LLM path.
+6. If narrative docs and contract files disagree on success field shapes, **contract files + `api_contracts.py` win**.
 
 ---
 

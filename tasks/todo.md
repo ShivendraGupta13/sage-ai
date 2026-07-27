@@ -5,44 +5,46 @@ Source of truth for `/build`: [plan.md](plan.md) · Spec: [docs/SPEC.md](../docs
 **Status:** Planning complete. **No application code until human review + explicit `/build`.**
 
 ## Phase 1: Foundation
-- [ ] Task 1: Config `@ConfigurationProperties` for `sage.*` YAML
-- [ ] Task 2: Ask / retrieve / Knowledge Card / health / error DTOs
-- [ ] Task 3: `ResultMerger` + unit tests
+- [x] Task 1: Config `@ConfigurationProperties` for `sage.*` YAML
+- [x] Task 2: Ask / retrieve / Knowledge Card / health / error DTOs
+- [x] Task 3: `ResultMerger` + unit tests
 
 ### Checkpoint: Foundation
-- [ ] Merger tests green; DTOs match contracts
-- [ ] Human skim of scoring edge cases before clients
+- [x] Merger tests green; DTOs match contracts
+- [x] Human skim of scoring edge cases before clients
 
 ## Phase 2: Retrieve clients + health
-- [ ] Task 4: Graph RAG HTTP clients + fail-soft + contract tests
-- [ ] Task 5: `GET /health` with Graph RAG reachability
+- [x] Task 4: Graph RAG HTTP clients + fail-soft + contract tests
+- [x] Task 5: `GET /health` with Graph RAG reachability
 
 ### Checkpoint: Clients + health
-- [ ] `./mvnw test` green without live Graph RAG
-- [ ] Manual optional: live `:8000` health when sister is up
+- [x] `./mvnw test` green without live Graph RAG
+- [x] Manual optional: live `:8000` health when sister is up
 
 ## Phase 3: ADK pipeline
-- [ ] Task 6: LLM/Ollama bean + optional spike test
-- [ ] Task 7: QueryInterpret agent
-- [ ] Task 8: Retrieve tools + ParallelAgent agents
-- [ ] Task 9: Merger tool + Synth + SageRoot SequentialAgent
+- [x] Task 6: LLM/Ollama bean + optional spike test
+- [x] Task 7: QueryInterpret agent
+- [x] Task 8: Retrieve tools + ParallelAgent agents
+- [x] Task 9: Merger tool + Synth + SageRoot SequentialAgent
 
 ### Checkpoint: ADK
-- [ ] Agent tree matches docs; evidence-only prompts reviewed
-- [ ] Human approve before SSE wiring
+- [x] Agent tree matches docs; evidence-only prompts reviewed
+- [x] Human approve before SSE wiring
 
 ## Phase 4: Public ask API
-- [ ] Task 10: `POST /ask` SSE bridge + validation + correlationId
-- [ ] Task 11: Ask integration tests (mocked Graph RAG)
+- [x] Task 10: `POST /ask` SSE bridge + validation + correlationId
+- [x] Task 11: Ask integration tests (mocked Graph RAG)
 
 ### Checkpoint: Ask E2E (mocked)
-- [ ] Full SSE sequence asserted in tests
-- [ ] Human demo dry-run with sister seed when available
+- [x] Full SSE sequence asserted in tests
+- [x] Human demo dry-run with sister seed when available
 
-## Phase 5: Eval + docs
+## Phase 5: Eval + MLflow tracking + docs
 - [ ] Task 12: F8 Promptfoo golden set
 - [ ] Task 13: README/docs sync with shipped behavior
+- [ ] Task 14: MLflow experiment tracking & latency/quality metrics
 
 ### Checkpoint: Complete
 - [ ] SPEC success criteria 1–10 satisfied for Java POC
+- [ ] MLflow Phase 1 Acceptance Criteria 1–16 satisfied
 - [ ] Ready for code review / CEO demo with seeded sister service
