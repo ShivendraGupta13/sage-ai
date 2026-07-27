@@ -26,6 +26,21 @@ class QueryInterpretAgentTest {
     }
 
     @Test
+    void instructionShouldRequireExtractOnlyTechNeeded() {
+        assertThat(QueryInterpretAgent.INSTRUCTION)
+            .contains("Technology-node")
+            .contains("explicitly named")
+            .contains("Prefer an empty array over a guess")
+            .contains("Do NOT add companion or \"implied\" stack")
+            .contains("Q: How do we stream Postgres changes into Kafka without dual writes?")
+            .contains("\"techNeeded\":[\"PostgreSQL\",\"Kafka\"]")
+            .contains("Q: How to use Elastic Search.")
+            .doesNotContain("clearly implied")
+            .doesNotContain("Debezium")
+            .doesNotContain("EBS");
+    }
+
+    @Test
     void shouldParseCleanJsonOutput() {
         String rawJson = """
             {

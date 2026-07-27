@@ -132,7 +132,7 @@ flowchart TB
 |------------|------------------|
 | `problemStatement` | `QueryInterpret` |
 | `techNeeded[]` | `QueryInterpret` |
-| `directAnswer` | `KnowledgeCardSynth` (from top hit title) |
+| `directAnswer` | Match count + top hit title/team/experts (deterministic in ask path) |
 | `results[].confidenceScore` | `ResultMerger` *(⚠️ D2)* |
 | `results[].matchedVia` | `ResultMerger` |
 | `results[].teamName` + `solvedBy` | Hit metadata from Python |
@@ -396,7 +396,7 @@ Do not add explanation. Output only the JSON object.
 Assemble a Knowledge Card from merged_hits and query_interpretation.
 - query: echo the original user question
 - problemStatement / techNeeded: from query_interpretation
-- directAnswer: one sentence derived from the top result
+- directAnswer: N match(es). Top: '{title}' owned by team '{team}'. Experts: … (or gap string if empty; never copy summary)
 - results[]: from merged_hits — map all fields directly; do NOT paraphrase summary/passage
 - gapFlag: true if merged_hits is empty
 - gapMessage: "No internal prior art found — this may be a candidate Hard Problem" when gapFlag=true

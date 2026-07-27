@@ -210,7 +210,7 @@ Every response returns this consistent structure as a JSON object in the `result
 | `query` | string | echo of user input | `"How did we handle SSRF for email image fetching?"` |
 | `problemStatement` | string | derived — F1 interpretation | `"Safely fetching external images from emails without exposing the server to SSRF attacks"` |
 | `techNeeded` | string[] | derived — F1 interpretation | `["SSRF mitigation", "npm image proxy", "email rendering"]` |
-| `directAnswer` | string | derived from top result | `"Yes — 1 team has solved this."` |
+| `directAnswer` | string | derived — match count + top hit | `"1 match. Top: 'SSRF-safe external image loader' owned by team 'Payments Platform'. Experts: Priya Sharma."` |
 | `results` | Result[] | F2 + F3 search output | see §8.2 |
 | `gapFlag` | boolean | derived | `false` |
 | `gapMessage` | string \| null | derived | `"No internal prior art found — candidate Hard Problem"` or `null` |

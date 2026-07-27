@@ -424,7 +424,7 @@ The Knowledge Card is the JSON payload sent in the `result` SSE event. It is the
 | `query` | string | echo | User's original question |
 | `problemStatement` | string | `QueryInterpret` | LLM-derived problem restatement |
 | `techNeeded` | string[] | `QueryInterpret` | LLM-extracted technology tags |
-| `directAnswer` | string | `KnowledgeCardSynth` | One-line answer derived from top result |
+| `directAnswer` | string | `KnowledgeCardSynth` | Match count + top hit title/team/experts |
 | `results` | Result[] | `ResultMerger` | Ranked results — see below |
 | `gapFlag` | boolean | `KnowledgeCardSynth` | `true` when `results` empty |
 | `gapMessage` | string \| null | `KnowledgeCardSynth` | Candidate Hard Problem callout when `gapFlag=true` |
@@ -461,7 +461,7 @@ The Knowledge Card is the JSON payload sent in the `result` SSE event. It is the
   "query": "How did we handle SSRF for external image fetching from emails?",
   "problemStatement": "Safely fetching external images from emails without SSRF exposure",
   "techNeeded": ["SSRF mitigation", "npm image proxy", "email rendering"],
-  "directAnswer": "Yes — 1 team has solved this.",
+  "directAnswer": "1 match. Top: 'SSRF-safe external image loader' owned by team 'Payments Platform'. Experts: Priya Sharma.",
   "results": [
     {
       "rank": 1,

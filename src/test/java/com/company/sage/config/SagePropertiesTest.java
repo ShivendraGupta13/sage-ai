@@ -32,7 +32,6 @@ class SagePropertiesTest {
         assertThat(sageProperties.scoring().w1()).isEqualTo(0.6);
         assertThat(sageProperties.scoring().w2()).isEqualTo(0.4);
         assertThat(sageProperties.scoring().dualMatchBoost()).isEqualTo(0.1);
-        //assertThat(sageProperties.scoring().minScore()).isEqualTo(0.60);
-        assertThat(sageProperties.scoring().minScore()).isEqualTo(0.35);
+        assertThat(sageProperties.scoring().minScore()).isEqualTo(0.60);
     }
 }

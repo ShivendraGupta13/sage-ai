@@ -15,7 +15,7 @@ public final class KnowledgeCardSynthAgent {
           "query": "<user question>",
           "problemStatement": "<from query_interpretation or default>",
           "techNeeded": ["<from query_interpretation>"],
-          "directAnswer": "<one sentence answer summarizing top result, or 'No internal prior art found.' if results is empty>",
+          "directAnswer": "<N match(es). Top: '{title}' owned by team '{team}'. Experts: … — or 'No internal prior art found.' if empty; never copy result summary>",
           "results": [ ... map all fields directly from merged_hits ... ],
           "gapFlag": <true if merged_hits is empty, otherwise false>,
           "gapMessage": "<'No internal prior art found — this may be a candidate Hard Problem' if gapFlag is true, otherwise null>"
