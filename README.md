@@ -30,8 +30,8 @@ uvicorn app.main:app --reload --port 8000
 ### 3. Java Sage service (`:8080`)
 
 ```bash
-# Optional: Ollama for LLM query interpretation
-ollama serve && ollama pull llama3.2:3b
+# Required for LLM query interpretation (without it, /ask falls back to the raw query)
+ollama serve && ollama pull llama3.2
 
 ./mvnw spring-boot:run
 ```

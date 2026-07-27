@@ -99,9 +99,7 @@ public class SageAskService {
             // Synthesis / Knowledge Card construction
             boolean gapFlag = mergedResults.isEmpty();
             String gapMessage = gapFlag ? "No internal prior art found — this may be a candidate Hard Problem" : null;
-            String directAnswer = !gapFlag && !mergedResults.isEmpty()
-                ? (mergedResults.get(0).summary() != null ? mergedResults.get(0).summary() : mergedResults.get(0).hardProblemTitle())
-                : "No internal prior art found.";
+            String directAnswer = buildDirectAnswer(mergedResults);
 
             KnowledgeCard card = new KnowledgeCard(
                 rawQuery,
@@ -140,5 +138,34 @@ public class SageAskService {
 
     private void sendSse(SseEmitter emitter, String eventName, Object data) throws IOException {
         emitter.send(SseEmitter.event().name(eventName).data(data));
+    }
+
+    /**
+     * Card-level routing headline: match count + top-ranked hit metadata.
+     * Never copies {@link CardResult#summary()} — that stays per-result evidence.
+     */
+    static String buildDirectAnswer(List<CardResult> results) {
+        if (results == null || results.isEmpty()) {
+            return "No internal prior art found.";
+        }
+
+        CardResult top = results.getFirst();
+        int matchCount = results.size();
+        String matchLabel = matchCount == 1 ? "match" : "matches";
+        String title = firstNonBlank(top.hardProblemTitle(), "Untitled");
+        String team = firstNonBlank(top.teamName(), "Unknown team");
+
+        String answer = "%d %s. Top: '%s' owned by team '%s'."
+            .formatted(matchCount, matchLabel, title, team);
+
+        List<String> experts = top.solvedBy();
+        if (experts != null && !experts.isEmpty()) {
+            return answer + " Experts: " + String.join(", ", experts) + ".";
+        }
+        return answer;
+    }
+
+    private static String firstNonBlank(String value, String fallback) {
+        return value != null && !value.isBlank() ? value : fallback;
     }
 }

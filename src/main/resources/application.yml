@@ -15,5 +15,4 @@ sage:
     w1: ${SAGE_SCORING_W1:0.6}
     w2: ${SAGE_SCORING_W2:0.4}
     dual-match-boost: ${SAGE_SCORING_DUAL_BOOST:0.1}
-    # Min score threshold set to 0.35 so single-channel semantic hits (weighted at w1 * vectorScore = 0.6 * score) pass filter
-    min-score: ${SAGE_SCORING_MIN_SCORE:0.35}
+    min-score: ${SAGE_SCORING_MIN_SCORE:0.40}
