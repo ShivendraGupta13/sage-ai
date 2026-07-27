@@ -21,6 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,8 +54,20 @@ class AskIntegrationTest {
 
     @Test
     void shouldExecuteFullAskPipelineAndEmitSseSequence() throws Exception {
-        RetrieveHit semHit = new RetrieveHit("DOC-101", "SSRF Fix in Proxy", 1.0, 0.0, List.of("semantic"), "Passage 1", "Source A", null);
-        RetrieveHit graphHit = new RetrieveHit("DOC-102", "Node Image Sanitizer", 0.0, 1.0, List.of("graph"), "Passage 2", "Source B", null);
+        RetrieveMetadata semMeta = new RetrieveMetadata(
+            "SSRF Fix in Proxy", "Payments Platform", "42",
+            List.of(), List.of("SSRF mitigation"), List.of(), "HARD_PROBLEMS", "Orion API"
+        );
+        RetrieveMetadata graphMeta = new RetrieveMetadata(
+            "Node Image Sanitizer", "Platform Security", "7",
+            List.of(), List.of("Node.js"), List.of(), "HARD_PROBLEMS", "Orion API"
+        );
+        RetrieveHit semHit = new RetrieveHit(
+            "DOC-101", "orion_metadata", 1.0, 0.0, List.of("semantic"), null, "Passage 1", semMeta
+        );
+        RetrieveHit graphHit = new RetrieveHit(
+            "DOC-102", "orion_metadata", 0.0, 1.0, List.of("graph"), "Path", "Passage 2", graphMeta
+        );
 
         when(graphRagClient.retrieveSemantic(any(), any()))
             .thenReturn(new RetrieveResponse(List.of(semHit), 10L, 1));
@@ -86,7 +99,10 @@ class AskIntegrationTest {
         assertThat(responseContent).contains("event:result");
         assertThat(responseContent).contains("\"confidenceScore\":0.6");
         assertThat(responseContent).contains("\"gapFlag\":false");
-        assertThat(responseContent).contains("team has solved this");
+        assertThat(responseContent).contains("Payments Platform");
+        assertThat(responseContent).contains("SSRF Fix in Proxy");
+        assertThat(responseContent).contains("solved this");
+        assertThat(responseContent).doesNotContain("N/A (Untitled)");
         assertThat(responseContent).contains("event:done");
         // Raw query must not be echoed as problemStatement when interpreter succeeds
         assertThat(responseContent).contains("\"query\":\"How did we solve SSRF in node services?\"");
@@ -126,6 +142,7 @@ class AskIntegrationTest {
         assertThat(responseContent).contains("\"techNeeded\":[\"SSRF mitigation\",\"Node.js\"]");
         assertThat(responseContent).contains("team has solved this");
         assertThat(responseContent).contains("Payments Platform");
+        verify(graphRagClient).retrieveGraph(any(), eq("test-correlation-recover"));
     }
 
     @Test

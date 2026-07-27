@@ -124,4 +124,23 @@ class SageAskServiceTest {
 
         verify(graphRagClient, never()).retrieveGraph(any(), any());
     }
+
+    @Test
+    void shouldSkipGraphWhenSemanticHitsExistButTechnologiesEmpty() {
+        when(queryInterpreter.interpret(any(), any()))
+            .thenReturn(new QueryInterpretation("Unknown problem", List.of()));
+
+        RetrieveMetadata meta = new RetrieveMetadata(
+            "Some HP", "Some Team", "1",
+            List.of(), List.of(), List.of(), "HARD_PROBLEMS", "Orion API"
+        );
+        RetrieveHit hit = new RetrieveHit("doc-1", "orion", 0.9, null, List.of(), null, "p", meta);
+        when(graphRagClient.retrieveSemantic(any(), any()))
+            .thenReturn(new RetrieveResponse(List.of(hit), 1L, 1));
+        when(resultMerger.merge(any(), any(), any(), anyInt())).thenReturn(List.of());
+
+        askService.processAsk(new AskRequest("Unseen"), "corr-skip-graph-hits");
+
+        verify(graphRagClient, never()).retrieveGraph(any(), any());
+    }
 }

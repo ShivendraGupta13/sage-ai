@@ -15,18 +15,25 @@ final class DirectAnswerFormatter {
             return "No internal prior art found.";
         }
 
-        CardResult top = results.getFirst();
-        String team = blankToNa(top.teamName());
-        String title = blankToUntitled(top.hardProblemTitle());
-
         Set<String> teams = new LinkedHashSet<>();
+        CardResult attributed = null;
         for (CardResult r : results) {
-            String name = blankToNa(r.teamName());
-            if (!"N/A".equals(name)) {
+            String name = realTeam(r.teamName());
+            if (name != null) {
                 teams.add(name);
+                if (attributed == null) {
+                    attributed = r;
+                }
             }
         }
-        int teamCount = Math.max(1, teams.size());
+
+        if (teams.isEmpty()) {
+            return "Yes — prior art found: " + displayTitle(results.getFirst()) + ".";
+        }
+
+        String team = realTeam(attributed.teamName());
+        String title = displayTitle(attributed);
+        int teamCount = teams.size();
         String verb = teamCount == 1 ? "team has" : "teams have";
 
         return String.format(
@@ -38,11 +45,19 @@ final class DirectAnswerFormatter {
         );
     }
 
-    private static String blankToNa(String teamName) {
-        return (teamName == null || teamName.isBlank()) ? "N/A" : teamName;
+    /** Non-blank team that is not the placeholder "N/A"; otherwise null. */
+    private static String realTeam(String teamName) {
+        if (teamName == null || teamName.isBlank() || "N/A".equalsIgnoreCase(teamName.trim())) {
+            return null;
+        }
+        return teamName.trim();
     }
 
-    private static String blankToUntitled(String title) {
-        return (title == null || title.isBlank()) ? "Untitled" : title;
+    private static String displayTitle(CardResult result) {
+        String title = result.hardProblemTitle();
+        if (title == null || title.isBlank() || "Untitled".equalsIgnoreCase(title.trim())) {
+            return "Untitled";
+        }
+        return title.trim();
     }
 }

@@ -46,4 +46,40 @@ class DirectAnswerFormatterTest {
         assertThat(DirectAnswerFormatter.format(List.of(a, b)))
             .isEqualTo("Yes — 2 teams have solved this: Payments Platform (SSRF-safe external image loader).");
     }
+
+    @Test
+    void shouldNotInventTeamWhenAttributionMissing() {
+        CardResult thin = new CardResult(
+            1, 0.9, List.of("semantic"), "N/A",
+            "Untitled", "HARD_PROBLEMS",
+            List.of(), "summary", null, null, List.of()
+        );
+        CardResult blankTeam = new CardResult(
+            1, 0.9, List.of("semantic"), "  ",
+            "Some title", "HARD_PROBLEMS",
+            List.of(), "summary", null, null, List.of()
+        );
+
+        assertThat(DirectAnswerFormatter.format(List.of(thin)))
+            .isEqualTo("Yes — prior art found: Untitled.");
+        assertThat(DirectAnswerFormatter.format(List.of(blankTeam)))
+            .isEqualTo("Yes — prior art found: Some title.");
+    }
+
+    @Test
+    void shouldPreferFirstAttributedTeamWhenTopHitLacksTeam() {
+        CardResult top = new CardResult(
+            1, 0.9, List.of("semantic"), "N/A",
+            "Untitled", "HARD_PROBLEMS",
+            List.of(), "summary", null, null, List.of()
+        );
+        CardResult attributed = new CardResult(
+            2, 0.8, List.of("graph"), "Payments Platform",
+            "SSRF-safe external image loader", "HARD_PROBLEMS",
+            List.of(), "summary", null, null, List.of()
+        );
+
+        assertThat(DirectAnswerFormatter.format(List.of(top, attributed)))
+            .isEqualTo("Yes — 1 team has solved this: Payments Platform (SSRF-safe external image loader).");
+    }
 }
