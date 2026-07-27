@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SageAskService {
@@ -21,15 +22,18 @@ public class SageAskService {
     private final GraphRagClient graphRagClient;
     private final ResultMerger resultMerger;
     private final SageProperties properties;
+    private final QueryInterpreter queryInterpreter;
 
     public SageAskService(
         GraphRagClient graphRagClient,
         ResultMerger resultMerger,
-        SageProperties properties
+        SageProperties properties,
+        QueryInterpreter queryInterpreter
     ) {
         this.graphRagClient = graphRagClient;
         this.resultMerger = resultMerger;
         this.properties = properties;
+        this.queryInterpreter = queryInterpreter;
     }
 
     public SseEmitter processAsk(AskRequest request, String correlationId) {
@@ -40,10 +44,7 @@ public class SageAskService {
             sendSse(emitter, "status", new SseStatusPayload("Interpreting query…"));
 
             String rawQuery = request.query();
-
-            // Fix: extract technology keywords from input query so Graph RAG receives non-empty tech context instead of empty []
-            List<String> techNeeded = extractTechKeywords(rawQuery);
-            QueryInterpretation interpretation = new QueryInterpretation(rawQuery, techNeeded);
+            QueryInterpretation interpretation = queryInterpreter.interpret(rawQuery, correlationId);
 
             sendSse(emitter, "status", new SseStatusPayload(
                 "Identified problem state and tech context",
@@ -98,7 +99,7 @@ public class SageAskService {
             sendSse(emitter, "result", card);
 
             // Event 6: done {}
-            sendSse(emitter, "done", java.util.Map.of());
+            sendSse(emitter, "done", Map.of());
 
             emitter.complete();
         } catch (Exception e) {
@@ -117,22 +118,6 @@ public class SageAskService {
         }
 
         return emitter;
-    }
-
-    private List<String> extractTechKeywords(String query) {
-        if (query == null || query.isBlank()) return List.of();
-        Set<String> stopWords = Set.of(
-            "how", "did", "we", "solve", "in", "of", "a", "an", "the", "for", "to",
-            "is", "on", "at", "by", "with", "from", "and", "or", "what", "which", "are", "do", "does", "implementation"
-        );
-        String[] tokens = query.split("[^a-zA-Z0-9+#]+");
-        List<String> keywords = new ArrayList<>();
-        for (String token : tokens) {
-            if (token.length() > 1 && !stopWords.contains(token.toLowerCase())) {
-                keywords.add(token);
-            }
-        }
-        return keywords;
     }
 
     private void sendSse(SseEmitter emitter, String eventName, Object data) throws IOException {

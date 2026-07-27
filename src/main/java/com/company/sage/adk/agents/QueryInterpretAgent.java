@@ -15,6 +15,9 @@ public final class QueryInterpretAgent {
           "problemStatement": "<one sentence: what problem is being solved in organisational context>",
           "techNeeded": ["<technology or pattern 1>", "..."]
         }
+        Rules:
+        - problemStatement must paraphrase the question as an organisational problem. Do NOT copy the question verbatim.
+        - techNeeded must list real technologies, tools, or patterns. Do NOT put generic English words from the question (e.g. "prevent", "how", "data", "loss").
         Do not add Markdown formatting, code blocks, or extra text outside the JSON. Output ONLY the JSON object.
         """;
 
