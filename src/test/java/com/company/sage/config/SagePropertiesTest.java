@@ -23,6 +23,7 @@ class SagePropertiesTest {
         assertThat(sageProperties.adk().llm()).isNotNull();
         assertThat(sageProperties.adk().llm().baseUrl()).isEqualTo("http://localhost:11434");
         assertThat(sageProperties.adk().llm().modelName()).isEqualTo("llama3.2");
+        assertThat(sageProperties.adk().llm().temperature()).isEqualTo(0.0);
 
         assertThat(sageProperties.retrieval()).isNotNull();
         assertThat(sageProperties.retrieval().topK()).isEqualTo(5);
@@ -32,6 +33,6 @@ class SagePropertiesTest {
         assertThat(sageProperties.scoring().w1()).isEqualTo(0.6);
         assertThat(sageProperties.scoring().w2()).isEqualTo(0.4);
         assertThat(sageProperties.scoring().dualMatchBoost()).isEqualTo(0.1);
-        assertThat(sageProperties.scoring().minScore()).isEqualTo(0.60);
+        assertThat(sageProperties.scoring().minScore()).isEqualTo(0.40);
     }
 }

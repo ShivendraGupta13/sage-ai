@@ -16,11 +16,20 @@ public class LlmConfig {
         String baseUrl = properties.adk().llm().baseUrl();
         String modelName = properties.adk().llm().modelName();
 
-        OllamaChatModel ollamaChatModel = OllamaChatModel.builder()
+        Double temp = (properties.adk() != null && properties.adk().llm() != null)
+            ? properties.adk().llm().temperature()
+            : null;
+
+        OllamaChatModel.OllamaChatModelBuilder builder = OllamaChatModel.builder()
             .baseUrl(baseUrl)
             .modelName(modelName)
-            .timeout(Duration.ofSeconds(60))
-            .build();
+            .timeout(Duration.ofSeconds(60));
+
+        if (temp != null) {
+            builder.temperature(temp);
+        }
+
+        OllamaChatModel ollamaChatModel = builder.build();
 
         return LangChain4j.builder()
             .chatModel(ollamaChatModel)

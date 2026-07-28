@@ -40,7 +40,7 @@ class SageAskServiceTest {
     void setUp() {
         SageProperties properties = new SageProperties(
             new SageProperties.GraphRag("http://localhost:8000"),
-            new SageProperties.Adk(new SageProperties.Adk.Llm("http://localhost:11434", "llama3.2")),
+            new SageProperties.Adk(new SageProperties.Adk.Llm("http://localhost:11434", "llama3.2", 0.0)),
             new SageProperties.Retrieval(5, 0.60),
             new SageProperties.Scoring(0.6, 0.4, 0.1, 0.35)
         );

@@ -12,7 +12,7 @@ public record SageProperties(
     public record GraphRag(String baseUrl) {}
 
     public record Adk(Llm llm) {
-        public record Llm(String baseUrl, String modelName) {}
+        public record Llm(String baseUrl, String modelName, Double temperature) {}
     }
 
     public record Retrieval(int topK, double minScore) {}
