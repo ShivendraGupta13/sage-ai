@@ -28,19 +28,33 @@ class QueryInterpretAgentTest {
     @Test
     void instructionShouldHandleRawQueriesAndIncludeEcosystemPeers() {
         assertThat(QueryInterpretAgent.INSTRUCTION)
+            // Input flexibility
             .contains("any form of input")
             .contains("keyword phrase")
             .contains("raw problem fragment")
-            .contains("2-3 sentences")
-            .contains("engineering problem")
-            .contains("technical goal")
-            .contains("ecosystem peer or alternative")
+            // CRITICAL blocks
+            .contains("CRITICAL (Output format)")
+            .contains("CRITICAL (No solutions)")
+            .contains("never the solution")
+            .contains("<generated_problem_statement>")
+            // Example of wrong/correct output
+            .contains("Example of WRONG output")
+            .contains("Example of CORRECT output")
+            // problemStatement structure
+            .contains("Sentence 1")
+            .contains("Sentence 2")
+            .contains("Sentence 3")
+            .contains("prior work, implementations, or decisions made within the organization")
+            // techNeeded rules
+            .contains("ecosystem peers or alternatives")
             .contains("Kafka → Pulsar, Kinesis")
             .contains("Elasticsearch → OpenSearch, Solr")
             .contains("Kubernetes → ECS, Nomad")
-            .contains("no English words, verbs, or adjectives")
-            .contains("prior work, implementations, or decisions made within the organization")
-            .contains("how did we")
+            .contains("Do not invent unrelated technologies")
+            .contains("leave the array empty")
+            .contains("Parallel Unit Testing")
+            .contains("Blue-Green Deployment")
+            // Obsolete strings must not appear
             .doesNotContain("Prefer an empty array over a guess")
             .doesNotContain("Q: How do we stream");
     }
