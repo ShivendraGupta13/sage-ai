@@ -26,18 +26,23 @@ class QueryInterpretAgentTest {
     }
 
     @Test
-    void instructionShouldRequireExtractOnlyTechNeeded() {
+    void instructionShouldHandleRawQueriesAndIncludeEcosystemPeers() {
         assertThat(QueryInterpretAgent.INSTRUCTION)
-            .contains("Technology-node")
-            .contains("explicitly named")
-            .contains("Prefer an empty array over a guess")
-            .contains("Do NOT add companion or \"implied\" stack")
-            .contains("Q: How do we stream Postgres changes into Kafka without dual writes?")
-            .contains("\"techNeeded\":[\"PostgreSQL\",\"Kafka\"]")
-            .contains("Q: How to use Elastic Search.")
-            .doesNotContain("clearly implied")
-            .doesNotContain("Debezium")
-            .doesNotContain("EBS");
+            .contains("any form of input")
+            .contains("keyword phrase")
+            .contains("raw problem fragment")
+            .contains("2-3 sentences")
+            .contains("engineering problem")
+            .contains("technical goal")
+            .contains("ecosystem peer or alternative")
+            .contains("Kafka → Pulsar, Kinesis")
+            .contains("Elasticsearch → OpenSearch, Solr")
+            .contains("Kubernetes → ECS, Nomad")
+            .contains("no English words, verbs, or adjectives")
+            .contains("prior work, implementations, or decisions made within the organization")
+            .contains("how did we")
+            .doesNotContain("Prefer an empty array over a guess")
+            .doesNotContain("Q: How do we stream");
     }
 
     @Test
