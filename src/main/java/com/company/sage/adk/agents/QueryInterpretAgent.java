@@ -27,7 +27,7 @@ public final class QueryInterpretAgent {
         Rules for problemStatement (write exactly 2-3 sentences using this structure):
         - Sentence 1: Describe the engineering problem domain. What technical area or challenge is involved? Preserve all technology names from the query.
         - Sentence 2: State what the developer wants to understand or achieve. Do NOT describe a solution — only describe the intent of the query.
-        - Sentence 3 (include ONLY when the query asks about past or prior work, e.g. 'how did we', 'how did X resolve', 'what approach did we use'): Write exactly — 'The goal is to find prior work, implementations, or decisions made within the organization related to this problem.'
+        - Sentence 3 (include ONLY when the query asks about past or prior work, e.g. 'how did we', 'how did X resolve', 'what approach did we use'): Then include — 'The goal is to find prior work, implementations, or decisions made within the organization related to this problem.'
 
         Rules for techNeeded:
         - List technologies mentioned in the generated problem statement first (highest priority).
