@@ -23,6 +23,7 @@ public class LlmConfig {
         OllamaChatModel.OllamaChatModelBuilder builder = OllamaChatModel.builder()
             .baseUrl(baseUrl)
             .modelName(modelName)
+            .maxRetries(0)
             .timeout(Duration.ofSeconds(60));
 
         if (temp != null) {
