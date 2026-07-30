@@ -7,11 +7,13 @@ services:
     container_name: ollama
     ports:
       - "11434:11434"
+    environment:
+      - OLLAMA_KEEP_ALIVE=-1
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
 
-  # 2. Automatically pulls the llama3.1:8b model once the Ollama container starts
+  # 2. Automatically pulls the llama3.2 model once the Ollama container starts
   ollama-pull:
     image: ollama/ollama:latest
     container_name: ollama-pull
@@ -25,7 +27,7 @@ services:
     command:
       - |
         echo "Waiting for Ollama daemon at http://ollama:11434 to start..."
-        until ollama pull llama3.1:8b; do
+        until ollama pull llama3.2:latest; do
           sleep 2
         done
         echo "Model pulled successfully!"
@@ -39,10 +41,18 @@ services:
     container_name: sage-java-app
     ports:
       - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
       - SAGE_GRAPH_RAG_BASE_URL=http://host.docker.internal:8000  # Points to the host where Python service would run if started, fail-softs if down
-      - SAGE_LLM_MODEL=llama3.1:8b
+      - SAGE_LLM_MODEL=llama3.2:latest
+      - OTEL_SERVICE_NAME=sage-ai
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4317
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=none
+      - OTEL_LOGS_EXPORTER=none
     depends_on:
       - ollama
       - ollama-pull

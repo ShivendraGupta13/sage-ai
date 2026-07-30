@@ -10,12 +10,12 @@ import java.time.Duration;
 @Configuration
 public class ClientConfig {
 
-    // Post-review enhancement: Configured explicit connect (3s) and read (5s) timeouts for HTTP resiliency
+    // Post-review enhancement: Configured explicit connect (5s) and read (30s) timeouts for HTTP resiliency
     @Bean
     public RestClient.Builder restClientBuilder() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(3));
-        requestFactory.setReadTimeout(Duration.ofSeconds(5));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(5));
+        requestFactory.setReadTimeout(Duration.ofSeconds(30));
 
         return RestClient.builder()
             .requestFactory(requestFactory);

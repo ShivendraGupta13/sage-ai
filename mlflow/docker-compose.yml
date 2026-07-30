@@ -95,6 +95,19 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # ── 3b. Auto-create Experiment in MLflow ────────────────────────────────────
+  create-experiment:
+    image: curlimages/curl:latest
+    container_name: mlflow-create-experiment
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      curl -s -X POST http://mlflow:5000/api/2.0/mlflow/experiments/create -H 'Content-Type: application/json' -d '{\"name\": \"sage-ai-agent-evaluation\"}' || true;
+      exit 0;
+      "
+
   # ── 4. OpenTelemetry Collector ────────────────────────────────────────────────
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -108,6 +121,8 @@ services:
     depends_on:
       mlflow:
         condition: service_healthy
+      create-experiment:
+        condition: service_completed_successfully
     restart: unless-stopped
 
 volumes:

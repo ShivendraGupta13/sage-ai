@@ -30,10 +30,8 @@ uvicorn app.main:app --reload --port 8000
 ### 3. Java Sage service (`:8080`)
 
 ```bash
-# Required for LLM query interpretation (without it, /ask falls back to the raw query)
-ollama serve && ollama pull llama3.2
-
-./mvnw spring-boot:run
+# Start Ollama and Java App in Docker
+docker-compose up --build -d
 ```
 
 Base URL for Graph RAG (default): `SAGE_GRAPH_RAG_BASE_URL=http://localhost:8000`
@@ -107,14 +105,9 @@ This suite evaluates Happy Paths, specific technical queries, and out-of-domain 
 
 3. **Live User Prompt Telemetry (OpenTelemetry Agent):**
    *Prerequisite: Ensure that the Python Graph RAG service (port 8000) is running.*
-   To stream live user prompts (`POST /ask` from Postman, Web UI, or cURL) into MLflow's **Traces** tab:
-   ```powershell
-   # Windows PowerShell:
-   .\scripts\run_sage_with_otel.ps1
-
-   # macOS / Linux:
-   ./scripts/run_sage_with_otel.sh
-   ```
+   The Java application is automatically instrumented with the OpenTelemetry Java Agent via its Docker container. 
+   When you run `docker-compose up -d` (from the project root), live user prompts (`POST /ask`) stream automatically to MLflow's **Traces** tab.
+   
    Open `http://localhost:5000` and select the **Traces** tab to view live, interactive visual waterfall span trees (`POST /ask` -> `QueryInterpreter` -> `GraphRagClient` -> `Ollama`).
    
    **Custom Span Attributes Tracked:**
