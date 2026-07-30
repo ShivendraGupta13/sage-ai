@@ -8,6 +8,7 @@ import com.google.adk.models.LlmRequest;
 import com.google.adk.models.LlmResponse;
 import com.google.genai.types.Content;
 import com.google.genai.types.Part;
+import com.company.sage.util.OtelSpanHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,11 @@ public class QueryInterpreter {
      * On blank input, LLM failure, or unparsable output: falls back to raw query and empty techNeeded.
      */
     public QueryInterpretation interpret(String rawQuery, String correlationId) {
+        OtelSpanHelper.setAttribute("sage.correlation_id", correlationId);
+        OtelSpanHelper.setAttribute("rag.query", rawQuery);
+        OtelSpanHelper.setAttribute("gen_ai.system", "ollama");
+        OtelSpanHelper.setAttribute("gen_ai.request.model", "llama3.2:latest");
+
         if (rawQuery == null || rawQuery.isBlank()) {
             return new QueryInterpretation("", List.of());
         }

@@ -56,6 +56,20 @@ public class SpringChatController {
                 .body(error);
         }
 
+        // Enrich the ACTIVE HTTP Root Span directly at controller entry before SseEmitter async dispatch
+        String rawQuery = request.query();
+        String formattedInput = String.format("{\"query\":\"%s\"}", rawQuery.replace("\"", "\\\"").replace("\n", " "));
+        com.company.sage.util.OtelSpanHelper.setAttribute("mlflow.trace.inputs", formattedInput);
+        com.company.sage.util.OtelSpanHelper.setAttribute("input.value", rawQuery);
+        com.company.sage.util.OtelSpanHelper.setAttribute("gen_ai.prompt", rawQuery);
+        com.company.sage.util.OtelSpanHelper.setAttribute("session.id", correlationId);
+        com.company.sage.util.OtelSpanHelper.setAttribute("user.id", "developer");
+        com.company.sage.util.OtelSpanHelper.setAttribute("service.version", "0.0.1-SNAPSHOT");
+
+        String commitHash = com.company.sage.util.GitUtil.getCommitHash();
+        com.company.sage.util.OtelSpanHelper.setAttribute("git.commit", commitHash);
+        com.company.sage.util.OtelSpanHelper.setAttribute("mlflow.source.git.commit", commitHash);
+
         SseEmitter emitter = askService.processAsk(request, correlationId);
 
         // Post-review enhancement: Pass X-Correlation-Id header back on successful HTTP 200 response for client tracking

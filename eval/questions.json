@@ -1,0 +1,30 @@
+[
+  {
+    "id": "q1",
+    "question": "How did we solve the slow build pipeline in the CI system?"
+  },
+  {
+    "id": "q2",
+    "question": "What approach did we use for rate limiting in the API gateway?"
+  },
+  {
+    "id": "q3",
+    "question": "How was the database connection pooling issue resolved in the Java service?"
+  },
+  {
+    "id": "q4",
+    "question": "What is the pattern used for distributed tracing across microservices?"
+  },
+  {
+    "id": "q5",
+    "question": "How did we implement cache invalidation for the product catalog?"
+  },
+  {
+    "id": "q6",
+    "question": "What solution was used to handle memory leaks in the Node.js frontend?"
+  },
+  {
+    "id": "q7",
+    "question": "How was the authentication token refresh mechanism implemented?"
+  }
+]

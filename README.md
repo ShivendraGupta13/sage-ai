@@ -88,6 +88,49 @@ Evaluations are run using [Promptfoo](https://promptfoo.dev) against the active 
    ```
 This suite evaluates Happy Paths, specific technical queries, and out-of-domain boundaries (asserting `gapFlag=true` and candidate Hard Problem notifications).
 
+### MLflow Experiment Tracking & Evaluation Harness
+
+1. **Start the MLflow Tracking Server & OpenTelemetry Stack:**
+   ```bash
+   cd mlflow
+   cp .env.example .env     # review defaults if needed
+   docker compose up -d     # starts postgres + rustfs (S3) + mlflow-server (v3.14.0) + otel-collector (port 4317)
+   ```
+   *UI available at:* `http://localhost:5000`
+
+2. **Run Batch Evaluation Harness:**
+   ```bash
+   # From project root:
+   eval\.venv\Scripts\python.exe eval\sage_eval.py [--top-k 5] [--questions eval/questions.json]
+   ```
+   *Features logged:* Parameters (`llm_model`, `git_commit`, `retrieval_top_k`, `scoring_w1`/`w2`), Step Metrics (`e2e_latency_s`, `llm_latency_s`, `retrieval_latency_s`, `input_tokens`, `output_tokens`, `tokens_per_sec`), Aggregates (`success_rate`, `gap_rate`, `p50_latency_s`, `p95_latency_s`), and downloadable Artifacts (`eval_results.json`, `sage_config_snapshot.json`).
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 099eca3 (feat: implement SageAskService with MLflow/OpenTelemetry integration for RAG tracing and metadata capture)
+3. **Live User Prompt Telemetry (OpenTelemetry Agent):**
+   *Prerequisite: Ensure that the Python Graph RAG service (port 8000) is running.*
+   To stream live user prompts (`POST /ask` from Postman, Web UI, or cURL) into MLflow's **Traces** tab:
+   ```powershell
+   # Windows PowerShell:
+   .\scripts\run_sage_with_otel.ps1
+
+   # macOS / Linux:
+   ./scripts/run_sage_with_otel.sh
+   ```
+   Open `http://localhost:5000` and select the **Traces** tab to view live, interactive visual waterfall span trees (`POST /ask` -> `QueryInterpreter` -> `GraphRagClient` -> `Ollama`).
+   
+   **Custom Span Attributes Tracked:**
+   - **GenAI / LLM Attributes:** `gen_ai.system` (`ollama`), `gen_ai.request.model` (`llama3.2:latest`), `gen_ai.usage.input_tokens`, `gen_ai.usage.output_tokens`, `gen_ai.usage.total_tokens`
+   - **RAG / Knowledge Base Attributes:** `rag.query`, `rag.num_results`, `rag.gap_flag`
+   - **System Metadata Attributes:** `sage.correlation_id`, `sage.problem_statement`, `sage.tech_needed`
+
+<<<<<<< HEAD
+=======
+>>>>>>> 28f3b25 (feat(mlflow): integrate experiment tracking, sse timing, and eval harness)
+=======
+>>>>>>> 099eca3 (feat: implement SageAskService with MLflow/OpenTelemetry integration for RAG tracing and metadata capture)
 ---
 
 ## Configuration Properties
