@@ -15,7 +15,6 @@ exporters:
   otlp_http/mlflow:
     traces_endpoint: "http://mlflow:5000/v1/traces"
     headers:
-      "Host": "localhost:5000"
       "x-mlflow-experiment-id": "1"
     encoding: json
     compression: none
