@@ -25,17 +25,21 @@ public class SageAskService {
     private final ResultMerger resultMerger;
     private final SageProperties properties;
     private final QueryInterpreter queryInterpreter;
+    private final com.company.sage.eval.JudgeService judgeService;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public SageAskService(
         GraphRagClient graphRagClient,
         ResultMerger resultMerger,
         SageProperties properties,
-        QueryInterpreter queryInterpreter
+        QueryInterpreter queryInterpreter,
+        com.company.sage.eval.JudgeService judgeService
     ) {
         this.graphRagClient = graphRagClient;
         this.resultMerger = resultMerger;
         this.properties = properties;
         this.queryInterpreter = queryInterpreter;
+        this.judgeService = judgeService;
     }
 
     public SseEmitter processAsk(AskRequest request, String correlationId) {
@@ -184,10 +188,24 @@ public class SageAskService {
                 log.warn("Fail-soft: failed to emit timing SSE event for correlationId {}: {}", correlationId, ex.getMessage());
             }
 
-            // Event 7: done {}
-            sendSse(emitter, "done", java.util.Map.of());
-
-            emitter.complete();
+            // Trigger background LLM-as-a-Judge evaluation asynchronously (zero impact on user latency)
+            if (judgeService != null) {
+                io.opentelemetry.api.trace.Span currentSpan = io.opentelemetry.api.trace.Span.current();
+                judgeService.evaluateAsync(rawQuery, directAnswer, mergedResults, correlationId, currentSpan)
+                    .thenRun(() -> {
+                        try {
+                            // Event 7: done {}
+                            sendSse(emitter, "done", java.util.Map.of());
+                            emitter.complete();
+                        } catch (Exception ex) {
+                            log.warn("Fail-soft: failed to complete emitter after judge: {}", ex.getMessage());
+                        }
+                    });
+            } else {
+                // Event 7: done {}
+                sendSse(emitter, "done", java.util.Map.of());
+                emitter.complete();
+            }
         } catch (Exception e) {
             log.error("Error processing ask request for correlationId {}: {}", correlationId, e.getMessage(), e);
             try {

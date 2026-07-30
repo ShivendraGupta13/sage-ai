@@ -44,7 +44,7 @@ class SageAskServiceTest {
             new SageProperties.Retrieval(5, 0.60),
             new SageProperties.Scoring(0.6, 0.4, 0.1, 0.35)
         );
-        askService = new SageAskService(graphRagClient, resultMerger, properties, queryInterpreter);
+        askService = new SageAskService(graphRagClient, resultMerger, properties, queryInterpreter, null);
     }
 
     @Test

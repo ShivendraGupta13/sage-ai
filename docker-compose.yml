@@ -13,7 +13,7 @@ services:
       - ollama_data:/root/.ollama
     restart: unless-stopped
 
-  # 2. Automatically pulls the llama3.2 model once the Ollama container starts
+  # 2. Automatically pulls the llama3.2:latest model once the Ollama container starts
   ollama-pull:
     image: ollama/ollama:latest
     container_name: ollama-pull

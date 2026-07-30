@@ -674,4 +674,124 @@ Populate MLflow's Summary tab (`Inputs`, `Outputs`), Top-level Cards (Request, R
 - [ ] Top cards (Request, Response, Session, User, Version) fully populated
 - [ ] `./mvnw test` green (all 48 tests pass)
 
+---
 
+## Phase 7 — Automated LLM-as-a-Judge Evaluation Harness
+
+Implement automated **LLM-as-a-Judge** scoring (`Faithfulness` and `Answer Relevance`) in `eval/sage_eval.py` using local Ollama (`llama3.2:latest`) via MLflow's GenAI evaluation metrics.
+
+---
+
+## Task 17: Update Evaluation Dependencies for LLM-as-a-Judge
+
+**Description:** Add `openai` and `pandas` dependencies to `eval/requirements.txt` to enable MLflow's GenAI evaluation engine (`mlflow.evaluate()`).
+
+**Acceptance criteria:**
+- [ ] `openai` and `pandas` added to `eval/requirements.txt`
+- [ ] `pip install -r eval/requirements.txt` completes cleanly
+
+**Files likely touched:**
+- `eval/requirements.txt` [MODIFY]
+
+**Estimated scope:** XS
+
+---
+
+## Task 18: Configure Ollama OpenAI-Compatible Endpoint in `sage_eval.py`
+
+**Description:** Configure environment variables (`OPENAI_API_BASE="http://localhost:11434/v1"`, `OPENAI_API_KEY="ollama"`) in `eval/sage_eval.py` to route MLflow's evaluator to local Ollama.
+
+**Acceptance criteria:**
+- [ ] `OPENAI_API_BASE` and `OPENAI_API_KEY` set in `eval/sage_eval.py`
+- [ ] Test script confirms local Ollama responds to OpenAI client calls
+
+**Files likely touched:**
+- `eval/sage_eval.py` [MODIFY]
+
+**Estimated scope:** S
+
+---
+
+## Task 19: Extract Context Chunks from SSE Response in `sage_eval.py`
+
+**Description:** Update `_parse_sse_stream()` in `eval/sage_eval.py` to extract retrieved document chunks (`context`) from the `result` event payload.
+
+**Acceptance criteria:**
+- [ ] `_parse_sse_stream()` captures retrieved search results (`context`)
+- [ ] Context payload is included in the evaluation data dict
+
+**Files likely touched:**
+- `eval/sage_eval.py` [MODIFY]
+
+**Estimated scope:** S
+
+---
+
+## Task 20: Integrate `mlflow.metrics.genai` & Async Batch Judge Runner into `sage_eval.py`
+
+**Description:** Implement the asynchronous/batch evaluation execution loop in `sage_eval.py`. The harness runs as an out-of-process evaluation runner that asynchronously/batch sends questions to Sage AI (`POST /ask`), collects answers & retrieved context, and invokes local Ollama (`llama3.2:latest`) as an automated Judge LLM via `mlflow.evaluate()` to judge results (`Faithfulness` & `Answer Relevance`).
+
+**Acceptance criteria:**
+- [ ] Async batch evaluation loop executes questions without blocking live user requests
+- [ ] `mlflow.evaluate()` calculates 1-5 quality scores for Faithfulness and Relevance
+- [ ] Judge scores are logged to the active MLflow run and viewable in MLflow UI (`http://localhost:5000`)
+
+**Files likely touched:**
+- `eval/sage_eval.py` [MODIFY]
+
+**Estimated scope:** M
+
+---
+
+## Task 21: Update Artifacts & Documentation
+
+**Description:** Output judge metric scores (`faithfulness_score`, `answer_relevance_score`) in `eval_results.json` and update `README.md` with LLM-as-a-Judge execution steps.
+
+**Acceptance criteria:**
+- [ ] `eval_results.json` includes judge metric scores
+- [ ] `README.md` documents LLM-as-a-Judge evaluation instructions
+
+**Files likely touched:**
+- `eval/sage_eval.py` [MODIFY]
+- `README.md` [MODIFY]
+- `tasks/mlflow-integration-plan.md` [MODIFY]
+- `tasks/mlflow-integration-todo.md` [MODIFY]
+
+**Estimated scope:** S
+
+---
+
+## Checkpoint 7: Phase 7 Complete
+- [x] Faithfulness & Relevance computed per-request asynchronously via JudgeService.java
+- [x] Judge scores logged as OTel span attributes
+- [x] Scores visible in MLflow Traces tab on every live request
+
+---
+
+## Phase 8: Extended Evaluation Metrics (RAG Quality Suite)
+
+Integrate expanded RAG quality metrics into the real-time JudgeService to match industry standards.
+
+### Scoring Scale Explanation
+- **1 to 5 Scale** (`faithfulness`, `relevance`, `context_precision`, `completeness`):
+  - **1**: Completely failed / Terrible
+  - **3**: Average / Acceptable (This is the fail-soft default)
+  - **5**: Perfect / Excellent
+- **Binary Scale** (`hallucination`):
+  - **0**: No hallucination detected (Good)
+  - **1**: Hallucination detected (Bad)
+
+### Task 22: Context Precision Score (`eval.context_precision`)
+**Description:** Evaluate if the retrieved chunks were useful or mostly noise. Graded on 1-5 scale.
+
+### Task 23: Hallucination Flag (`eval.hallucination`)
+**Description:** Binary flag (0 or 1) indicating if the answer contains claims not supported by the retrieved context.
+
+### Task 24: Completeness Score (`eval.completeness`)
+**Description:** Evaluate if the answer fully addressed all parts of the user's query. Graded on 1-5 scale.
+
+### Task 25: Update Unit Tests
+**Description:** Update `JudgeServiceTest.java` to mock and assert all 5 metrics.
+
+### Checkpoint 8: Phase 8 Complete
+- [ ] All 5 metrics computed in a single LLM call and logged to MLflow Traces.

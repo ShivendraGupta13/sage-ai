@@ -221,3 +221,69 @@ Source of truth: tasks/mlflow-integration-plan.md | SPEC: docs/SPEC.md §MLflow 
 ### Checkpoint 6 — PHASE 6 COMPLETE
 - [x] Dynamic Git commit metadata working
 - [x] Prompt and Git Commit columns populated in MLflow UI
+
+---
+
+## Phase 7 — Automated LLM-as-a-Judge Evaluation Harness
+
+- [ ] **T17** Update Evaluation Dependencies for LLM-as-a-Judge
+  - [ ] Add `openai` and `pandas` dependencies to `eval/requirements.txt`
+  - [ ] Verify `pip install -r eval/requirements.txt` completes cleanly
+  - Scope: XS | Files: `eval/requirements.txt` [MODIFY]
+
+- [ ] **T18** Configure Ollama OpenAI-Compatible Endpoint in `sage_eval.py`
+  - [ ] Set `OPENAI_API_BASE="http://localhost:11434/v1"` and `OPENAI_API_KEY="ollama"` in `eval/sage_eval.py`
+  - [ ] Verify local Ollama responds to OpenAI client calls
+  - Scope: S | Files: `eval/sage_eval.py` [MODIFY]
+
+- [ ] **T19** Extract Context Chunks from SSE Response in `sage_eval.py`
+  - [ ] Update `_parse_sse_stream()` in `eval/sage_eval.py` to extract retrieved context chunks
+  - [ ] Include context payload in evaluation data dict
+  - Scope: S | Files: `eval/sage_eval.py` [MODIFY]
+
+- [ ] **T20** Integrate `mlflow.metrics.genai` & Async Batch Judge Runner into `sage_eval.py`
+  - [ ] Configure `faithfulness` and `answer_relevance` metrics with `model="openai:/llama3.2:latest"`
+  - [ ] Execute async/batch evaluation loop against Sage AI (`POST /ask`) and collect answers + context
+  - [ ] Invoke `mlflow.evaluate()` with Pandas DataFrame to judge results and log 1-5 quality scores to MLflow UI
+  - Scope: M | Files: `eval/sage_eval.py` [MODIFY]
+
+- [ ] **T21** Update Artifacts & Documentation
+  - [ ] Output judge scores in `eval_results.json`
+  - [ ] Update `README.md` with LLM-as-a-Judge execution steps
+  - Scope: S | Files: `eval/sage_eval.py` [MODIFY], `README.md` [MODIFY]
+
+### Checkpoint 7 — PHASE 7 COMPLETE
+- [x] Faithfulness & Relevance computed per-request asynchronously via JudgeService.java
+- [x] Judge scores logged as OTel span attributes (`eval.faithfulness`, `eval.relevance`)
+- [x] Scores visible in MLflow Traces tab on every live request
+
+---
+
+## Phase 8 — Extended Evaluation Metrics (RAG Quality Suite)
+
+> Industry standard: Context Precision + Hallucination + Completeness must be tracked alongside Faithfulness & Relevance for production RAG systems.
+
+- [x] **T22** Context Precision Score (`eval.context_precision`)
+  - [x] Single expanded judge prompt returns context_precision score (1-5)
+  - [x] Measures: were the retrieved chunks actually useful or noisy?
+  - Scope: S | Files: `src/main/java/com/company/sage/eval/JudgeService.java` [MODIFY]
+
+- [x] **T23** Hallucination Flag (`eval.hallucination`)
+  - [x] Binary 0/1 — did the answer contain claims not supported by retrieved context?
+  - [x] Included in same single LLM judge call (no extra latency)
+  - Scope: S | Files: `src/main/java/com/company/sage/eval/JudgeService.java` [MODIFY]
+
+- [x] **T24** Completeness Score (`eval.completeness`)
+  - [x] Score 1-5 — did the answer fully address all parts of the query?
+  - [x] Included in same single LLM judge call (no extra latency)
+  - Scope: S | Files: `src/main/java/com/company/sage/eval/JudgeService.java` [MODIFY]
+
+- [ ] **T25** Update Unit Tests for Extended Metrics
+  - [ ] Update `JudgeServiceTest.java` to assert all 5 metric keys in judge JSON
+  - Scope: S | Files: `src/test/java/com/company/sage/eval/JudgeServiceTest.java` [MODIFY]
+
+### Checkpoint 8 — PHASE 8 COMPLETE
+- [ ] All 5 metrics logged per request: `eval.faithfulness`, `eval.relevance`, `eval.context_precision`, `eval.hallucination`, `eval.completeness`
+- [ ] Single LLM judge call computes all 5 metrics (no extra latency overhead)
+- [ ] All metrics visible in MLflow Traces tab span attributes
+- [ ] Unit tests passing for all 5 metrics
