@@ -24,7 +24,7 @@ public class LlmConfig {
             .baseUrl(baseUrl)
             .modelName(modelName)
             .maxRetries(0)
-            .timeout(Duration.ofSeconds(60));
+            .timeout(Duration.ofSeconds(180));
 
         if (temp != null) {
             builder.temperature(temp);
