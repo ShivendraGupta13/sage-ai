@@ -26,18 +26,37 @@ class QueryInterpretAgentTest {
     }
 
     @Test
-    void instructionShouldRequireExtractOnlyTechNeeded() {
+    void instructionShouldHandleRawQueriesAndIncludeEcosystemPeers() {
         assertThat(QueryInterpretAgent.INSTRUCTION)
-            .contains("Technology-node")
-            .contains("explicitly named")
-            .contains("Prefer an empty array over a guess")
-            .contains("Do NOT add companion or \"implied\" stack")
-            .contains("Q: How do we stream Postgres changes into Kafka without dual writes?")
-            .contains("\"techNeeded\":[\"PostgreSQL\",\"Kafka\"]")
-            .contains("Q: How to use Elastic Search.")
-            .doesNotContain("clearly implied")
-            .doesNotContain("Debezium")
-            .doesNotContain("EBS");
+            // Input flexibility
+            .contains("any form of input")
+            .contains("keyword phrase")
+            .contains("raw problem fragment")
+            // CRITICAL blocks
+            .contains("CRITICAL (Output format)")
+            .contains("CRITICAL (No solutions)")
+            .contains("never the solution")
+            .contains("<generated_problem_statement>")
+            // Example of wrong/correct output
+            .contains("Example of WRONG output")
+            .contains("Example of CORRECT output")
+            // problemStatement structure
+            .contains("Sentence 1")
+            .contains("Sentence 2")
+            .contains("Sentence 3")
+            .contains("prior work, implementations, or decisions made within the organization")
+            // techNeeded rules
+            .contains("ecosystem peers or alternatives")
+            .contains("Kafka → Pulsar, Kinesis")
+            .contains("Elasticsearch → OpenSearch, Solr")
+            .contains("Kubernetes → ECS, Nomad")
+            .contains("Do not invent unrelated technologies")
+            .contains("leave the array empty")
+            .contains("Parallel Unit Testing")
+            .contains("Blue-Green Deployment")
+            // Obsolete strings must not appear
+            .doesNotContain("Prefer an empty array over a guess")
+            .doesNotContain("Q: How do we stream");
     }
 
     @Test
