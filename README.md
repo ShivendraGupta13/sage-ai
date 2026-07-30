@@ -105,10 +105,6 @@ This suite evaluates Happy Paths, specific technical queries, and out-of-domain 
    ```
    *Features logged:* Parameters (`llm_model`, `git_commit`, `retrieval_top_k`, `scoring_w1`/`w2`), Step Metrics (`e2e_latency_s`, `llm_latency_s`, `retrieval_latency_s`, `input_tokens`, `output_tokens`, `tokens_per_sec`), Aggregates (`success_rate`, `gap_rate`, `p50_latency_s`, `p95_latency_s`), and downloadable Artifacts (`eval_results.json`, `sage_config_snapshot.json`).
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 099eca3 (feat: implement SageAskService with MLflow/OpenTelemetry integration for RAG tracing and metadata capture)
 3. **Live User Prompt Telemetry (OpenTelemetry Agent):**
    *Prerequisite: Ensure that the Python Graph RAG service (port 8000) is running.*
    To stream live user prompts (`POST /ask` from Postman, Web UI, or cURL) into MLflow's **Traces** tab:
@@ -126,11 +122,6 @@ This suite evaluates Happy Paths, specific technical queries, and out-of-domain 
    - **RAG / Knowledge Base Attributes:** `rag.query`, `rag.num_results`, `rag.gap_flag`
    - **System Metadata Attributes:** `sage.correlation_id`, `sage.problem_statement`, `sage.tech_needed`
 
-<<<<<<< HEAD
-=======
->>>>>>> 28f3b25 (feat(mlflow): integrate experiment tracking, sse timing, and eval harness)
-=======
->>>>>>> 099eca3 (feat: implement SageAskService with MLflow/OpenTelemetry integration for RAG tracing and metadata capture)
 ---
 
 ## Configuration Properties
